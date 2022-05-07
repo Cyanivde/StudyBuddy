@@ -1,1 +1,2 @@
-FLASK_APP=tengo.py
+FLASK_APP=app.py
+FLASK_ENV=development
