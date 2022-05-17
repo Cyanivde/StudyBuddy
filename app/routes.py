@@ -49,6 +49,5 @@ def welcome():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a welcomeed user!')
         return redirect(url_for('login'))
     return render_template('welcome.html', title='welcome', form=form)
