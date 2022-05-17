@@ -8,10 +8,11 @@ from app.models import User
 
 
 @app.route('/')
-@app.route('/index')
-@login_required
 def index():
-    return render_template("index.html", title='Home Page')
+    if current_user.is_authenticated:
+        return render_template("index.html", title='Home Page')
+    else:
+        return redirect(url_for('welcome'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -38,8 +39,8 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
+@app.route('/welcome', methods=['GET', 'POST'])
+def welcome():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
@@ -48,6 +49,6 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        flash('Congratulations, you are now a welcomeed user!')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('welcome.html', title='welcome', form=form)
