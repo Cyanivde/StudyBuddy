@@ -1,7 +1,7 @@
 <html>
     <head>
         {% if title %}
-        <title>{{ title }} - Tengo</title>
+        <title>{{ title }}</title>
         {% else %}
         <title>Tengo</title>
         {% endif %}
@@ -17,15 +17,9 @@
             {% endif %}
         </div>
         <hr>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
         {% block content %}{% endblock %}
+        <hr>
+        <a href="https://github.com/Cyanivde/tengo">GitHub</a>
     </body>
 </html>
+
