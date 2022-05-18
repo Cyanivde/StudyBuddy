@@ -10,8 +10,14 @@ ERR_PASSWORD_EMPTY = "Password must not be empty."
 ERR_EMAIL_EMPTY = "Email must not be empty."
 
 
+def strip_whitespace(s):
+    if isinstance(s, str):
+        s = s.strip()
+    return s
+
+
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[
+    username = StringField('Username', filters=[strip_whitespace], validators=[
                            DataRequired(message=ERR_USERNAME_EMPTY)])
     password = PasswordField('Password', validators=[
         DataRequired(message=ERR_PASSWORD_EMPTY)])
@@ -20,10 +26,10 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[
+    username = StringField('Username', filters=[strip_whitespace], validators=[
         DataRequired(message=ERR_USERNAME_EMPTY), Regexp('^\w{5,20}$', message="Username must contain 5-20 letters, numbers or underscore.")])
-    email = StringField('Email', validators=[
-        DataRequired(message=ERR_EMAIL_EMPTY), Email()])
+    email = StringField('Email', filters=[strip_whitespace], validators=[
+        DataRequired(message=ERR_EMAIL_EMPTY),  Email()])
     password = PasswordField('Password', validators=[
         DataRequired(message=ERR_PASSWORD_EMPTY), Regexp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', message="Password must contain 8+ characters, of which at least one letter and one number.")])
     password2 = PasswordField(
