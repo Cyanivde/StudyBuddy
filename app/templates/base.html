@@ -3,12 +3,12 @@
         {% if title %}
         <title>{{ title }}</title>
         {% else %}
-        <title>Tengo</title>
+        <title>Fly</title>
         {% endif %}
     </head>
     <body>
         <div>
-            Tengo:
+            Fly:
             <a href="{{ url_for('index') }}">Home</a>
             {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Login</a>
@@ -19,7 +19,7 @@
         <hr>
         {% block content %}{% endblock %}
         <hr>
-        Tengo is, and will forever be, 100% free and open source. Contribute on <a href="https://github.com/Cyanivde/tengo">GitHub</a>
+        Fly is, and will forever be, 100% free and open source. Contribute on <a href="https://github.com/Cyanivde/fly">GitHub</a>
     </body>
 </html>
 
