@@ -17,31 +17,31 @@ def strip_whitespace(s):
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', filters=[strip_whitespace], validators=[
+    username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
                            DataRequired(message=ERR_USERNAME_EMPTY)])
-    password = PasswordField('Password', validators=[
+    password = PasswordField('סיסמה', validators=[
         DataRequired(message=ERR_PASSWORD_EMPTY)])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    remember_me = BooleanField('זכור אותי')
+    submit = SubmitField('התחברות')
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_USERNAME_EMPTY), Regexp('^\w{5,20}$', message="Username must contain 5-20 letters, numbers or underscore.")])
-    email = StringField('Email', filters=[strip_whitespace], validators=[
+    username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
+        DataRequired(message=ERR_USERNAME_EMPTY), Regexp('^\w{5,20}$', message=".שם המשתמש חייב להכיל 5-20 תווים: אותיות, ספרות או קו תחתון")])
+    email = StringField('כתובת מייל', filters=[strip_whitespace], validators=[
         DataRequired(message=ERR_EMAIL_EMPTY),  Email()])
-    password = PasswordField('Password', validators=[
-        DataRequired(message=ERR_PASSWORD_EMPTY), Regexp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', message="Password must contain 8+ characters, of which at least one letter and one number.")])
+    password = PasswordField('סיסמה', validators=[
+        DataRequired(message=ERR_PASSWORD_EMPTY), Regexp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
     password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(ERR_PASSWORD_EMPTY), EqualTo('password')])
-    submit = SubmitField('Register')
+        'סיסמה', validators=[DataRequired(ERR_PASSWORD_EMPTY), EqualTo('password')])
+    submit = SubmitField('הרשמה')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data.lower()).first()
         if user is not None:
-            raise ValidationError('Username is already in use.')
+            raise ValidationError('שם המשתמש כבר נמצא בשימוש.')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data.lower()).first()
         if user is not None:
-            raise ValidationError('Email address is already in use.')
+            raise ValidationError('כתובת המייל כבר נמצאת בשימוש.')

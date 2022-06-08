@@ -9,10 +9,7 @@ from app.models import User
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        return render_template("index.html", title='Home Page')
-    else:
-        return redirect(url_for('welcome'))
+    return render_template("index.html", title='Home Page')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -40,8 +37,8 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/welcome', methods=['GET', 'POST'])
-def welcome():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
@@ -53,4 +50,4 @@ def welcome():
         db.session.commit()
         login_user(user)
         return redirect(url_for('index'))
-    return render_template('welcome.html', title='welcome', form=form)
+    return render_template('register.html', title='register', form=form)
