@@ -5,9 +5,9 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Re
 
 from app.models import User
 
-ERR_USERNAME_EMPTY = "Username must not be empty."
-ERR_PASSWORD_EMPTY = "Password must not be empty."
-ERR_EMAIL_EMPTY = "Email must not be empty."
+ERR_USERNAME_EMPTY = "לא ניתן להזין שם משתמש ריק."
+ERR_PASSWORD_EMPTY = "לא ניתן להזין סיסמה ריקה."
+ERR_EMAIL_EMPTY = "לא ניתן להזין כתובת מייל ריקה."
 
 
 def strip_whitespace(s):
@@ -33,7 +33,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('סיסמה', validators=[
         DataRequired(message=ERR_PASSWORD_EMPTY), Regexp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
     password2 = PasswordField(
-        'סיסמה', validators=[DataRequired(ERR_PASSWORD_EMPTY), EqualTo('password')])
+        'סיסמה', validators=[DataRequired(ERR_PASSWORD_EMPTY), EqualTo('סיסמה')])
     submit = SubmitField('הרשמה')
 
     def validate_username(self, username):
