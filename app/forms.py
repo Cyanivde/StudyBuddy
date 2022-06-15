@@ -1,6 +1,6 @@
 from curses import ERR
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp, Length
 
 from app.models import User
@@ -14,6 +14,11 @@ def strip_whitespace(s):
     if isinstance(s, str):
         s = s.strip()
     return s
+
+
+class SubjectsForm(FlaskForm):
+    subjects = TextAreaField('עץ הנושאים')
+    submit = SubmitField('שמירה')
 
 
 class LoginForm(FlaskForm):

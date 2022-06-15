@@ -33,6 +33,14 @@ class Post(db.Model):
         return '<Post {}>'.format(self.body)
 
 
+class Subject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(500))
+
+    def __repr__(self):
+        return '<Subject {}>'.format(self.body)
+
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

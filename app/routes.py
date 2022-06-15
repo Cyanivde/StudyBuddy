@@ -1,14 +1,41 @@
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
+from sqlalchemy import all_
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
-from app.models import User
+from app.forms import LoginForm, RegistrationForm, SubjectsForm
+from app.models import User, Subject
 
 
 @app.route('/')
 def index():
+    return render_template("index.html", title='Home Page')
+
+
+@app.route('/subjects', methods=['GET', 'POST'])
+def subjects():
+    all_subjects = Subject.query.all()
+
+    all_subject_names = [subject.name for subject in all_subjects]
+
+    form = SubjectsForm()
+    if form.validate_on_submit():
+        all_subject_names = form.subjects.data.split("\n")
+
+        db.session.query(Subject).delete()
+        for subject_name in all_subject_names:
+            subject = Subject(name=subject_name)
+            db.session.add(subject)
+        db.session.commit()
+        form.subjects.data = "\n".join(all_subject_names)
+        return render_template("subjects.html", title='Home Page', form=form)
+    form.subjects.data = "\n".join(all_subject_names)
+    return render_template("subjects.html", title='Home Page', form=form)
+
+
+@app.route('/upload')
+def upload():
     return render_template("index.html", title='Home Page')
 
 
