@@ -122,7 +122,7 @@ def course(course_id):
     form = CourseResourcesForm()
     if form.validate_on_submit():
         resources = [(line.split(']')[0][-1], ' '.join(line.split(' ')[1:-1])[:-1],
-                      line.split(': ')[-1]) for line in form.resources.data.split('\n')]
+                      line.split(': ')[-1]) for line in form.resources.data.split('\n') if ' ' in line]
 
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
