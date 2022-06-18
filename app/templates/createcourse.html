@@ -5,12 +5,13 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.subjects.label }}<br>
-            {{ form.subjects(rows='22',cols='100')}}<br>
-            {% for error in form.subjects.errors %}
+            {{ form.name.label }}<br>
+            {{ form.name(size=32) }}<br>
+            {% for error in form.name.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        
         <p>{{ form.submit() }}</p>
     </form>
     {%endif%}

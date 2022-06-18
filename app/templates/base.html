@@ -18,15 +18,16 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <form class="d-flex" style="margin-block-end: 0">
-                        <input class="form-control me-2" type="search" placeholder="" aria-label="Search">
+                    <form class="d-flex" style="margin-block-end: 0" action="{{url_for('searchredirection') }}" method="POST" >
+                        <input name="searchbox" class="form-control me-2" type="search" placeholder="" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">חיפוש</button>
                       </form>
-                      <li class="nav-item"><a class="nav-link" href="{{ url_for('subjects') }}">עץ הנושאים</a></li>
-                  <li class="nav-item"><a class="nav-link" href="{{ url_for('upload') }}">העלאת חומר</a></li>
 
-                  {% if current_user.is_anonymous %}
-                    {% else %}
+                      {% if current_user.username == 'yaniv' %}
+                  <li class="nav-item"><a class="nav-link" href="{{ url_for('subjects') }}">עץ הנושאים</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{{ url_for('upload') }}">העלאת חומר</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{{ url_for('createcourse') }}">יצירת קורס</a></li>
+                      
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                           הקורסים שלי
@@ -37,9 +38,11 @@
                           <li><a class="dropdown-item" href="#">קורס 3</a></li>
                         </ul>
                       </li>
-                
+
                     {% endif %}
                 </ul>
+
+                
                 <ul class="navbar-nav">
                   {% if current_user.is_anonymous %}
                   <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">התחברות</a></li>
@@ -53,9 +56,10 @@
               </div>
             </div>
           </nav>
-
+          
+        <div style="margin: 20px">
         {% block content %}{% endblock %}
-        
+        </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     </body>
 </html>

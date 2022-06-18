@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <a href="{{ resource.link }}" target="_blank">קישור</a> 
+    {% if resource.specification %} ({{ resource.specification }}) {%endif%}
+    
+{% endblock %}

@@ -4,25 +4,28 @@ from sqlalchemy import all_
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, SubjectsForm
-from app.models import User, Subject
+from app.forms import LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm
+from app.models import ResourceToCourse, User, Subject, Resource, Course
 
 
 @app.route('/')
 def index():
-    return render_template("index.html", title='Home Page')
+    courses = Course.query.all()
+    return render_template("index.html", title='Home Page', courses=courses)
 
 
 @app.route('/subjects', methods=['GET', 'POST'])
 def subjects():
     all_subjects = Subject.query.all()
-
     all_subject_names = [subject.name for subject in all_subjects]
+    if (all_subject_names is not None):
+        all_subject_names.sort()
 
     form = SubjectsForm()
     if form.validate_on_submit():
         all_subject_names = form.subjects.data.split("\n")
-
+        if (all_subject_names is not None):
+            all_subject_names.sort()
         db.session.query(Subject).delete()
         for subject_name in all_subject_names:
             subject = Subject(name=subject_name)
@@ -34,9 +37,39 @@ def subjects():
     return render_template("subjects.html", title='Home Page', form=form)
 
 
-@app.route('/upload')
+@app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    return render_template("index.html", title='Home Page')
+    all_subjects = Subject.query.all()
+    all_subject_names = [subject.name for subject in all_subjects]
+    if (all_subject_names is not None):
+        all_subject_names.sort()
+
+    form = UploadForm()
+    form.subject.choices = all_subject_names
+
+    if form.validate_on_submit():
+        resource = Resource(link=form.link.data,
+                            specification=form.specification.data,
+                            subject=form.subject.data,
+                            textdump=form.textdump.data.lower())
+        db.session.add(resource)
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    return render_template('upload.html', title='upload', form=form)
+
+
+@app.route('/createcourse', methods=['GET', 'POST'])
+def createcourse():
+    form = CreateCourseForm()
+
+    if form.validate_on_submit():
+        course = Course(name=form.name.data)
+        db.session.add(course)
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    return render_template('createcourse.html', title='createcourse', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -78,3 +111,64 @@ def register():
         login_user(user)
         return redirect(url_for('index'))
     return render_template('register.html', title='register', form=form)
+
+
+@app.route('/course/<course_id>', methods=['GET', 'POST'])
+def course(course_id):
+    course = Course.query.filter_by(id=course_id).first_or_404()
+
+    resources = ResourceToCourse.query.filter_by(course_id=course_id)
+
+    form = CourseResourcesForm()
+    if form.validate_on_submit():
+        resources = [(line.split(']')[0][-1], ' '.join(line.split(' ')[1:-1])[:-1],
+                      line.split(': ')[-1]) for line in form.resources.data.split('\n')]
+
+        db.session.query(ResourceToCourse).filter_by(
+            course_id=course_id).delete()
+        for resource in resources:
+            resource_to_course = ResourceToCourse(
+                course_id=course_id, resource_id=resource[2], description=resource[1], importance=resource[0])
+            db.session.add(resource_to_course)
+        db.session.commit()
+        return render_template('course.html', form=form, course=course, existing_resources=resources)
+    form.resources.data = "\n".join(["[{0}] {1}: {2}".format(
+        resource.importance, resource.description, resource.resource_id) for resource in resources])
+    return render_template('course.html', form=form, course=course, existing_resources=resources)
+
+
+@app.route('/resource/<resource_id>', methods=['GET'])
+def resource(resource_id):
+    resource = Resource.query.filter_by(id=resource_id).first_or_404()
+
+    return render_template('resource.html', resource=resource)
+
+
+@app.route('/search', methods=['POST'])
+def searchredirection():
+    return redirect(url_for('search', query=request.form.get("searchbox", "")))
+
+
+@app.route('/search/<query>', methods=['GET'])
+def search(query):
+    resources = Resource.query.filter(
+        Resource.textdump.contains(query)).all()
+
+    resource_to_occurences = dict()
+
+    for resource in resources:
+        resource_to_occurences[resource.id] = resource.textdump .count(
+            query.lower())
+
+    result_resources = ResourceToCourse.query.filter(
+        ResourceToCourse.resource_id.in_(resource_to_occurences.keys()))
+
+    result_resources_final = []
+
+    for result_resource in result_resources:
+        result_resource.occurrences = resource_to_occurences[result_resource.resource_id]
+        result_resources_final += [result_resource]
+
+    result_resources_final.sort(key=lambda x: x.occurrences, reverse=True)
+
+    return render_template('search.html', query=query, result_resources=result_resources_final)

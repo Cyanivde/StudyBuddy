@@ -1,36 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if current_user.username == 'yaniv' %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
+            {{ form.link.label }}<br>
+            {{ form.link(size=32) }}<br>
+            {% for error in form.link.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}<br>
-            {% for error in form.email.errors %}
+            {{ form.specification.label }}<br>
+            {{ form.specification(size=32) }}<br>
+            {% for error in form.specification.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
+            {{ form.subject.label }}<br>
+            {{ form.subject }}<br>
+            {% for error in form.subject.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.password2.label }}<br>
-            {{ form.password2(size=32) }}<br>
-            {% for error in form.password2.errors %}
+            {{ form.textdump.label }}<br>
+            {{ form.textdump(rows='10',cols='100')}}<br>
+            {% for error in form.textdump.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    {%endif%}
 {% endblock %}

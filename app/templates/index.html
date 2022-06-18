@@ -1,4 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+כל הקורסים:
+<ul>
+{% for course in courses %}
+    <li><a href="{{ url_for('course', course_id=course.id) }}">{{ course.name }}</a></li>
+    {% endfor %}
 {% endblock %}
+</ul>

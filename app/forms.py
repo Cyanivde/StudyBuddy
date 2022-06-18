@@ -1,6 +1,6 @@
 from curses import ERR
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp, Length
 
 from app.models import User
@@ -21,6 +21,24 @@ class SubjectsForm(FlaskForm):
     submit = SubmitField('שמירה')
 
 
+class CreateCourseForm(FlaskForm):
+    name = StringField('שם הקורס')
+    submit = SubmitField('יצירה')
+
+
+class CourseResourcesForm(FlaskForm):
+    resources = TextAreaField('חומרי הקורס')
+    submit = SubmitField('שמירה')
+
+
+class UploadForm(FlaskForm):
+    link = StringField('קישור')
+    specification = StringField('הערת סוגריים')
+    subject = SelectField('נושא', validate_choice=False)
+    textdump = TextAreaField('העתקה של הטקסט')
+    submit = SubmitField('העלאה')
+
+
 class LoginForm(FlaskForm):
     username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
                            DataRequired(message=ERR_USERNAME_EMPTY)])
@@ -31,15 +49,15 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
+    username = StringField('username', filters=[strip_whitespace], validators=[
         DataRequired(message=ERR_USERNAME_EMPTY), Regexp('^\w{5,20}$', message=".שם המשתמש חייב להכיל 5-20 תווים: אותיות, ספרות או קו תחתון")])
-    email = StringField('כתובת מייל', filters=[strip_whitespace], validators=[
+    email = StringField('email', filters=[strip_whitespace], validators=[
         DataRequired(message=ERR_EMAIL_EMPTY),  Email()])
-    password = PasswordField('סיסמה', validators=[
+    password = PasswordField('password', validators=[
         DataRequired(message=ERR_PASSWORD_EMPTY), Regexp('^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
     password2 = PasswordField(
-        'סיסמה', validators=[DataRequired(ERR_PASSWORD_EMPTY), EqualTo('סיסמה')])
-    submit = SubmitField('הרשמה')
+        'confirm password', validators=[DataRequired(ERR_PASSWORD_EMPTY), EqualTo('password')])
+    submit = SubmitField('register')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data.lower()).first()

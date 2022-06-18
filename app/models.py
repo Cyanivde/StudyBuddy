@@ -19,9 +19,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
-
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,16 +26,31 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __repr__(self):
-        return '<Post {}>'.format(self.body)
-
 
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500))
 
-    def __repr__(self):
-        return '<Subject {}>'.format(self.body)
+
+class Resource(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    link = db.Column(db.String(500))
+    specification = db.Column(db.String(140))
+    subject = db.Column(db.String(500))
+    textdump = db.Column(db.Text)
+
+
+class Course(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+
+
+class ResourceToCourse(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer)
+    resource_id = db.Column(db.Integer)
+    description = db.Column(db.String(140))
+    importance = db.Column(db.Integer)
 
 
 @login.user_loader
