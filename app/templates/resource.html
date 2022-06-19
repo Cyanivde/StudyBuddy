@@ -5,4 +5,8 @@
     <a href="{{ resource.link }}" target="_blank">קישור</a> 
     {% if resource.specification %} ({{ resource.specification }}) {%endif%}
     
+    {% if current_user.username == 'yaniv' %}
+    <hr />
+    <a href="{{ url_for('delete', resource_id=resource.id) }}">מחק חומר</a>
+      {%endif%}
 {% endblock %}

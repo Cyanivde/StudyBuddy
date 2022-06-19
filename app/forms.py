@@ -16,6 +16,11 @@ def strip_whitespace(s):
     return s
 
 
+class SearchForm(FlaskForm):
+    query = StringField('שאילתה')
+    submit = SubmitField('חיפוש')
+
+
 class SubjectsForm(FlaskForm):
     subjects = TextAreaField('עץ הנושאים')
     submit = SubmitField('שמירה')

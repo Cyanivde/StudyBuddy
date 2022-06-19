@@ -149,26 +149,62 @@ def searchredirection():
     return redirect(url_for('search', query=request.form.get("searchbox", "")))
 
 
+@app.route('/delete/<resource_id>')
+def delete(resource_id):
+    results = db.session.query(ResourceToCourse).filter_by(
+        resource_id=resource_id)
+    message = "Cannot delete resource, it is linked in courses: "
+    courses_list = []
+    for result in results:
+        courses_list += [result.course_id]
+
+    if (len(courses_list) > 0):
+        return render_template('delete.html', message=message + str(courses_list))
+
+    db.session.query(Resource).filter_by(
+        id=resource_id).delete()
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
 @app.route('/search/<query>', methods=['GET'])
 def search(query):
     resources = Resource.query.filter(
-        Resource.textdump.contains(query)).all()
+        Resource.textdump.contains(query.lower())).all()
 
     resource_to_occurences = dict()
+    resource_to_descriptions = dict()
+    resource_to_link = dict()
 
     for resource in resources:
-        resource_to_occurences[resource.id] = resource.textdump .count(
+        resource_to_occurences[resource.id] = resource.textdump.count(
             query.lower())
+        resource_to_link[resource.id] = resource.link
 
-    result_resources = ResourceToCourse.query.filter(
+    resource_to_course = ResourceToCourse.query.filter(
         ResourceToCourse.resource_id.in_(resource_to_occurences.keys()))
 
-    result_resources_final = []
+    resource_ids_in_course = {
+        result_resource.resource_id: result_resource.description for result_resource in resource_to_course}
 
-    for result_resource in result_resources:
-        result_resource.occurrences = resource_to_occurences[result_resource.resource_id]
-        result_resources_final += [result_resource]
+    for resource_id in resource_to_occurences.keys():
+        if resource_id in resource_ids_in_course:
+            resource_to_descriptions[resource_id] = resource_ids_in_course[resource_id]
+        else:
+            resource_to_descriptions[resource_id] = resource_to_link[resource_id]
+
+    result_resources_final = []
+    for resource_id in resource_to_occurences.keys():
+        resource = Object()
+        resource.resource_id = resource_id
+        resource.description = resource_to_descriptions[resource_id]
+        resource.occurrences = resource_to_occurences[resource_id]
+        result_resources_final += [resource]
 
     result_resources_final.sort(key=lambda x: x.occurrences, reverse=True)
 
     return render_template('search.html', query=query, result_resources=result_resources_final)
+
+
+class Object(object):
+    pass
