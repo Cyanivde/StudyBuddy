@@ -7,3 +7,4 @@ python-dotenv
 SQLAlchemy
 flask-login
 email-validator
+pandas

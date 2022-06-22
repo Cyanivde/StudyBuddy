@@ -4,8 +4,9 @@ from sqlalchemy import all_
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm
+from app.forms import LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm, SearchForm
 from app.models import ResourceToCourse, User, Subject, Resource, Course
+import pandas as pd
 
 
 @app.route('/')
@@ -54,7 +55,8 @@ def upload():
                             textdump=form.textdump.data.lower())
         db.session.add(resource)
         db.session.commit()
-        return redirect(url_for('index'))
+        db.session.refresh(resource)
+        return redirect(url_for('resource', resource_id=resource.id))
 
     return render_template('upload.html', title='upload', form=form)
 
@@ -117,13 +119,20 @@ def register():
 def course(course_id):
     course = Course.query.filter_by(id=course_id).first_or_404()
 
-    resources = ResourceToCourse.query.filter_by(course_id=course_id)
-
     form = CourseResourcesForm()
-    if form.validate_on_submit():
+
+    resources_df = _fetch_resources(
+        course_id, query=request.args.get('query'))
+
+    if not form.validate_on_submit():
+        form.resources.data = _resources_to_textarea(resources_df)
+
+        return render_template('course.html', form=form, course=course, current_search=request.args.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
+
+    else:
+        # insert
         resources = [(line.split(']')[0][-1], ' '.join(line.split(' ')[1:-1])[:-1],
                       line.split(': ')[-1]) for line in form.resources.data.split('\n') if ' ' in line]
-
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
         for resource in resources:
@@ -131,25 +140,53 @@ def course(course_id):
                 course_id=course_id, resource_id=resource[2], description=resource[1], importance=resource[0])
             db.session.add(resource_to_course)
         db.session.commit()
-        return render_template('course.html', form=form, course=course, existing_resources=resources)
-    form.resources.data = "\n".join(["[{0}] {1}: {2}".format(
-        resource.importance, resource.description, resource.resource_id) for resource in resources])
-    return render_template('course.html', form=form, course=course, existing_resources=resources)
+
+        resources_df = _fetch_resources(
+            course_id, query=request.args.get('query'))
+        form.resources.data = _resources_to_textarea(resources_df)
+
+        return render_template('course.html', form=form, course=course, current_search=request.args.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
 
 
-@app.route('/resource/<resource_id>', methods=['GET'])
+def _fetch_resources(course_id, query):
+    resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(
+        course_id=course_id).statement, db.session.bind)
+
+    resource_ids = set(resource_to_course_df['resource_id'])
+
+    resources_df = pd.read_sql(Resource.query.filter(
+        Resource.id.in_(resource_ids)).statement, db.session.bind)
+
+    resources_extended_df = pd.merge(
+        left=resources_df, right=resource_to_course_df, left_on="id", right_on="resource_id")
+
+    if (query):
+        resources_extended_df = resources_extended_df[resources_extended_df['textdump'].str.contains(
+            query.lower())]
+        resources_extended_df['occurrences'] = resources_extended_df['textdump'].str.count(
+            query.lower())
+
+    return resources_extended_df
+
+
+def _resources_to_textarea(df):
+    return "\n".join(["[{0}] {1}: {2}".format(
+        resource[1].importance, resource[1].description, resource[1].resource_id) for resource in df.iterrows()])
+
+
+@ app.route('/resource/<resource_id>', methods=['GET'])
 def resource(resource_id):
     resource = Resource.query.filter_by(id=resource_id).first_or_404()
 
     return render_template('resource.html', resource=resource)
 
 
-@app.route('/search', methods=['POST'])
+@ app.route('/search', methods=['POST'])
 def searchredirection():
     return redirect(url_for('search', query=request.form.get("searchbox", "")))
 
 
-@app.route('/delete/<resource_id>')
+@ app.route('/delete/<resource_id>')
 def delete(resource_id):
     results = db.session.query(ResourceToCourse).filter_by(
         resource_id=resource_id)
@@ -167,7 +204,7 @@ def delete(resource_id):
     return redirect(url_for('index'))
 
 
-@app.route('/search/<query>', methods=['GET'])
+@ app.route('/search/<query>', methods=['GET'])
 def search(query):
     resources = Resource.query.filter(
         Resource.textdump.contains(query.lower())).all()

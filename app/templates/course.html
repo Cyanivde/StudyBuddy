@@ -4,9 +4,21 @@
 
     {{ course.name }}
     <hr />
+
+    <form class="d-flex" style="margin-block-end: 0" method="GET" >
+        <div class="col-xs-4"><input name="query" class="form-control me-2" type="search" value="{% if current_search %}{{current_search}}{% else %}{%endif%}" placeholder="חיפוש בתוך החומרים" aria-label="Search"></div>
+        <button class="btn btn-outline-success" type="submit">חיפוש</button>
+      </form>
+
+      <hr/>
+
     <ul>
     {% for existing_resource in existing_resources %}
-    <li><a href="{{ url_for('resource', resource_id=existing_resource.resource_id) }}">{{ existing_resource.description }}</a></li>
+    <li><a target="_blank" href="{{ existing_resource.link }}">{{ existing_resource.description }}</a>
+        <span style="font-size: 9px"><a href="{{ url_for('resource', resource_id=existing_resource.resource_id) }}">תגובות</a></span>
+    {% if existing_resource.occurrences %}
+    ({{ existing_resource.occurrences }} התאמות) {%endif%}
+    </li>
     {% endfor %}
     </ul>
         {% if current_user.username == 'yaniv' %}
