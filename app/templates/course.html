@@ -2,40 +2,50 @@
 
 {% block content %}
 
-    {{ course.name }}
+    <b>{{ course.name }}</b>
     <hr />
-
-    <form class="d-flex" style="margin-block-end: 0" method="GET" >
-        <div class="col-xs-4"><input name="query" class="form-control me-2" type="search" value="{% if current_search %}{{current_search}}{% else %}{%endif%}" placeholder="חיפוש בתוך החומרים" aria-label="Search"></div>
-        <button class="btn btn-outline-success" type="submit">חיפוש</button>
-      </form>
-
-      <hr/>
-
-    <ul>
+    <form class="d-flex" method="post" >
+    <table class="table table-hover w-auto">
+        
+        <thead>
+            <tr class="align-middle">
+            <td>מעקב</td>
+            <td>חומר לימוד</td>
+            <td>יוצרים</td>
+            <td>
+                    <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
+                        {% for subject in subjects %}
+                        <option {% if subject in filtered_subjects or not filtered_subjects %} selected {% endif %}>{{ subject }}</option>
+                        {% endfor %}
+                      </select><button class="btn btn-outline-success" type="submit">סינון</button>
+            </td>
+            <td>
+                <div class="input-group">
+                <input name="query" class="form-control" type="search" value="{% if current_search %}{{current_search}}{% else %}{%endif%}" placeholder="חיפוש חופשי" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">חיפוש</button>
+                </div>
+              </td>
+              <td>תגובות</td>
+        </tr></thead>
     {% for existing_resource in existing_resources %}
-    <li><a target="_blank" href="{{ existing_resource.link }}">{{ existing_resource.description }}</a>
-        <span style="font-size: 9px"><a href="{{ url_for('resource', resource_id=existing_resource.resource_id) }}">תגובות</a></span>
-    {% if existing_resource.occurrences %}
-    ({{ existing_resource.occurrences }} התאמות) {%endif%}
-    </li>
-    {% endfor %}
-    </ul>
-        {% if current_user.username == 'yaniv' %}
-        
-    <hr />
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.resources.label }}<br>
-            {{ form.resources(rows='22',cols='100')}}<br>
-            {% for error in form.resources.errors %}
-            <span style="color: red;">[{{ error }}]</span>
+    <tr {%if existing_resource.show == False %}style="display:none"{%endif%}>
+        <td>
+            {% if not current_user.is_authenticated %}<span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת">{%endif%}
+                <input class="form-check-input" type="checkbox" value="done" name="checkbox-{{existing_resource.resource_id}}" onChange="this.form.submit()" {% if existing_resource.resource_id in done_resource_ids %}checked{%endif%} {% if not current_user.is_authenticated %}disabled {%endif%}>
+                {% if not current_user.is_authenticated %}</span>{%endif%}
+        </td>
+        <td><a class="text-decoration-none" target="_blank" href="{{ existing_resource.link }}">{{ existing_resource.description }}</a></td>
+        <td>{{ existing_resource.creator }}</td>
+        <td>
+        {% for subj in existing_resource.subject %}
+        <span class="badge bg-secondary">{{ subj }}</span>
             {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-        
-    </form>
-    {%endif%}
-    
+        </td>
+        <td>{% if existing_resource.occurrences %}
+            {{ existing_resource.occurrences }} התאמות {%endif%}</td>
+        <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource.resource_id) }}">צפייה בתגובות</a></td>
+    </tr>
+    {% endfor %}
+</table>
+</form>
 {% endblock %}

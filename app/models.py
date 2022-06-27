@@ -36,7 +36,8 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
     specification = db.Column(db.String(140))
-    subject = db.Column(db.String(500))
+    creator = db.Column(db.String(140))
+    subject = db.Column(db.Text)
     textdump = db.Column(db.Text)
 
 
@@ -51,6 +52,12 @@ class ResourceToCourse(db.Model):
     resource_id = db.Column(db.Integer)
     description = db.Column(db.String(140))
     importance = db.Column(db.Integer)
+
+
+class ResourceToUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    resource_id = db.Column(db.Integer)
 
 
 @login.user_loader

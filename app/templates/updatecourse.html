@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <b>{{ course.name }}</b>
+    <hr />
+        {% if current_user.username == 'yaniv' %}
+        
+    <hr />
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.resources.label }}<br>
+            {{ form.resources(rows='22',cols='100')}}<br>
+            {% for error in form.resources.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+        
+    </form>
+    {%endif%}
+    
+{% endblock %}

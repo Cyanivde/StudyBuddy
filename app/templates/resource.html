@@ -5,6 +5,9 @@
     <a href="{{ resource.link }}" target="_blank">קישור</a> 
     {% if resource.specification %} ({{ resource.specification }}) {%endif%}
     
+    <script defer src="https://cdn.commento.io/js/commento.js"></script>
+    <div id="commento"></div>
+
     {% if current_user.username == 'yaniv' %}
     <hr />
     <a href="{{ url_for('delete', resource_id=resource.id) }}">מחק חומר</a>

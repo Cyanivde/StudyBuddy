@@ -5,8 +5,9 @@ from werkzeug.urls import url_parse
 
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm, SearchForm
-from app.models import ResourceToCourse, User, Subject, Resource, Course
+from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource, Course
 import pandas as pd
+import json
 
 
 @app.route('/')
@@ -51,14 +52,15 @@ def upload():
     if form.validate_on_submit():
         resource = Resource(link=form.link.data,
                             specification=form.specification.data,
-                            subject=form.subject.data,
+                            creator=form.creator.data,
+                            subject=json.dumps(form.subject.data),
                             textdump=form.textdump.data.lower())
         db.session.add(resource)
         db.session.commit()
         db.session.refresh(resource)
         return redirect(url_for('resource', resource_id=resource.id))
 
-    return render_template('upload.html', title='upload', form=form)
+    return render_template('upload.html', title='upload', form=form, options=all_subject_names)
 
 
 @app.route('/createcourse', methods=['GET', 'POST'])
@@ -119,18 +121,50 @@ def register():
 def course(course_id):
     course = Course.query.filter_by(id=course_id).first_or_404()
 
+    done_resource_ids = []
+    if current_user.is_authenticated:
+        done_resource_ids = list(pd.read_sql(ResourceToUser.query.filter_by(
+            user_id=current_user.id).statement, db.session.bind)['resource_id'])
+
+    resources_df = _fetch_resources(course_id)
+
+    all_subjects = _get_subjects(resources_df)
+
+    resources_df = _filter_resources(resources_df, query=request.form.get(
+        'query'), subject=request.form.getlist('subject'))
+
+    if request.method == "POST":
+        if current_user.is_authenticated:
+            resource_ids = resources_df['resource_id']
+
+            done_resource_ids = []
+            for resource_id in resource_ids:
+                if request.form.get("checkbox-{}".format(resource_id)) == "done":
+                    done_resource_ids += [resource_id]
+
+                db.session.query(ResourceToUser).filter_by(
+                    user_id=current_user.id, resource_id=resource_id).delete()
+
+            for resource_id in done_resource_ids:
+                resource_to_user = ResourceToUser(
+                    user_id=current_user.id, resource_id=resource_id)
+                db.session.add(resource_to_user)
+            db.session.commit()
+
+    return render_template('course.html', done_resource_ids=done_resource_ids, subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
+
+
+@app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
+def updatecourse(course_id):
+    course = Course.query.filter_by(id=course_id).first_or_404()
+
     form = CourseResourcesForm()
-
-    resources_df = _fetch_resources(
-        course_id, query=request.args.get('query'))
-
+    resources_df = _fetch_resources(course_id)
     if not form.validate_on_submit():
         form.resources.data = _resources_to_textarea(resources_df)
-
-        return render_template('course.html', form=form, course=course, current_search=request.args.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
+        return render_template('updatecourse.html', form=form, course=course)
 
     else:
-        # insert
         resources = [(line.split(']')[0][-1], ' '.join(line.split(' ')[1:-1])[:-1],
                       line.split(': ')[-1]) for line in form.resources.data.split('\n') if ' ' in line]
         db.session.query(ResourceToCourse).filter_by(
@@ -141,14 +175,10 @@ def course(course_id):
             db.session.add(resource_to_course)
         db.session.commit()
 
-        resources_df = _fetch_resources(
-            course_id, query=request.args.get('query'))
-        form.resources.data = _resources_to_textarea(resources_df)
-
-        return render_template('course.html', form=form, course=course, current_search=request.args.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
+        return render_template('updatecourse.html', form=form, course=course)
 
 
-def _fetch_resources(course_id, query):
+def _fetch_resources(course_id):
     resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(
         course_id=course_id).statement, db.session.bind)
 
@@ -160,11 +190,8 @@ def _fetch_resources(course_id, query):
     resources_extended_df = pd.merge(
         left=resources_df, right=resource_to_course_df, left_on="id", right_on="resource_id")
 
-    if (query):
-        resources_extended_df = resources_extended_df[resources_extended_df['textdump'].str.contains(
-            query.lower())]
-        resources_extended_df['occurrences'] = resources_extended_df['textdump'].str.count(
-            query.lower())
+    resources_extended_df['subject'] = resources_extended_df['subject'].apply(
+        lambda x: json.loads(x))
 
     return resources_extended_df
 
@@ -172,6 +199,32 @@ def _fetch_resources(course_id, query):
 def _resources_to_textarea(df):
     return "\n".join(["[{0}] {1}: {2}".format(
         resource[1].importance, resource[1].description, resource[1].resource_id) for resource in df.iterrows()])
+
+
+def _get_subjects(resources_df):
+    list_of_lists = [
+        resource[1].subject for resource in resources_df.iterrows()]
+    return set([x for xs in list_of_lists for x in xs])
+
+
+def _filter_resources(resources_extended_df, query, subject):
+    if query and subject:
+        resources_extended_df['show'] = (resources_extended_df['textdump'].str.contains(query.lower())) & (
+            resources_extended_df['subject'].apply(lambda x: any([subj in x for subj in subject])))
+    elif query:
+        resources_extended_df['show'] = resources_extended_df['textdump'].str.contains(
+            query.lower())
+    elif subject:
+        resources_extended_df['show'] = resources_extended_df['subject'].apply(
+            lambda x: any([subj in x for subj in subject]))
+    else:
+        resources_extended_df['show'] = True
+
+    if (query):
+        resources_extended_df['occurrences'] = resources_extended_df['textdump'].str.count(
+            query.lower())
+
+    return resources_extended_df
 
 
 @ app.route('/resource/<resource_id>', methods=['GET'])

@@ -19,8 +19,19 @@
             {% endfor %}
         </p>
         <p>
+            {{ form.creator.label }}<br>
+            {{ form.creator(size=32) }}<br>
+            {% for error in form.creator.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
             {{ form.subject.label }}<br>
-            {{ form.subject }}<br>
+            <select name="subject" class="selectpicker" multiple data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס">
+                {% for opt in options %}
+                <option>{{ opt }}</option>
+                {% endfor %}
+              </select>
             {% for error in form.subject.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
