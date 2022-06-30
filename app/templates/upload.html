@@ -29,7 +29,7 @@
             {{ form.subject.label }}<br>
             <select name="subject" class="selectpicker" multiple data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס">
                 {% for opt in options %}
-                <option>{{ opt }}</option>
+                <option {%if form.subject.data and opt in form.subject.data%}selected{%endif%}>{{ opt }}</option>
                 {% endfor %}
               </select>
             {% for error in form.subject.errors %}

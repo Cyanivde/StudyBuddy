@@ -16,10 +16,15 @@ def index():
     return render_template("index.html", title='Home Page', courses=courses)
 
 
+@app.route('/gr')
+def gr():
+    return render_template("gr.html", title='Study Buddy')
+
+
 @app.route('/subjects', methods=['GET', 'POST'])
 def subjects():
     all_subjects = Subject.query.all()
-    all_subject_names = [subject.name for subject in all_subjects]
+    all_subject_names = [subject.name.strip() for subject in all_subjects]
     if (all_subject_names is not None):
         all_subject_names.sort()
 
@@ -30,7 +35,7 @@ def subjects():
             all_subject_names.sort()
         db.session.query(Subject).delete()
         for subject_name in all_subject_names:
-            subject = Subject(name=subject_name)
+            subject = Subject(name=subject_name.strip())
             db.session.add(subject)
         db.session.commit()
         form.subjects.data = "\n".join(all_subject_names)
@@ -50,6 +55,10 @@ def upload():
     form.subject.choices = all_subject_names
 
     if form.validate_on_submit():
+        if ("https://grades.cs.technion.ac.il/grades.cgi?" in form.link.data):
+            form.link.data = "https://grades.cs.technion.ac.il/grades.cgi?" + \
+                "XXXXXXXX+" + '+'.join(form.link.data.split('+')[1:])
+
         resource = Resource(link=form.link.data,
                             specification=form.specification.data,
                             creator=form.creator.data,
@@ -59,6 +68,40 @@ def upload():
         db.session.commit()
         db.session.refresh(resource)
         return redirect(url_for('resource', resource_id=resource.id))
+
+    return render_template('upload.html', title='upload', form=form, options=all_subject_names)
+
+
+@app.route('/edit/<resource_id>', methods=['GET', 'POST'])
+def edit(resource_id):
+    all_subjects = Subject.query.all()
+    all_subject_names = [subject.name for subject in all_subjects]
+    if (all_subject_names is not None):
+        all_subject_names.sort()
+
+    form = UploadForm()
+    form.subject.choices = all_subject_names
+
+    resource = Resource.query.filter_by(id=resource_id).first()
+
+    if form.validate_on_submit():
+        resource.link = form.link.data
+        resource.specification = form.specification.data
+        resource.creator = form.creator.data
+        resource.subject = json.dumps(form.subject.data)
+        resource.textdump = form.textdump.data.lower()
+        db.session.commit()
+        db.session.refresh(resource)
+        return redirect(url_for('resource', resource_id=resource.id))
+
+    else:
+        form.link.data = resource.link
+        form.specification.data = resource.specification
+        form.creator.data = resource.creator
+        form.subject.data = json.loads(resource.subject)
+        form.textdump.data = resource.textdump
+
+        print('\r' in all_subject_names[0])
 
     return render_template('upload.html', title='upload', form=form, options=all_subject_names)
 

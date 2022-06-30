@@ -5,11 +5,26 @@
     <a href="{{ resource.link }}" target="_blank">קישור</a> 
     {% if resource.specification %} ({{ resource.specification }}) {%endif%}
     
-    <script defer src="https://cdn.commento.io/js/commento.js"></script>
+    <script defer src="http://localhost:8080/js/commento.js"></script>
     <div id="commento"></div>
 
     {% if current_user.username == 'yaniv' %}
     <hr />
-    <a href="{{ url_for('delete', resource_id=resource.id) }}">מחק חומר</a>
+    <a href="{{ url_for('edit', resource_id=resource.id) }}">ערוך חומר</a>
+    
       {%endif%}
+
+      
+<script type="text/javascript">
+  var links = document.getElementsByTagName('a');
+  var d = new Date();
+  for(let i = 0; i < links.length; i++)
+  {
+    if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?') && (!localStorage.token || localStorage.tokentime < d.setHours(d.getHours() - 2))) {
+          localStorage.setItem('ref', window.location.href);
+          window.location.href = "/gr";
+      }
+      links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
+  }
+</script>
 {% endblock %}

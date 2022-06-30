@@ -4,28 +4,28 @@
 
     <b>{{ course.name }}</b>
     <hr />
+
     <form class="d-flex" method="post" >
     <table class="table table-hover w-auto">
         
         <thead>
             <tr class="align-middle">
             <td>מעקב</td>
-            <td>חומר לימוד</td>
+            <td colspan="2">חומר לימוד</td>
             <td>יוצרים</td>
             <td>
-                    <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
+                    <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="בחירת נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
                         {% for subject in subjects %}
-                        <option {% if subject in filtered_subjects or not filtered_subjects %} selected {% endif %}>{{ subject }}</option>
+                        <option id="subj-{{subject}}" {% if subject in filtered_subjects %} selected {% endif %}>{{ subject }}</option>
                         {% endfor %}
                       </select><button class="btn btn-outline-success" type="submit">סינון</button>
             </td>
             <td>
                 <div class="input-group">
-                <input name="query" class="form-control" type="search" value="{% if current_search %}{{current_search}}{% else %}{%endif%}" placeholder="חיפוש חופשי" aria-label="Search">
+                <input name="query" class="form-control" type="search" value="{% if current_search %}{{current_search}}{% else %}{%endif%}" placeholder="חיפוש בגוף הטקסט" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">חיפוש</button>
                 </div>
               </td>
-              <td>תגובות</td>
         </tr></thead>
     {% for existing_resource in existing_resources %}
     <tr {%if existing_resource.show == False %}style="display:none"{%endif%}>
@@ -35,17 +35,35 @@
                 {% if not current_user.is_authenticated %}</span>{%endif%}
         </td>
         <td><a class="text-decoration-none" target="_blank" href="{{ existing_resource.link }}">{{ existing_resource.description }}</a></td>
+        <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource.resource_id) }}">תגובות ופתרונות</a></td>
         <td>{{ existing_resource.creator }}</td>
         <td>
         {% for subj in existing_resource.subject %}
-        <span class="badge bg-secondary">{{ subj }}</span>
+        {%if subj in filtered_subjects %}
+        <button type="button" class="btn btn-primary" style="padding: 0.125rem 0.25rem;font-size: 0.75rem;border-radius: 0.3rem;" onClick="document.getElementById('subj-{{subj}}').selected = false; this.form.submit();">{{ subj }}</button>
+        {% else %}
+        <button type="button" class="btn btn-outline-primary" style="padding: 0.125rem 0.25rem;font-size: 0.75rem;border-radius: 0.3rem;" onClick="document.getElementById('subj-{{subj}}').selected = true; this.form.submit();">{{ subj }}</button>
+        {% endif%}
             {% endfor %}
         </td>
         <td>{% if existing_resource.occurrences %}
             {{ existing_resource.occurrences }} התאמות {%endif%}</td>
-        <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource.resource_id) }}">צפייה בתגובות</a></td>
+        
     </tr>
     {% endfor %}
 </table>
 </form>
-{% endblock %}
+
+<script type="text/javascript">
+    var links = document.getElementsByTagName('a');
+    var d = new Date();
+    for(let i = 0; i < links.length; i++)
+    {
+        if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?') && (!localStorage.token || localStorage.tokentime < d.setHours(d.getHours() - 2))) {
+            localStorage.setItem('ref', window.location.href);
+            window.location.href = "/gr";
+        }
+        links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
+    }
+</script>
+{%endblock%}
