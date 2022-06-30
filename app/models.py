@@ -56,8 +56,19 @@ class ResourceToCourse(db.Model):
 
 class ResourceToUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     resource_id = db.Column(db.Integer)
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resource_id = db.Column(db.Integer, db.ForeignKey('resource.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_name = db.Column(db.String(140))
+    body = db.Column(db.Text)
+    parent_comment = db.Column(db.Integer)
+    score = db.Column(db.Integer)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
 @login.user_loader

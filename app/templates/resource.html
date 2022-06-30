@@ -2,29 +2,53 @@
 
 {% block content %}
 
-    <a href="{{ resource.link }}" target="_blank">קישור</a> 
-    {% if resource.specification %} ({{ resource.specification }}) {%endif%}
     
-    <script defer src="http://localhost:8080/js/commento.js"></script>
-    <div id="commento"></div>
+    {% if resource.specification %} <p><b>({{ resource.specification }})</b></p> {%endif%}
+      <p>יוצרים: {{resource.creator}}</p>
+      <p>קישור: <a href="{{ resource.link }}" target="_blank">לחצו כאן</a> </p>
+    
 
     {% if current_user.username == 'yaniv' %}
     <hr />
     <a href="{{ url_for('edit', resource_id=resource.id) }}">ערוך חומר</a>
     
       {%endif%}
+<hr/>
+<p><b>תגובות</b></p>
 
+      <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name(size=32) }}<br>
+            {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.body.label }}<br>
+            {{ form.body(rows='5',cols='100')}}<br>
+            {% for error in form.body.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
       
 <script type="text/javascript">
   var links = document.getElementsByTagName('a');
   var d = new Date();
   for(let i = 0; i < links.length; i++)
   {
-    if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?') && (!localStorage.token || localStorage.tokentime < d.setHours(d.getHours() - 2))) {
-          localStorage.setItem('ref', window.location.href);
-          window.location.href = "/gr";
+    if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
+      if (!localStorage.token || localStorage.tokentime < d.setHours(d.getHours() - 2)) {
+        localStorage.setItem('ref', window.location.href);
+        window.location.href = "/gr";
       }
-      links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
+      else {
+        links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
+      }
+    }  
   }
 </script>
 {% endblock %}

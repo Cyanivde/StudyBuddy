@@ -4,7 +4,7 @@ from sqlalchemy import all_
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm, SearchForm
+from app.forms import CommentForm, LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm, SearchForm
 from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource, Course
 import pandas as pd
 import json
@@ -270,11 +270,16 @@ def _filter_resources(resources_extended_df, query, subject):
     return resources_extended_df
 
 
-@ app.route('/resource/<resource_id>', methods=['GET'])
+@ app.route('/resource/<resource_id>', methods=['GET', 'POST'])
 def resource(resource_id):
     resource = Resource.query.filter_by(id=resource_id).first_or_404()
 
-    return render_template('resource.html', resource=resource)
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        return render_template('resource.html', form=form, resource=resource)
+
+    return render_template('resource.html', form=form, resource=resource)
 
 
 @ app.route('/search', methods=['POST'])

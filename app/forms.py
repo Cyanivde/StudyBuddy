@@ -46,6 +46,14 @@ class UploadForm(FlaskForm):
     submit = SubmitField('העלאה')
 
 
+class CommentForm(FlaskForm):
+    name = StringField('השם שלך', validators=[
+        DataRequired(message=ERR_EMPTY)])
+    body = TextAreaField('תוכן התגובה', validators=[
+        DataRequired(message=ERR_EMPTY)])
+    submit = SubmitField('תגובה')
+
+
 class LoginForm(FlaskForm):
     username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
                            DataRequired(message=ERR_EMPTY)])
