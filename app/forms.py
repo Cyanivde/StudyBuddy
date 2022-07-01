@@ -69,7 +69,7 @@ class RegistrationForm(FlaskForm):
     email = StringField('email', filters=[strip_whitespace], validators=[
         DataRequired(message=ERR_EMPTY),  Email()])
     password = PasswordField('password', validators=[
-        DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
+        DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
     password2 = PasswordField(
         'confirm password', validators=[DataRequired(ERR_EMPTY), EqualTo('password')])
     submit = SubmitField('register')
