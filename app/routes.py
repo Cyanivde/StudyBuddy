@@ -101,8 +101,6 @@ def edit(resource_id):
         form.subject.data = json.loads(resource.subject)
         form.textdump.data = resource.textdump
 
-        print('\r' in all_subject_names[0])
-
     return render_template('upload.html', title='upload', form=form, options=all_subject_names)
 
 
@@ -205,6 +203,7 @@ def course(course_id):
         for directory in resources_df['directory']:
             multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
+    print(multi_resources)
     return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources)
 
 
@@ -254,11 +253,11 @@ def _fetch_resources(course_id):
             resources_extended_df = pd.merge(how='left',
                                              left=resources_extended_df, right=resource_to_user, left_on="resource_id", right_on="resource_id", suffixes=['', '_u'])
 
-    print(resources_extended_df)
     if 'subject' in resources_extended_df.keys():
         resources_extended_df['subject'] = resources_extended_df['subject'].apply(
             lambda x: _jsonload(x))
 
+    resources_extended_df = resources_extended_df.fillna(0)
     return resources_extended_df
 
 
