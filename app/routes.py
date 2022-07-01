@@ -194,7 +194,14 @@ def course(course_id):
             resources_df = _filter_resources(resources_df, query=request.form.get(
                 'query'), subject=request.form.getlist('subject'))
 
-    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
+    resources_df[['directory', 'description']
+                 ] = resources_df['description'].str.split('/', 1, expand=True)
+
+    multi_resources = dict()
+    for directory in resources_df['directory']:
+        multi_resources[directory] = resources_df[resources_df['directory'] == directory]
+
+    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources)
 
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
