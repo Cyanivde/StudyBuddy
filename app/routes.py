@@ -166,6 +166,9 @@ def course(course_id):
 
     resources_df = _fetch_resources(course_id)
 
+    if 'subject' not in resources_df.keys():
+        return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict())
+
     all_subjects = _get_subjects(resources_df)
 
     resources_df = _filter_resources(resources_df, query=request.form.get(
@@ -194,12 +197,13 @@ def course(course_id):
             resources_df = _filter_resources(resources_df, query=request.form.get(
                 'query'), subject=request.form.getlist('subject'))
 
-    resources_df[['directory', 'description']
-                 ] = resources_df['description'].str.split('/', 1, expand=True)
-
     multi_resources = dict()
-    for directory in resources_df['directory']:
-        multi_resources[directory] = resources_df[resources_df['directory'] == directory]
+    if len(resources_df) > 0:
+        resources_df[['directory', 'description']
+                     ] = resources_df['description'].str.split('/', 1, expand=True)
+
+        for directory in resources_df['directory']:
+            multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
     return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources)
 
@@ -237,22 +241,32 @@ def _fetch_resources(course_id):
     resources_df = pd.read_sql(Resource.query.filter(
         Resource.id.in_(resource_ids)).statement, db.session.bind)
 
+    resources_extended_df = resource_to_course_df
+    if len(resources_df) > 0:
+        resources_extended_df = pd.merge(how='right',
+                                         left=resources_df, right=resource_to_course_df, left_on="id", right_on="resource_id", suffixes=['_a', ''])
+
     if current_user.is_authenticated:
         resource_to_user = pd.read_sql(ResourceToUser.query.filter_by(
             user_id=current_user.id).statement, db.session.bind)
 
-    resources_extended_df = pd.merge(
-        left=resources_df, right=resource_to_course_df, left_on="id", right_on="resource_id", suffixes=['', '_c'])
-
-    if current_user.is_authenticated:
         if len(resource_to_user) > 0:
-            resources_extended_df = pd.merge(
-                left=resources_extended_df, right=resource_to_user, left_on="id", right_on="resource_id", suffixes=['', '_u'])
+            resources_extended_df = pd.merge(how='left',
+                                             left=resources_extended_df, right=resource_to_user, left_on="resource_id", right_on="resource_id", suffixes=['', '_u'])
 
-    resources_extended_df['subject'] = resources_extended_df['subject'].apply(
-        lambda x: json.loads(x))
+    print(resources_extended_df)
+    if 'subject' in resources_extended_df.keys():
+        resources_extended_df['subject'] = resources_extended_df['subject'].apply(
+            lambda x: _jsonload(x))
 
     return resources_extended_df
+
+
+def _jsonload(x):
+    if isinstance(x, str):
+        return json.loads(x)
+    else:
+        return ''
 
 
 def _resources_to_textarea(df):
