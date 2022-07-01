@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+{% if resource.specification %} <p><b>{{ resource.specification }}</b></p> {%endif%}
+<hr/>
+<a href={{url_for('gr')}} style="text-decoration:none"> <div name="warn-gr" class="alert alert-warning p-2 small" role="alert" display="none">
+      
+  העמוד הנוכחי מכיל קישורים למערכת ה-GR (טכניון). כדי שהקישורים יעבדו, יש 
+       להגדיר טוקן עדכני
+   מדי שעתיים. לחצו כאן כדי לעשות זאת.
+  
+</div></a>
     
-    {% if resource.specification %} <p><b>({{ resource.specification }})</b></p> {%endif%}
       <p>יוצרים: {{resource.creator}}</p>
       <p>קישור: <a href="{{ resource.link }}" target="_blank">לחצו כאן</a> </p>
     
@@ -35,20 +42,15 @@
         <p>{{ form.submit() }}</p>
     </form>
       
-<script type="text/javascript">
-  var links = document.getElementsByTagName('a');
-  var d = new Date();
-  for(let i = 0; i < links.length; i++)
-  {
-    if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
-      if (!localStorage.token || localStorage.tokentime < d.setHours(d.getHours() - 2)) {
-        localStorage.setItem('ref', window.location.href);
-        window.location.href = "/gr";
-      }
-      else {
-        links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
-      }
-    }  
-  }
-</script>
+    <script type="text/javascript">
+      var links = document.getElementsByTagName('a');
+      var d = new Date();
+      for(let i = 0; i < links.length; i++)
+    {
+      if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
+          links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
+          document.getElementByName("warn-gr").display = "inline";
+      }  
+    }
+  </script>
 {% endblock %}

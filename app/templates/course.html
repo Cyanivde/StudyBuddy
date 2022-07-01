@@ -5,14 +5,26 @@
     <b>{{ course.name }}</b>
     <hr />
 
+    <a href={{url_for('gr')}} style="text-decoration:none"> <div name="warn-gr" class="alert alert-warning p-2 small" role="alert" display="none">
+      
+      העמוד הנוכחי מכיל קישורים למערכת ה-GR (טכניון). כדי שהקישורים יעבדו, יש 
+           להגדיר טוקן עדכני
+       מדי שעתיים. לחצו כאן כדי לעשות זאת.
+      
+    </div></a>
+    <div class="overflow-auto">
     <form class="d-flex" method="post" >
+    
     <table class="table table-hover w-auto col-auto">
         
         <thead>
             <tr class="align-middle">
-            <td>מעקב</td>
-            <td colspan="2">חומר לימוד</td>
-            <td>יוצרים</td>
+            <td class="text-center">מעקב
+              <label for="happy" class="float-start" style="font-size:10px; margin-top:8px">0%</label>
+                <label for="" class="float-end" style="font-size:10px; margin-top:8px">100%</label>
+            </td>
+            <td class="text-center" colspan="2"></td>
+            <td class="text-center">יוצרים</td>
             <td>
                     <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="בחירת נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
                         {% for subject in subjects %}
@@ -31,7 +43,9 @@
     <tr {%if existing_resource.show == False %}style="display:none"{%endif%}>
         <td>
             {% if not current_user.is_authenticated %}<span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת">{%endif%}
-                <input class="form-check-input" type="checkbox" value="done" name="checkbox-{{existing_resource.resource_id}}" onChange="this.form.submit()" {% if existing_resource.resource_id in done_resource_ids %}checked{%endif%} {% if not current_user.is_authenticated %}disabled {%endif%}>
+                
+                <input type="range" min="0" max="4" value="{{existing_resource.done or '0'}}" style="width:100px" class="form-range" onChange="this.form.submit()" name="checkbox-{{existing_resource.resource_id}}"{% if not current_user.is_authenticated %}disabled {%endif%}>
+                </br>
                 {% if not current_user.is_authenticated %}</span>{%endif%}
         </td>
         <td><a class="text-decoration-none" target="_blank" href="{{ existing_resource.link }}">{{ existing_resource.description }}</a></td>
@@ -52,35 +66,17 @@
     </tr>
     {% endfor %}
 </table>
-</form>
 
+</form>
+</div>
 <script type="text/javascript">
     var links = document.getElementsByTagName('a');
     var d = new Date();
     for(let i = 0; i < links.length; i++)
   {
     if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
-        
-
-      if (!localStorage.token || localStorage.tokentime < d.setHours(d.getHours() - 2)) {
-        localStorage.setItem('ref', window.location.href);
-        window.location.href = "/gr";
-      }
-      else {
         links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
-
-        fetch(links[i].href).then((response)=>{
-            if (response.status >= 400) {
-                //handle unsuccessful request ...
-            }
-        
-            // or 
-            if (response.status == 200) { 
-                // status ok 
-            }
-        
-        });
-      }
+        document.getElementByName("warn-gr").display = "inline";
     }  
   }
 </script>

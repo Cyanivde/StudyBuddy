@@ -164,11 +164,6 @@ def register():
 def course(course_id):
     course = Course.query.filter_by(id=course_id).first_or_404()
 
-    done_resource_ids = []
-    if current_user.is_authenticated:
-        done_resource_ids = list(pd.read_sql(ResourceToUser.query.filter_by(
-            user_id=current_user.id).statement, db.session.bind)['resource_id'])
-
     resources_df = _fetch_resources(course_id)
 
     all_subjects = _get_subjects(resources_df)
@@ -180,21 +175,26 @@ def course(course_id):
         if current_user.is_authenticated:
             resource_ids = resources_df['resource_id']
 
-            done_resource_ids = []
             for resource_id in resource_ids:
-                if request.form.get("checkbox-{}".format(resource_id)) == "done":
-                    done_resource_ids += [resource_id]
+                done_value = request.form.get(
+                    "checkbox-{}".format(resource_id))
 
                 db.session.query(ResourceToUser).filter_by(
                     user_id=current_user.id, resource_id=resource_id).delete()
 
-            for resource_id in done_resource_ids:
                 resource_to_user = ResourceToUser(
-                    user_id=current_user.id, resource_id=resource_id)
+                    user_id=current_user.id, resource_id=resource_id, done=done_value)
                 db.session.add(resource_to_user)
             db.session.commit()
 
-    return render_template('course.html', done_resource_ids=done_resource_ids, subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
+            resources_df = _fetch_resources(course_id)
+
+            all_subjects = _get_subjects(resources_df)
+
+            resources_df = _filter_resources(resources_df, query=request.form.get(
+                'query'), subject=request.form.getlist('subject'))
+
+    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), existing_resources=[row[1] for row in resources_df.iterrows()])
 
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
@@ -230,8 +230,17 @@ def _fetch_resources(course_id):
     resources_df = pd.read_sql(Resource.query.filter(
         Resource.id.in_(resource_ids)).statement, db.session.bind)
 
+    if current_user.is_authenticated:
+        resource_to_user = pd.read_sql(ResourceToUser.query.filter_by(
+            user_id=current_user.id).statement, db.session.bind)
+
     resources_extended_df = pd.merge(
-        left=resources_df, right=resource_to_course_df, left_on="id", right_on="resource_id")
+        left=resources_df, right=resource_to_course_df, left_on="id", right_on="resource_id", suffixes=['', '_c'])
+
+    if current_user.is_authenticated:
+        if len(resource_to_user) > 0:
+            resources_extended_df = pd.merge(
+                left=resources_extended_df, right=resource_to_user, left_on="id", right_on="resource_id", suffixes=['', '_u'])
 
     resources_extended_df['subject'] = resources_extended_df['subject'].apply(
         lambda x: json.loads(x))

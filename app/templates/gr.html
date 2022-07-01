@@ -2,8 +2,6 @@
 
 
 {% block content %}
-<h3>לפני שממשיכים...</h3>
-<p>נראה שאין לך טוקן עדכני ל-GR</p>
 <p>כדי שקישורים ל-GR יעבדו, יש לבצע את השלבים הבאים:</p>
 <ol>
     <li>להתחבר: <a target="_blank" href="https://grades.cs.technion.ac.il/">https://grades.cs.technion.ac.il</a></li>
@@ -11,7 +9,7 @@
     <input type="text" id="token"></input>
     <input type="submit" value="שמירה" onclick="localStorage.setItem('tokentime', Date.now()); localStorage.setItem('token', document.getElementById('token').value.split('?')[1].split('+')[0]); window.location.href = localStorage.ref;"></input>
 </ol>
-<p>Token החיבור שלכם יישמר אצלכם בדפדפן (בלבד!) וישמש אתכם לגישה לקישורים.</p>
+<p>טוקן החיבור שלכם יישמר אצלכם בדפדפן בלבד.</p>
 <p style="color:blue" id="done"></p>
 {%endblock%}
 

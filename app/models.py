@@ -58,6 +58,7 @@ class ResourceToUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     resource_id = db.Column(db.Integer)
+    done = db.Column(db.Integer)
 
 
 class Comment(db.Model):
@@ -68,6 +69,7 @@ class Comment(db.Model):
     body = db.Column(db.Text)
     parent_comment = db.Column(db.Integer)
     score = db.Column(db.Integer)
+    pinned = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 
