@@ -92,7 +92,7 @@
   {
     if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
         links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
-        document.getElementByName("warn-gr").display = "inline";
+        document.getElementsByName("warn-gr")[0].display = "inline";
     }  
   }
 </script>
