@@ -178,7 +178,7 @@ def course(course_id):
 
             for resource_id in resource_ids:
                 done_value = request.form.get(
-                    "checkbox-{}".format(resource_id))
+                    "btnradio-{}".format(resource_id))
 
                 db.session.query(ResourceToUser).filter_by(
                     user_id=current_user.id, resource_id=resource_id).delete()
@@ -203,7 +203,6 @@ def course(course_id):
         for directory in resources_df['directory']:
             multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
-    print(multi_resources)
     return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources)
 
 
