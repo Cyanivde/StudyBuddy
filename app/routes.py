@@ -322,7 +322,7 @@ def resource(resource_id):
         if form.parent.data == 'הדף כולו':
             form.parent.data = 0
 
-        userid = "0"
+        userid = 0
         if current_user.is_authenticated:
             userid = current_user.id
 
