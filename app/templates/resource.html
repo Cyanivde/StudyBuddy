@@ -12,7 +12,7 @@
 </div></a>
 
 {%for res in resource_tuples%}
-<nav style="--bs-breadcrumb-divider: '🠘';" aria-label="breadcrumb">
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{url_for('course', course_id=res[2])}}">{{res[1]}}</a></li>
     <li class="breadcrumb-item active" aria-current="page"><a href="{{ resource.link }}" target="_blank">{{res[0]}}</a></li>
