@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if resource.specification %} <p><b>{{ resource.specification }}</b></p> {%endif%}
-<hr/>
+
+
 <a href={{url_for('gr')}} style="text-decoration:none"> <div name="warn-gr" class="alert alert-warning p-2 small" role="alert" display="none">
       
   העמוד הנוכחי מכיל קישורים למערכת ה-GR (טכניון). כדי שהקישורים יעבדו, יש 
@@ -10,10 +10,17 @@
    מדי שעתיים. לחצו כאן כדי לעשות זאת.
   
 </div></a>
-    
-      <p>יוצרים: {{resource.creator}}</p>
-      <p>קישור: <a href="{{ resource.link }}" target="_blank">לחצו כאן</a> </p>
-    
+
+{%for res in resource_tuples%}
+<nav style="--bs-breadcrumb-divider: '🠘';" aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{url_for('course', course_id=res[2])}}">{{res[1]}}</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><a href="{{ resource.link }}" target="_blank">{{res[0]}}</a></li>
+  </ol>
+</nav>
+   
+{%endfor%}
+
 
     {% if current_user.username == 'yaniv' %}
     <hr />
@@ -21,9 +28,52 @@
     
       {%endif%}
 <hr/>
-<p><b>תגובות</b></p>
 
+{% for main_comment in main_comments %}
+<div class="card" style="width: 100%; max-width:800px; margin: 20px 0">
+  <div class="card-body">
+    <p>{{main_comment[1].id}}. <b>{{main_comment[1].user_name}}</b>
+      <span style="font-size:10px">פורסם ב-{{main_comment[1].timestamp.date()}}</span></p>
+    <p class="card-text">{{main_comment[1].body|urlize(target='_blank')}}</p>
+   
+
+    {% for other_comment in other_comments[main_comment[1].id].iterrows()%}
+        <div class="card" style="width: 100%; max-width:800px; margin: 20px 0">
+          <div class="card-body">
+            <p>{{other_comment[1].id}}. <b>{{other_comment[1].user_name}}</b>
+              <span style="font-size:10px">פורסם ב-{{other_comment[1].timestamp.date()}}</span></p>
+            <p class="card-text">{{other_comment[1].body|urlize(target='_blank')}}
+            
+            {%if current_user.id == other_comment[1].user_id or current_user.username == 'yaniv' %}
+            <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{other_comment[1].id}}'; document.getElementById('mode').value='עריכה ל'">ערוך תגובה</button>
+            {%endif %}
+            {%if current_user.username == 'yaniv' %}
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='{{url_for('deletecomment', comment_id=other_comment[1].id)}}'">מחק תגובה</button>
+            {%endif %}
+          </div>
+        </div>
+    {% endfor %}
+    <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{main_comment[1].id}}'; document.getElementById('mode').value='תגובה ל'">הוספת תגובה</button>
+    
+    {%if current_user.id == main_comment[1].user_id or current_user.username == 'yaniv' %}
+    <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{main_comment[1].id}}'; document.getElementById('mode').value='עריכה ל'">ערוך תגובה</button>
+    {%endif %}
+    {%if current_user.username == 'yaniv' %}
+    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='{{url_for('deletecomment', comment_id=main_comment[1].id)}}'">מחק תגובה</button>
+    {%endif %}
+  </div>
+</div>
+
+{% endfor %}
+<button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='הדף כולו'; document.getElementById('mode').value='תגובה ל'">הוספת תגובה</button>
+
+
+<div style="display: none; width: 100%; max-width:800px; margin: 20px 0" class="card" id="comment">
+  <div class="card-body">
+    
       <form action="" method="post">
+        
+        <p><input name="mode" id="mode" value="תגובה ל" style="border: 0; width:62px"></input><input value="0" id="parent" name="parent" style="border: 0;"></input></p>
         {{ form.hidden_tag() }}
         <p>
             {{ form.name.label }}<br>
@@ -34,13 +84,15 @@
         </p>
         <p>
             {{ form.body.label }}<br>
-            {{ form.body(rows='5')}}<br>
+            {{ form.body(cols='33', rows='5')}}<br>
             {% for error in form.body.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+  </div>
+  </div>
       
     <script type="text/javascript">
       var links = document.getElementsByTagName('a');
@@ -49,7 +101,7 @@
     {
       if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
           links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
-          document.getElementByName("warn-gr").display = "inline";
+          document.getElementsByName("warn-gr").display = "inline";
       }  
     }
   </script>

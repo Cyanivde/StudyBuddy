@@ -47,11 +47,12 @@ class UploadForm(FlaskForm):
 
 
 class CommentForm(FlaskForm):
-    name = StringField('השם שלך', validators=[
-        DataRequired(message=ERR_EMPTY)])
+    name = StringField('השם שלך (אופציונלי)')
     body = TextAreaField('תוכן התגובה', validators=[
         DataRequired(message=ERR_EMPTY)])
-    submit = SubmitField('תגובה')
+    parent = StringField()
+    mode = StringField()
+    submit = SubmitField('שמירה')
 
 
 class LoginForm(FlaskForm):
