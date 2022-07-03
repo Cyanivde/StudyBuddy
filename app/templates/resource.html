@@ -34,7 +34,7 @@
   <div class="card-body">
     <p>{{main_comment[1].id}}. <b>{{main_comment[1].user_name}}</b>
       <span style="font-size:10px">פורסם ב-{{main_comment[1].timestamp.date()}}</span></p>
-    <p class="card-text">{{main_comment[1].body|urlize(target='_blank')}}</p>
+    <p class="card-text">{{main_comment[1].body|urlize(32, target='_blank')}}</p>
    
 
     {% for other_comment in other_comments[main_comment[1].id].iterrows()%}
@@ -42,8 +42,8 @@
           <div class="card-body">
             <p>{{other_comment[1].id}}. <b>{{other_comment[1].user_name}}</b>
               <span style="font-size:10px">פורסם ב-{{other_comment[1].timestamp.date()}}</span></p>
-            <p class="card-text">{{other_comment[1].body|urlize(target='_blank')}}
-            
+            <p class="card-text">{{other_comment[1].body|urlize(32, target='_blank')}}
+            https://grades.cs.technion.ac.il/
             {%if current_user.id == other_comment[1].user_id or current_user.username == 'yaniv' %}
             <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{other_comment[1].id}}'; document.getElementById('mode').value='עריכה ל'">ערוך תגובה</button>
             {%endif %}
