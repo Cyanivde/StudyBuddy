@@ -76,14 +76,14 @@
         {{ form.hidden_tag() }}
         <p>
             {{ form.name.label }}<br>
-            {{ form.name(size=30) }}<br>
+            {{ form.name(size=28) }}<br>
             {% for error in form.name.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
             {{ form.body.label }}<br>
-            {{ form.body(cols='33', rows='5')}}<br>
+            {{ form.body(cols='30', rows='5')}}<br>
             {% for error in form.body.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
