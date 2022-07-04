@@ -15,13 +15,15 @@
     <div class="overflow-auto">
     <form class="d-flex" method="post" >
     
-    <table class="table w-auto col-auto">
+    <table class="table w-auto col-auto small">
         
         <thead>
             <tr class="align-middle">
             <td>מעקב
             </td>
-            <td colspan="2">חומר לימוד</td>
+            <td>חומר לימוד</td>
+            <td>פתרון</td>
+            <td>תגובות</td>
             <td>יוצרים</td>
             <td>
                     <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="בחירת נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
@@ -65,7 +67,8 @@
                 </div>  
           </td>
           <td><a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{{ existing_resource[1].description }}</a></td>
-          <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource[1].resource_id) }}">תגובות ופתרונות</a></td>
+          <td>{% if  existing_resource[1].specification%}<a class="text-decoration-none" href="{{ existing_resource[1].specification }}">פתרון</a>{%endif%}</td>
+          <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource[1].resource_id) }}">תגובות</a></td>
           <td>{{ existing_resource[1].creator }}</td>
           <td>
           {% for subj in existing_resource[1].subject %}
