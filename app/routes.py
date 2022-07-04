@@ -59,6 +59,10 @@ def upload():
             form.link.data = "https://grades.cs.technion.ac.il/grades.cgi?" + \
                 "XXXXXXXX+" + '+'.join(form.link.data.split('+')[1:])
 
+        if ("https://grades.cs.technion.ac.il/grades.cgi?" in form.specification.data):
+            form.specification.data = "https://grades.cs.technion.ac.il/grades.cgi?" + \
+                "XXXXXXXX+" + '+'.join(form.specification.data.split('+')[1:])
+
         resource = Resource(link=form.link.data,
                             specification=form.specification.data,
                             creator=form.creator.data,

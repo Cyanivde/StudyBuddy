@@ -67,7 +67,7 @@
                 </div>  
           </td>
           <td><a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{{ existing_resource[1].description }}</a></td>
-          <td>{% if  existing_resource[1].specification%}<a class="text-decoration-none" href="{{ existing_resource[1].specification }}">פתרון</a>{%endif%}</td>
+          <td>{% if  existing_resource[1].specification%}<a  target="_blank" class="text-decoration-none" href="{{ existing_resource[1].specification }}">פתרון</a>{%endif%}</td>
           <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource[1].resource_id) }}">תגובות</a></td>
           <td>{{ existing_resource[1].creator }}</td>
           <td>
