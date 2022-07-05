@@ -14,14 +14,17 @@
 {%for res in resource_tuples%}
 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{url_for('course', course_id=res[2])}}">{{res[1]}}</a></li>
-    <li class="breadcrumb-item active" aria-current="page"><a href="{{ resource.link }}" target="_blank">{{res[0]}}</a></li>
+    <li class="breadcrumb-item"><a style="text-decoration:none" href="{{url_for('course', course_id=res[2])}}">{{res[1]}}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{res[0]}}</li>
   </ol>
 </nav>
    
 {%endfor%}
-
-
+<hr/>
+<ul>
+<li><a style="text-decoration:none" href="{{ resource.link }}" target="_blank">קישור</a></li>
+{% if  resource.specification%}<li><a style="text-decoration:none" href="{{ resource.specification }}" target="_blank">פתרון</a></li>{%endif%}
+</ul>
     {% if current_user.username == 'yaniv' %}
     <hr />
     <a href="{{ url_for('edit', resource_id=resource.id) }}">ערוך חומר</a>
