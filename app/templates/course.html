@@ -18,13 +18,10 @@
     <table class="table w-auto col-auto small">
         
         <thead>
-            <tr class="align-middle">
-            <td>מעקב
-            </td>
-            <td>חומר לימוד</td>
-            <td>פתרון</td>
-            <td>תגובות</td>
-            <td>יוצרים</td>
+            <tr class="align-middle">            
+            <td style="text-align:center" colspan="2">חומר לימוד</td>
+            <td style="text-align:center">תגובות</td>
+            <td style="text-align:center">יוצרים</td>
             <td>
                     <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="בחירת נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
                         {% for subject in subjects %}
@@ -38,16 +35,33 @@
                 <button class="btn btn-outline-success" type="submit">חיפוש</button>
                 </div>
               </td>
+              <td style="text-align:center">מעקב</td>
         </tr></thead>
       {% for directory in resources.keys() %}
       <tr style="font-size:10px">
-        <td colspan="6" style="padding-top:15px;">
+        <td colspan="7" style="padding-top:15px;">
           <b>{{directory}}</b>
         </td>
       </td>
       {% for existing_resource in resources[directory].iterrows() %}
       <tr {%if existing_resource[1].show == False %}style="display:none"{%endif%}>
+          
+          <td colspan="2"><a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{{ existing_resource[1].description }}</a>
+          {% if  existing_resource[1].specification%} / <a  target="_blank" class="text-decoration-none" href="{{ existing_resource[1].specification }}">פתרון</a>  {%endif%}</td>
+          <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource[1].resource_id) }}">תגובות</a></td>
+          <td>{{ existing_resource[1].creator }}</td>
           <td>
+          {% for subj in existing_resource[1].subject %}
+          {%if subj in filtered_subjects %}
+          <button type="button" class="btn btn-primary" style="padding: 0.125rem 0.25rem;font-size: 0.75rem;border-radius: 0.3rem;" onClick="document.getElementById('subj-{{subj}}').selected = false; this.form.submit();">{{ subj }}</button>
+          {% else %}
+          <button type="button" class="btn btn-outline-primary" style="padding: 0.125rem 0.25rem;font-size: 0.75rem;border-radius: 0.3rem;" onClick="document.getElementById('subj-{{subj}}').selected = true; this.form.submit();">{{ subj }}</button>
+          {% endif%}
+              {% endfor %}
+          </td>
+          <td>{% if existing_resource[1].occurrences %}
+              {{ existing_resource[1].occurrences }} התאמות {%endif%}</td>
+              <td>
                 <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{%endif%} class="btn-group" role="group" aria-label="Basic radio toggle button group">
                   <input onChange="this.form.submit()" type="radio" class="btn-check" name="btnradio-{{existing_resource[1].resource_id}}" id="btnradio1-{{existing_resource[1].resource_id}}" value="0" autocomplete="off" {% if (existing_resource[1].done != 1) and (existing_resource[1].done != 2) %}checked{%endif%} {% if not current_user.is_authenticated %}disabled {%endif%}>
                   <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{%endif%} style="padding: .25rem .5rem" class="btn btn-outline-primary" for="btnradio1-{{existing_resource[1].resource_id}}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
@@ -66,22 +80,6 @@
                   </svg></label>{% if current_user.is_authenticated %}</span>{%endif%}
                 </div>  
           </td>
-          <td><a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{{ existing_resource[1].description }}</a></td>
-          <td>{% if  existing_resource[1].specification%}<a  target="_blank" class="text-decoration-none" href="{{ existing_resource[1].specification }}">פתרון</a>{%endif%}</td>
-          <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource[1].resource_id) }}">תגובות</a></td>
-          <td>{{ existing_resource[1].creator }}</td>
-          <td>
-          {% for subj in existing_resource[1].subject %}
-          {%if subj in filtered_subjects %}
-          <button type="button" class="btn btn-primary" style="padding: 0.125rem 0.25rem;font-size: 0.75rem;border-radius: 0.3rem;" onClick="document.getElementById('subj-{{subj}}').selected = false; this.form.submit();">{{ subj }}</button>
-          {% else %}
-          <button type="button" class="btn btn-outline-primary" style="padding: 0.125rem 0.25rem;font-size: 0.75rem;border-radius: 0.3rem;" onClick="document.getElementById('subj-{{subj}}').selected = true; this.form.submit();">{{ subj }}</button>
-          {% endif%}
-              {% endfor %}
-          </td>
-          <td>{% if existing_resource[1].occurrences %}
-              {{ existing_resource[1].occurrences }} התאמות {%endif%}</td>
-          
       </tr>
       {% endfor %}
       {%endfor%}
