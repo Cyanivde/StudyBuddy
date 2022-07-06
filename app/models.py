@@ -35,7 +35,7 @@ class Subject(db.Model):
 class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
-    specification = db.Column(db.String(140))
+    specification = db.Column(db.String(500))
     creator = db.Column(db.String(140))
     subject = db.Column(db.Text)
     textdump = db.Column(db.Text)
