@@ -5,13 +5,6 @@
     <b>{{ course.name }}</b>
     <hr />
 
-    <a href={{url_for('gr')}} style="text-decoration:none"> <div name="warn-gr" class="alert alert-warning p-2 small" role="alert" display="none">
-      
-      העמוד הנוכחי מכיל קישורים למערכת ה-GR (טכניון). כדי שהקישורים יעבדו, יש 
-           להגדיר טוקן עדכני
-       מדי שעתיים. לחצו כאן כדי לעשות זאת.
-      
-    </div></a>
     <div class="overflow-auto">
     <form class="d-flex" method="post" >
     
@@ -96,15 +89,4 @@
   {%endif%}
 
 </div>
-<script type="text/javascript">
-    var links = document.getElementsByTagName('a');
-    var d = new Date();
-    for(let i = 0; i < links.length; i++)
-  {
-    if (links[i].href.includes('grades.cs.technion.ac.il/grades.cgi?')) {
-        links[i].href = 'https://grades.cs.technion.ac.il/grades.cgi?' + localStorage.token + links[i].href.substr(links[i].href.indexOf('+'));
-        document.getElementsByName("warn-gr")[0].display = "inline";
-    }  
-  }
-</script>
 {%endblock%}
