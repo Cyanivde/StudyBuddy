@@ -171,6 +171,15 @@ def course(course_id):
     resources_df = _filter_resources(resources_df, query=request.form.get(
         'query'), subject=request.form.getlist('subject'))
 
+    if request.method == "POST":
+        if current_user.is_authenticated:
+            resources_df = _fetch_resources(course_id)
+
+            all_subjects = _get_subjects(resources_df)
+
+            resources_df = _filter_resources(resources_df, query=request.form.get(
+                'query'), subject=request.form.getlist('subject'))
+
     multi_resources = dict()
     if len(resources_df) > 0:
         resources_df[['directory', 'description']

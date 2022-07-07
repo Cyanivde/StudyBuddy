@@ -8,6 +8,8 @@
     <hr />
 
     <div class="overflow-auto">    
+      <form class="d-flex" method="post" >
+
     <table class="table w-auto col-auto small">
         
         <thead>
@@ -79,6 +81,8 @@
 
 
 </table>
+</form>
+
 {% if current_user.username == 'yaniv' %}
 <hr />
 <a href="{{ url_for('updatecourse', course_id=course.id) }}">ערוך קורס</a>
