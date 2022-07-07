@@ -16,11 +16,6 @@ def index():
     return render_template("index.html", title='Home Page', courses=courses)
 
 
-@app.route('/gr')
-def gr():
-    return render_template("gr.html", title='Study Buddy')
-
-
 @app.route('/subjects', methods=['GET', 'POST'])
 def subjects():
     all_subjects = Subject.query.all()
@@ -176,29 +171,6 @@ def course(course_id):
     resources_df = _filter_resources(resources_df, query=request.form.get(
         'query'), subject=request.form.getlist('subject'))
 
-    if request.method == "POST":
-        if current_user.is_authenticated:
-            resource_ids = resources_df['resource_id']
-
-            for resource_id in resource_ids:
-                done_value = request.form.get(
-                    "btnradio-{}".format(resource_id))
-
-                db.session.query(ResourceToUser).filter_by(
-                    user_id=current_user.id, resource_id=resource_id).delete()
-
-                resource_to_user = ResourceToUser(
-                    user_id=current_user.id, resource_id=resource_id, done=done_value)
-                db.session.add(resource_to_user)
-            db.session.commit()
-
-            resources_df = _fetch_resources(course_id)
-
-            all_subjects = _get_subjects(resources_df)
-
-            resources_df = _filter_resources(resources_df, query=request.form.get(
-                'query'), subject=request.form.getlist('subject'))
-
     multi_resources = dict()
     if len(resources_df) > 0:
         resources_df[['directory', 'description']
@@ -300,6 +272,24 @@ def _filter_resources(resources_extended_df, query, subject):
             query.lower())
 
     return resources_extended_df
+
+
+@ app.route('/updateresource', methods=['POST'])
+def updateresource():
+
+    resource_id = request.get_json()['resource_id']
+    val = request.get_json()['val']
+
+    if current_user.is_authenticated:
+        db.session.query(ResourceToUser).filter_by(
+            user_id=current_user.id, resource_id=resource_id).delete()
+
+        resource_to_user = ResourceToUser(
+            user_id=current_user.id, resource_id=resource_id, done=val)
+        db.session.add(resource_to_user)
+        db.session.commit()
+
+    return render_template("index.html", title='Home Page')
 
 
 @ app.route('/resource/<resource_id>', methods=['GET', 'POST'])
