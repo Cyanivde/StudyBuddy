@@ -46,7 +46,7 @@
       {% for existing_resource in resources[directory].iterrows() %}
       <tr {%if existing_resource[1].show == False %}style="display:none"{%endif%}>
           
-          <td colspan="2"><a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{{ existing_resource[1].description }}</a>
+          <td colspan="2">{%if existing_resource[1].link != "-"%}<a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{%endif%}{{ existing_resource[1].description }}{%if existing_resource[1].link == '-'%}</a>{%endif%}
           {% if  existing_resource[1].specification%} / <a  target="_blank" class="text-decoration-none" href="{{ existing_resource[1].specification }}">{%if 'panopto' in existing_resource[1].specification%}הקלטה{%else%}פתרון{%endif%}</a>  {%endif%}</td>
           <td>
           {% for subj in existing_resource[1].subject %}
