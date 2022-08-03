@@ -52,6 +52,9 @@ def upload(course_id):
     form.subject.choices = all_subject_names
 
     if form.validate_on_submit():
+        if ('/' not in form.description.data):
+            form.description.data = "ללא קטגוריה/"+form.description.data
+
         resource = Resource(link=form.link.data,
                             specification=form.specification.data,
                             subject=json.dumps(form.subject.data),
