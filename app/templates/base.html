@@ -24,22 +24,9 @@
               </button>
               <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                      {% if current_user.username == 'yaniv' %}
+                      {% if current_user.username in admins %}
                   <li class="nav-item"><a class="nav-link" href="{{ url_for('subjects') }}">עץ הנושאים</a></li>
-                  <li class="nav-item"><a class="nav-link" href="{{ url_for('upload') }}">העלאת חומר</a></li>
                   <li class="nav-item"><a class="nav-link" href="{{ url_for('createcourse') }}">יצירת קורס</a></li>
-                      
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          הקורסים שלי
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                          <li><a class="dropdown-item" href="#">קורס 1</a></li>
-                          <li><a class="dropdown-item" href="#">קורס 2</a></li>
-                          <li><a class="dropdown-item" href="#">קורס 3</a></li>
-                        </ul>
-                      </li>
-
                     {% endif %}
                 </ul>
 

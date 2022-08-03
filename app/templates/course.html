@@ -3,8 +3,13 @@
 
 
 {% block content %}
-
-    <b>{{ course.name }}</b>
+  <b><a style="text-decoration:none" href="{{ url_for('course', course_id=course.id) }}">{{ course.name }}</a></b>
+  {% if current_user.username in admins %}
+  <span style="padding-right: 15px">
+<a style="text-decoration:none" href="{{ url_for('upload', course_id=course.id) }}">העלאת חומר</a></span>
+<span style="padding-right: 15px"><a style="text-decoration:none" href="{{ url_for('updatecourse', course_id=course.id) }}">ערוך קורס</a>
+  </span>
+  {%endif%}
     <hr />
 
     <div class="overflow-auto">    
@@ -15,15 +20,13 @@
         <thead>
             <tr class="align-middle">            
             <td style="text-align:center" colspan="2">חומר לימוד</td>
-            <td style="text-align:center">תגובות</td>
-            <td style="text-align:center">יוצרים</td>
-            <td>
+            <td><div class="input-group">
                     <select name="subject" class="selectpicker" multiple data-actions-box="true" data-style="" data-style-base="form-control" data-none-results-text="אין תוצאות עבור {0}" data-live-search="true" data-width="200px" data-none-selected-text="בחירת נושאים" data-select-all-text="בחר הכל" data-deselect-all-text="איפוס" data-selected-text-format="static">
                         {% for subject in subjects %}
                         <option id="subj-{{subject}}" {% if subject in filtered_subjects %} selected {% endif %}>{{ subject }}</option>
                         {% endfor %}
                       </select><button class="btn btn-outline-success" type="submit">סינון</button>
-            </td>
+                    </div></td>
             <td>
                 <div class="input-group">
                 <input name="query" class="form-control" type="search" value="{% if current_search %}{{current_search}}{% else %}{%endif%}" placeholder="חיפוש בגוף הטקסט" aria-label="Search">
@@ -31,6 +34,8 @@
                 </div>
               </td>
               <td style="text-align:center">מעקב</td>
+
+              {% if current_user.username in admins %}<td style="text-align:center"></td>{%endif%}
         </tr></thead>
       {% for directory in resources.keys() %}
       <tr style="font-size:10px">
@@ -43,8 +48,6 @@
           
           <td colspan="2"><a class="text-decoration-none" target="_blank" href="{{ existing_resource[1].link }}">{{ existing_resource[1].description }}</a>
           {% if  existing_resource[1].specification%} / <a  target="_blank" class="text-decoration-none" href="{{ existing_resource[1].specification }}">פתרון</a>  {%endif%}</td>
-          <td><a class="text-decoration-none" href="{{ url_for('resource', resource_id=existing_resource[1].resource_id) }}">תגובות</a></td>
-          <td>{{ existing_resource[1].creator }}</td>
           <td>
           {% for subj in existing_resource[1].subject %}
           {%if subj in filtered_subjects %}
@@ -75,6 +78,7 @@
                   </svg></label>{% if current_user.is_authenticated %}</span>{%endif%}
                 </div>  
           </td>
+          <td><a class="text-decoration-none" href="{{ url_for('edit',resource_id=existing_resource[1].resource_id, course_id=course.id) }}">עריכה</a></td>
       </tr>
       {% endfor %}
       {%endfor%}
@@ -83,11 +87,7 @@
 </table>
 </form>
 
-{% if current_user.username == 'yaniv' %}
-<hr />
-<a href="{{ url_for('updatecourse', course_id=course.id) }}">ערוך קורס</a>
 
-  {%endif%}
 
 </div>
 

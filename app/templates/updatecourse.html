@@ -4,7 +4,7 @@
 
     <b>{{ course.name }}</b>
     <hr />
-        {% if current_user.username == 'yaniv' %}
+    {% if current_user.username in admins %}
         
     <hr />
     <form action="" method="post">

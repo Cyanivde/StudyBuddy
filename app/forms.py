@@ -35,15 +35,14 @@ class CourseResourcesForm(FlaskForm):
 
 
 class UploadForm(FlaskForm):
+    description = StringField('שם')
     link = StringField('קישור', validators=[
         DataRequired(message=ERR_EMPTY)])
-    specification = StringField('הערת סוגריים')
-    creator = StringField('יוצרים', validators=[
-        DataRequired(message=ERR_EMPTY)])
+    specification = StringField('פתרון')
     subject = SelectMultipleField('נושא', validate_choice=False)
     textdump = TextAreaField('העתקה של הטקסט', validators=[
         DataRequired(message=ERR_EMPTY)])
-    submit = SubmitField('העלאה')
+    submit = SubmitField('שמירה')
 
 
 class CommentForm(FlaskForm):

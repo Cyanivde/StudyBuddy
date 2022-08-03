@@ -1,9 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if current_user.username == 'yaniv' %}
+{% if current_user.username in admins %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
+        {% if with_name%}
+        <p>
+            {{ form.description.label }}<br>
+            {{ form.description(size=32) }}<br>
+            {% for error in form.description.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        {% endif %}
         <p>
             {{ form.link.label }}<br>
             {{ form.link(size=32) }}<br>
@@ -15,13 +24,6 @@
             {{ form.specification.label }}<br>
             {{ form.specification(size=32) }}<br>
             {% for error in form.specification.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.creator.label }}<br>
-            {{ form.creator(size=32) }}<br>
-            {% for error in form.creator.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

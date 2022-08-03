@@ -9,11 +9,13 @@ from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource
 import pandas as pd
 import json
 
+admins = ['yaniv', 'gilad', 'hili.levy']
+
 
 @app.route('/')
 def index():
     courses = Course.query.all()
-    return render_template("index.html", title='Home Page', courses=courses)
+    return render_template("index.html", title='Home Page', courses=courses, admins=admins)
 
 
 @app.route('/subjects', methods=['GET', 'POST'])
@@ -34,13 +36,13 @@ def subjects():
             db.session.add(subject)
         db.session.commit()
         form.subjects.data = "\n".join(all_subject_names)
-        return render_template("subjects.html", title='Home Page', form=form)
+        return render_template("subjects.html", title='Home Page', form=form, admins=admins)
     form.subjects.data = "\n".join(all_subject_names)
-    return render_template("subjects.html", title='Home Page', form=form)
+    return render_template("subjects.html", title='Home Page', form=form, admins=admins)
 
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
+@app.route('/upload/<course_id>', methods=['GET', 'POST'])
+def upload(course_id):
     all_subjects = Subject.query.all()
     all_subject_names = [subject.name for subject in all_subjects]
     if (all_subject_names is not None):
@@ -50,25 +52,23 @@ def upload():
     form.subject.choices = all_subject_names
 
     if form.validate_on_submit():
-        if ("https://grades.cs.technion.ac.il/grades.cgi?" in form.link.data):
-            form.link.data = "https://grades.cs.technion.ac.il/grades.cgi?" + \
-                "XXXXXXXX+" + '+'.join(form.link.data.split('+')[1:])
-
-        if ("https://grades.cs.technion.ac.il/grades.cgi?" in form.specification.data):
-            form.specification.data = "https://grades.cs.technion.ac.il/grades.cgi?" + \
-                "XXXXXXXX+" + '+'.join(form.specification.data.split('+')[1:])
-
         resource = Resource(link=form.link.data,
                             specification=form.specification.data,
-                            creator=form.creator.data,
                             subject=json.dumps(form.subject.data),
                             textdump=form.textdump.data.lower())
         db.session.add(resource)
+
         db.session.commit()
         db.session.refresh(resource)
-        return redirect(url_for('resource', resource_id=resource.id))
 
-    return render_template('upload.html', title='upload', form=form, options=all_subject_names)
+        resource_to_course = ResourceToCourse(
+            course_id=course_id, resource_id=resource.id, description=form.description.data, importance=0)
+        db.session.add(resource_to_course)
+        db.session.commit()
+
+        return redirect(url_for('course', course_id=course_id))
+
+    return render_template('upload.html', title='upload', form=form, options=all_subject_names, admins=admins, with_name=True)
 
 
 @app.route('/edit/<resource_id>', methods=['GET', 'POST'])
@@ -86,21 +86,19 @@ def edit(resource_id):
     if form.validate_on_submit():
         resource.link = form.link.data
         resource.specification = form.specification.data
-        resource.creator = form.creator.data
         resource.subject = json.dumps(form.subject.data)
         resource.textdump = form.textdump.data.lower()
         db.session.commit()
         db.session.refresh(resource)
-        return redirect(url_for('resource', resource_id=resource.id))
+        return redirect(url_for('course', course_id=request.args.get('course_id')))
 
     else:
         form.link.data = resource.link
         form.specification.data = resource.specification
-        form.creator.data = resource.creator
         form.subject.data = json.loads(resource.subject)
         form.textdump.data = resource.textdump
 
-    return render_template('upload.html', title='upload', form=form, options=all_subject_names)
+    return render_template('upload.html', title='upload', form=form, options=all_subject_names, admins=admins, with_name=False)
 
 
 @app.route('/createcourse', methods=['GET', 'POST'])
@@ -113,7 +111,7 @@ def createcourse():
         db.session.commit()
         return redirect(url_for('index'))
 
-    return render_template('createcourse.html', title='createcourse', form=form)
+    return render_template('createcourse.html', title='createcourse', form=form, admins=admins)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -132,7 +130,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('login.html', title='Sign In', form=form, admins=admins)
 
 
 @app.route('/logout')
@@ -154,7 +152,7 @@ def register():
         db.session.commit()
         login_user(user)
         return redirect(url_for('index'))
-    return render_template('register.html', title='register', form=form)
+    return render_template('register.html', title='register', form=form, admins=admins)
 
 
 @app.route('/course/<course_id>', methods=['GET', 'POST'])
@@ -164,7 +162,7 @@ def course(course_id):
     resources_df = _fetch_resources(course_id)
 
     if 'subject' not in resources_df.keys():
-        return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict())
+        return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict(), admins=admins)
 
     all_subjects = _get_subjects(resources_df)
 
@@ -188,7 +186,7 @@ def course(course_id):
         for directory in resources_df['directory']:
             multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
-    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources)
+    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, admins=admins)
 
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
@@ -199,20 +197,20 @@ def updatecourse(course_id):
     resources_df = _fetch_resources(course_id)
     if not form.validate_on_submit():
         form.resources.data = _resources_to_textarea(resources_df)
-        return render_template('updatecourse.html', form=form, course=course)
+        return render_template('updatecourse.html', form=form, course=course, admins=admins)
 
     else:
-        resources = [(line.split(']')[0][-1], ' '.join(line.split(' ')[1:-1])[:-1],
-                      line.split(': ')[-1]) for line in form.resources.data.split('\n') if ' ' in line]
+        resources = [(line.split(' | ')[0], line.split(' | ')[1])
+                     for line in form.resources.data.split('\n') if ' ' in line]
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
         for resource in resources:
             resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[2], description=resource[1], importance=resource[0])
+                course_id=course_id, resource_id=resource[0], description=resource[1], importance=0)
             db.session.add(resource_to_course)
         db.session.commit()
 
-        return render_template('updatecourse.html', form=form, course=course)
+        return render_template('updatecourse.html', form=form, course=course, admins=admins)
 
 
 def _fetch_resources(course_id):
@@ -253,8 +251,8 @@ def _jsonload(x):
 
 
 def _resources_to_textarea(df):
-    return "\n".join(["[{0}] {1}: {2}".format(
-        resource[1].importance, resource[1].description, resource[1].resource_id) for resource in df.iterrows()])
+    return "\n".join(["{0} | {1}".format(
+        resource[1].resource_id, resource[1].description) for resource in df.iterrows()])
 
 
 def _get_subjects(resources_df):
@@ -298,7 +296,7 @@ def updateresource():
         db.session.add(resource_to_user)
         db.session.commit()
 
-    return render_template("index.html", title='Home Page')
+    return render_template("index.html", title='Home Page', admins=admins)
 
 
 @ app.route('/resource/<resource_id>', methods=['GET', 'POST'])
@@ -357,7 +355,7 @@ def resource(resource_id):
         other_comments[main_comment_id] = comments_df[comments_df['parent_comment']
                                                       == main_comment_id]
 
-    return render_template('resource.html', form=form, resource=resource, resource_tuples=resource_tuples, main_comments=main_comments.iterrows(), other_comments=other_comments)
+    return render_template('resource.html', form=form, resource=resource, resource_tuples=resource_tuples, main_comments=main_comments.iterrows(), other_comments=other_comments, admins=admins)
 
 
 @ app.route('/search', methods=['POST'])
@@ -375,7 +373,7 @@ def delete(resource_id):
         courses_list += [result.course_id]
 
     if (len(courses_list) > 0):
-        return render_template('delete.html', message=message + str(courses_list))
+        return render_template('delete.html', message=message + str(courses_list), admins=admins)
 
     db.session.query(Resource).filter_by(
         id=resource_id).delete()
@@ -427,7 +425,7 @@ def search(query):
 
     result_resources_final.sort(key=lambda x: x.occurrences, reverse=True)
 
-    return render_template('search.html', query=query, result_resources=result_resources_final)
+    return render_template('search.html', query=query, result_resources=result_resources_final, admins=admins)
 
 
 class Object(object):

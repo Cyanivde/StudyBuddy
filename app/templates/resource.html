@@ -17,75 +17,12 @@
 <li><a style="text-decoration:none" href="{{ resource.link }}" target="_blank">קישור</a></li>
 {% if  resource.specification%}<li><a style="text-decoration:none" href="{{ resource.specification }}" target="_blank">פתרון</a></li>{%endif%}
 </ul>
-    {% if current_user.username == 'yaniv' %}
+{% if current_user.username in admins %}
     <hr />
     <a href="{{ url_for('edit', resource_id=resource.id) }}">ערוך חומר</a>
     
       {%endif%}
 <hr/>
 
-{% for main_comment in main_comments %}
-<div class="card" style="width: 100%; max-width:800px; margin: 20px 0">
-  <div class="card-body">
-    <p><b>{{main_comment[1].user_name}}</b>
-      <span style="font-size:10px">פורסם ב-{{main_comment[1].timestamp.date()}}</span></p>
-    <p class="card-text">{{main_comment[1].body|urlize(32, target='_blank')}}</p>
-   
-
-    {% for other_comment in other_comments[main_comment[1].id].iterrows()%}
-        <div class="card" style="width: 100%; max-width:800px; margin: 20px 0">
-          <div class="card-body">
-            <p><b>{{other_comment[1].user_name}}</b>
-              <span style="font-size:10px">פורסם ב-{{other_comment[1].timestamp.date()}}</span></p>
-            <p class="card-text">{{other_comment[1].body|urlize(32, target='_blank')}}
-            {%if current_user.id == other_comment[1].user_id or current_user.username == 'yaniv' %}
-            <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{other_comment[1].id}}'; document.getElementById('mode').value='עריכה ל'">ערוך תגובה</button>
-            {%endif %}
-            {%if current_user.username == 'yaniv' %}
-            <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='{{url_for('deletecomment', comment_id=other_comment[1].id)}}'">מחק תגובה</button>
-            {%endif %}
-          </div>
-        </div>
-    {% endfor %}
-    <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{main_comment[1].id}}'; document.getElementById('mode').value='תגובה ל'">הוספת תגובה</button>
-    
-    {%if current_user.id == main_comment[1].user_id or current_user.username == 'yaniv' %}
-    <button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='{{main_comment[1].id}}'; document.getElementById('mode').value='עריכה ל'">ערוך תגובה</button>
-    {%endif %}
-    {%if current_user.username == 'yaniv' %}
-    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.href='{{url_for('deletecomment', comment_id=main_comment[1].id)}}'">מחק תגובה</button>
-    {%endif %}
-  </div>
-</div>
-
-{% endfor %}
-<button type="button" class="btn btn-primary  btn-sm" onclick="document.getElementById('comment').style='display: block; width: 100%; max-width:800px; margin: 20px 0'; document.getElementById('parent').value='הדף כולו'; document.getElementById('mode').value='תגובה ל'">הוספת תגובה</button>
-
-
-<div style="display: none; width: 100%; max-width:800px; margin: 20px 0" class="card" id="comment">
-  <div class="card-body">
-    
-      <form action="" method="post">
-        
-        <p><input name="mode" id="mode" value="תגובה ל" style="display:none"></input><input value="0" id="parent" name="parent" style="display:none"></input></p>
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=28) }}<br>
-            {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.body.label }}<br>
-            {{ form.body(cols='30', rows='5')}}<br>
-            {% for error in form.body.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-  </div>
-  </div>
 
 {% endblock %}
