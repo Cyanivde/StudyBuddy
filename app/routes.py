@@ -381,11 +381,23 @@ def delete(resource_id):
     return redirect(url_for('index'))
 
 
+@ app.route('/deletecourse/<course_id>')
+def deletecourse(course_id):
+    if current_user.is_authenticated and current_user.username in admins:
+        db.session.query(ResourceToCourse).filter_by(
+            course_id=course_id).delete()
+        db.session.query(Course).filter_by(
+            id=course_id).delete()
+        db.session.commit()
+    return redirect(url_for('index'))
+
+
 @ app.route('/deletecomment/<comment_id>')
 def deletecomment(comment_id):
-    db.session.query(Comment).filter_by(
-        id=comment_id).delete()
-    db.session.commit()
+    if current_user.is_authenticated and current_user.username in admins:
+        db.session.query(Comment).filter_by(
+            id=comment_id).delete()
+        db.session.commit()
     return redirect(url_for('index'))
 
 
