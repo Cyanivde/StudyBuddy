@@ -78,7 +78,7 @@
                   </svg></label>{% if current_user.is_authenticated %}</span>{%endif%}
                 </div>  
           </td>
-          <td><a class="text-decoration-none" href="{{ url_for('edit',resource_id=existing_resource[1].resource_id, course_id=course.id) }}">עריכה</a></td>
+          {% if current_user.username in admins %}<td><a class="text-decoration-none" href="{{ url_for('edit',resource_id=existing_resource[1].resource_id, course_id=course.id) }}">עריכה</a></td>{%endif%}
       </tr>
       {% endfor %}
       {%endfor%}
