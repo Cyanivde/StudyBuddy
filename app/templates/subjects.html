@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% if current_user.username in {{admins}} %}
+{% if current_user.username in admins %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
