@@ -1,0 +1,18 @@
+a {
+    text-decoration:none;
+}
+
+.subject-btn {
+    padding: 0.125rem 0.25rem !important;
+    font-size: 0.75rem;
+    border-radius: 0.3rem;
+}
+
+/* Override settings from libraries */
+.filter-option {
+    text-align: right !important;
+}
+
+.btn-outline-primary {
+    padding: 0rem 0.5rem 0.2rem 0.5rem;
+}

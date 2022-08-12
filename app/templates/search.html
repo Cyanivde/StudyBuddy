@@ -1,14 +1,12 @@
 {% extends "base.html" %}
-
 {% block content %}
-
     תוצאות חיפוש עבור: {{ query }}
     <hr />
     <ul>
-    {% for result_resource in result_resources %}
-    <li><a href="{{ url_for('resource', resource_id=result_resource.resource_id) }}">{{ result_resource.description }}</a> ({{ result_resource.occurrences }} התאמות)</li>
-    {% endfor %}
+        {% for result_resource in result_resources %}
+            <li>
+                <a href="{{ url_for('resource', resource_id=result_resource.resource_id) }}">{{ result_resource.description }}</a> ({{ result_resource.occurrences }} התאמות)
+            </li>
+        {% endfor %}
     </ul>
-        
-    
 {% endblock %}
