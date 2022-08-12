@@ -15,10 +15,10 @@
       {% if is_archive %}</b>{% endif %}
     </li>
     {% if current_user.username in admins %}
-      <li class="list-group-item">
+      <li class="list-group-item list-group-item-link">
         <a href="{{ url_for('upload', course_id=course.id) }}">העלאת חומר</a>
       </li>
-      <li class="list-group-item">
+      <li class="list-group-item list-group-item-link">
         <a href="{{ url_for('updatecourse', course_id=course.id) }}">ערוך קורס</a>
       </li>
     {% endif %}
