@@ -2,7 +2,17 @@
 {% block content %}
   <ul class="list-group list-group-horizontal">
     <li class="list-group-item">
-      <b><a href="{{ url_for('course', course_id=course.id) }}">{{ course.name }}</a></b>
+      <h4>{{ course.name }}</h4>
+    </li>
+    <li class="list-group-item list-group-item-link">
+      {% if not is_archive %}<b>{% endif %}
+      <a href="{{ url_for('course', course_id=course.id) }}">הסמסטר הנוכחי</a>
+      {% if not is_archive %}</b>{% endif %}
+    </li>
+    <li class="list-group-item list-group-item-link">
+      {% if is_archive %}<b>{% endif %}
+      <a href="{{ url_for('archive', course_id=course.id) }}">ארכיון</a>
+      {% if is_archive %}</b>{% endif %}
     </li>
     {% if current_user.username in admins %}
       <li class="list-group-item">

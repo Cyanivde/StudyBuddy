@@ -157,11 +157,20 @@ def register():
     return render_template('register.html', title='register', form=form, admins=admins)
 
 
+@app.route('/archive/<course_id>', methods=['GET', 'POST'])
+def archive(course_id):
+    return _course(course_id, 1)
+
+
 @app.route('/course/<course_id>', methods=['GET', 'POST'])
 def course(course_id):
+    return _course(course_id, 0)
+
+
+def _course(course_id, is_archive):
     course = Course.query.filter_by(id=course_id).first_or_404()
 
-    resources_df = _fetch_resources(course_id)
+    resources_df = _fetch_resources(course_id, is_archive)
 
     if 'subject' not in resources_df.keys():
         return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict(), admins=admins)
@@ -173,7 +182,7 @@ def course(course_id):
 
     if request.method == "POST":
         if current_user.is_authenticated:
-            resources_df = _fetch_resources(course_id)
+            resources_df = _fetch_resources(course_id, is_archive)
 
             all_subjects = _get_subjects(resources_df)
 
@@ -188,7 +197,7 @@ def course(course_id):
         for directory in resources_df['directory']:
             multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
-    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, admins=admins)
+    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, admins=admins, is_archive=is_archive)
 
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
@@ -196,28 +205,37 @@ def updatecourse(course_id):
     course = Course.query.filter_by(id=course_id).first_or_404()
 
     form = CourseResourcesForm()
-    resources_df = _fetch_resources(course_id)
+    resources_df = _fetch_resources(course_id, 0)
+    archive_df = _fetch_resources(course_id, 1)
     if not form.validate_on_submit():
         form.resources.data = _resources_to_textarea(resources_df)
+        form.archive.data = _resources_to_textarea(archive_df)
         return render_template('updatecourse.html', form=form, course=course, admins=admins)
 
     else:
         resources = [(line.split(' | ')[0], line.split(' | ')[1])
                      for line in form.resources.data.split('\n') if ' ' in line]
+        archive = [(line.split(' | ')[0], line.split(' | ')[1])
+                   for line in form.archive.data.split('\n') if ' ' in line]
+
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
         for resource in resources:
             resource_to_course = ResourceToCourse(
                 course_id=course_id, resource_id=resource[0], description=resource[1], importance=0)
             db.session.add(resource_to_course)
+        for resource in archive:
+            resource_to_course = ResourceToCourse(
+                course_id=course_id, resource_id=resource[0], description=resource[1], importance=1)
+            db.session.add(resource_to_course)
         db.session.commit()
 
         return render_template('updatecourse.html', form=form, course=course, admins=admins)
 
 
-def _fetch_resources(course_id):
+def _fetch_resources(course_id, is_archive):
     resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(
-        course_id=course_id).statement, db.session.bind)
+        course_id=course_id, importance=is_archive).statement, db.session.bind)
 
     resource_ids = set(resource_to_course_df['resource_id'])
 

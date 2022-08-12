@@ -31,6 +31,7 @@ class CreateCourseForm(FlaskForm):
 
 class CourseResourcesForm(FlaskForm):
     resources = TextAreaField('חומרי הקורס')
+    archive = TextAreaField('ארכיון חומרים')
     submit = SubmitField('שמירה')
 
 

@@ -16,6 +16,10 @@ a {
     border: none;
 }
 
+.list-group-item-link {
+    padding-top: 14px;
+}
+
 /* Override settings from libraries */
 .filter-option {
     text-align: right !important;

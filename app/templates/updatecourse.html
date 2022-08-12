@@ -9,9 +9,16 @@
             <p>
                 {{ form.resources.label }}
                 <br/>
-                {{ form.resources(rows='22',cols='100')}}
+                {{ form.resources(rows='8',cols='100')}}
                 <br/>
                 {% for error in form.resources.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            </p>
+            <p>
+                {{ form.archive.label }}
+                <br/>
+                {{ form.archive(rows='8',cols='100')}}
+                <br/>
+                {% for error in form.archive.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>{{ form.submit() }}</p>
         </form>
