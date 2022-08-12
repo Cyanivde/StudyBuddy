@@ -13,11 +13,21 @@
   <hr/>
   <ul>
     <li>
-      <a href="{{ resource.link }}" target="_blank">קישור</a>
+      {% if resource.link != "-" %}<a class="text-decoration-none"
+   target="_blank"
+   href="{{ resource.link }}">{% endif %}
+      קישור
+      {% if resource.link != '-' %}</a>{% endif %}
     </li>
     {% if resource.specification %}
       <li>
-        <a href="{{ resource.specification }}" target="_blank">פתרון</a>
+        <a href="{{ resource.specification }}" target="_blank">
+          {% if 'panopto' in resource.specification %}
+            הקלטה
+          {% else %}
+            פתרון
+          {% endif %}
+        </a>
       </li>
     {% endif %}
   </ul>
