@@ -12,6 +12,10 @@ a {
     --bs-breadcrumb-divider: '>';
 }
 
+.list-group-item {
+    border: none;
+}
+
 /* Override settings from libraries */
 .filter-option {
     text-align: right !important;

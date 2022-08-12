@@ -318,11 +318,6 @@ def resource(resource_id):
     return render_template('resource.html', resource=resource, resource_tuples=resource_tuples, admins=admins)
 
 
-@ app.route('/search', methods=['POST'])
-def searchredirection():
-    return redirect(url_for('search', query=request.form.get("searchbox", "")))
-
-
 @ app.route('/delete/<resource_id>')
 def delete(resource_id):
     results = db.session.query(ResourceToCourse).filter_by(
@@ -350,45 +345,6 @@ def deletecourse(course_id):
             id=course_id).delete()
         db.session.commit()
     return redirect(url_for('index'))
-
-
-@ app.route('/search/<query>', methods=['GET'])
-def search(query):
-    resources = Resource.query.filter(
-        Resource.textdump.contains(query.lower())).all()
-
-    resource_to_occurences = dict()
-    resource_to_descriptions = dict()
-    resource_to_link = dict()
-
-    for resource in resources:
-        resource_to_occurences[resource.id] = resource.textdump.count(
-            query.lower())
-        resource_to_link[resource.id] = resource.link
-
-    resource_to_course = ResourceToCourse.query.filter(
-        ResourceToCourse.resource_id.in_(resource_to_occurences.keys()))
-
-    resource_ids_in_course = {
-        result_resource.resource_id: result_resource.description for result_resource in resource_to_course}
-
-    for resource_id in resource_to_occurences.keys():
-        if resource_id in resource_ids_in_course:
-            resource_to_descriptions[resource_id] = resource_ids_in_course[resource_id]
-        else:
-            resource_to_descriptions[resource_id] = resource_to_link[resource_id]
-
-    result_resources_final = []
-    for resource_id in resource_to_occurences.keys():
-        resource = Object()
-        resource.resource_id = resource_id
-        resource.description = resource_to_descriptions[resource_id]
-        resource.occurrences = resource_to_occurences[resource_id]
-        result_resources_final += [resource]
-
-    result_resources_final.sort(key=lambda x: x.occurrences, reverse=True)
-
-    return render_template('search.html', query=query, result_resources=result_resources_final, admins=admins)
 
 
 class Object(object):
