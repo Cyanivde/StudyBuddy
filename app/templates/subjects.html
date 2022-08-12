@@ -5,12 +5,12 @@
             {{ form.hidden_tag() }}
             <p>
                 {{ form.subjects.label }}
-                <br>
+                <br/>
                 {{ form.subjects(rows='22',cols='100')}}
-                <br>
-                {% for error in form.subjects.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                <br/>
+                {% for error in form.subjects.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>{{ form.submit() }}</p>
         </form>
     {% endif %}
-{% endblock %}
+{% endblock content %}

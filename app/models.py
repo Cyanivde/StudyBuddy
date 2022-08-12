@@ -61,18 +61,6 @@ class ResourceToUser(db.Model):
     done = db.Column(db.Integer)
 
 
-class Comment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    resource_id = db.Column(db.Integer, db.ForeignKey('resource.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user_name = db.Column(db.String(140))
-    body = db.Column(db.Text)
-    parent_comment = db.Column(db.Integer)
-    score = db.Column(db.Integer)
-    pinned = db.Column(db.Integer)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
-
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))

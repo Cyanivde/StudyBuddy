@@ -45,15 +45,6 @@ class UploadForm(FlaskForm):
     submit = SubmitField('שמירה')
 
 
-class CommentForm(FlaskForm):
-    name = StringField('השם שלך (אופציונלי)')
-    body = TextAreaField('תוכן התגובה', validators=[
-        DataRequired(message=ERR_EMPTY)])
-    parent = StringField()
-    mode = StringField()
-    submit = SubmitField('שמירה')
-
-
 class LoginForm(FlaskForm):
     username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
                            DataRequired(message=ERR_EMPTY)])

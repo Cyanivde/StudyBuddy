@@ -3,8 +3,8 @@ from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.forms import CommentForm, LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm, SearchForm
-from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource, Course, Comment
+from app.forms import LoginForm, RegistrationForm, SubjectsForm, UploadForm, CreateCourseForm, CourseResourcesForm, SearchForm
+from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource, Course
 import pandas as pd
 import json
 
@@ -315,49 +315,7 @@ def resource(resource_id):
         resource_tuples += [(res.description.split('/')
                              [1], course.name, res.course_id)]
 
-    form = CommentForm()
-
-    if form.validate_on_submit():
-
-        if form.name.data == '':
-            form.name.data = 'אנונימי'
-
-        if form.parent.data == 'הדף כולו':
-            form.parent.data = 0
-
-        userid = 0
-        if current_user.is_authenticated:
-            userid = current_user.id
-
-        if form.mode.data == 'תגובה ל':
-            comment = Comment(
-                resource_id=resource_id,
-                user_id=userid,
-                user_name=form.name.data,
-                body=form.body.data,
-                parent_comment=form.parent.data,
-                score=0,
-                pinned=0)
-            db.session.add(comment)
-            db.session.commit()
-        else:
-            comment = Comment.query.filter_by(id=form.parent.data).first()
-            comment.user_name = form.name.data
-            comment.body = form.body.data
-            db.session.commit()
-            db.session.refresh(resource)
-
-    comments_df = pd.read_sql(Comment.query.filter_by(
-        resource_id=resource_id).statement, db.session.bind)
-
-    main_comments = comments_df[comments_df['parent_comment'] == 0]
-    other_comments = dict()
-
-    for main_comment_id in main_comments['id']:
-        other_comments[main_comment_id] = comments_df[comments_df['parent_comment']
-                                                      == main_comment_id]
-
-    return render_template('resource.html', form=form, resource=resource, resource_tuples=resource_tuples, main_comments=main_comments.iterrows(), other_comments=other_comments, admins=admins)
+    return render_template('resource.html', resource=resource, resource_tuples=resource_tuples, admins=admins)
 
 
 @ app.route('/search', methods=['POST'])
@@ -390,15 +348,6 @@ def deletecourse(course_id):
             course_id=course_id).delete()
         db.session.query(Course).filter_by(
             id=course_id).delete()
-        db.session.commit()
-    return redirect(url_for('index'))
-
-
-@ app.route('/deletecomment/<comment_id>')
-def deletecomment(comment_id):
-    if current_user.is_authenticated and current_user.username in admins:
-        db.session.query(Comment).filter_by(
-            id=comment_id).delete()
         db.session.commit()
     return redirect(url_for('index'))
 

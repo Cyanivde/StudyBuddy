@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   {% for res in resource_tuples %}
-    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <nav class="breadcrumb-nav" aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="{{ url_for('course', course_id=res[2])}}">{{ res[1] }}</a>
@@ -15,7 +15,7 @@
     <li>
       <a href="{{ resource.link }}" target="_blank">קישור</a>
     </li>
-    {% if  resource.specification %}
+    {% if resource.specification %}
       <li>
         <a href="{{ resource.specification }}" target="_blank">פתרון</a>
       </li>
@@ -26,4 +26,4 @@
     <a href="{{ url_for('edit', resource_id=resource.id) }}">ערוך חומר</a>
   {% endif %}
   <hr/>
-{% endblock %}
+{% endblock content %}

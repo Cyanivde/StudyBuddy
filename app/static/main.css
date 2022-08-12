@@ -8,6 +8,10 @@ a {
     border-radius: 0.3rem;
 }
 
+.breadcrumb-nav {
+    --bs-breadcrumb-divider: '>';
+}
+
 /* Override settings from libraries */
 .filter-option {
     text-align: right !important;

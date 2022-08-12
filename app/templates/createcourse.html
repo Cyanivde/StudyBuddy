@@ -5,12 +5,10 @@
             {{ form.hidden_tag() }}
             <p>
                 {{ form.name.label }}
-                <br>
+                <br/>
                 {{ form.name(size=32) }}
-                <br>
-                {% for error in form.name.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
             </p>
             <p>{{ form.submit() }}</p>
         </form>
     {% endif %}
-{% endblock %}
+{% endblock content %}

@@ -6,29 +6,29 @@
             {% if with_name %}
                 <p>
                     {{ form.description.label }}
-                    <br>
+                    <br/>
                     {{ form.description(size=32) }}
-                    <br>
-                    {% for error in form.description.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                    <br/>
+                    {% for error in form.description.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
                 </p>
             {% endif %}
             <p>
                 {{ form.link.label }}
-                <br>
+                <br/>
                 {{ form.link(size=32) }}
-                <br>
-                {% for error in form.link.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                <br/>
+                {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>
                 {{ form.specification.label }}
-                <br>
+                <br/>
                 {{ form.specification(size=32) }}
-                <br>
-                {% for error in form.specification.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                <br/>
+                {% for error in form.specification.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>
                 {{ form.subject.label }}
-                <br>
+                <br/>
                 <select name="subject"
                         class="selectpicker"
                         multiple
@@ -46,16 +46,16 @@
                         </option>
                     {% endfor %}
                 </select>
-                {% for error in form.subject.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>
                 {{ form.textdump.label }}
-                <br>
+                <br/>
                 {{ form.textdump(rows='10',cols='100')}}
-                <br>
-                {% for error in form.textdump.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                <br/>
+                {% for error in form.textdump.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>{{ form.submit() }}</p>
         </form>
     {% endif %}
-{% endblock %}
+{% endblock content %}

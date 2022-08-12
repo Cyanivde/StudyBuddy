@@ -8,12 +8,12 @@
             {{ form.hidden_tag() }}
             <p>
                 {{ form.resources.label }}
-                <br>
+                <br/>
                 {{ form.resources(rows='22',cols='100')}}
-                <br>
-                {% for error in form.resources.errors %}<span style="color: red;">[{{ error }}]</span>{% endfor %}
+                <br/>
+                {% for error in form.resources.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>{{ form.submit() }}</p>
         </form>
     {% endif %}
-{% endblock %}
+{% endblock content %}
