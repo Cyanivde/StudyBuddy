@@ -276,8 +276,9 @@ def _fetch_resources(course_id, is_archive):
                 headers.add(header)
                 header_row = dict(row[1])
                 header_row['description'] = desc.split('/')[0] + '/' + header
-                header_row['done'] = resources_extended_df[resources_extended_df['header']
-                                                           == header]['done'].min()
+                if 'done' in resources_extended_df.columns:
+                    header_row['done'] = resources_extended_df[resources_extended_df['header']
+                                                               == header]['done'].min()
                 header_row['subject'] = [item for sublist in resources_extended_df[resources_extended_df['header']
                                                                                    == header]['subject'] for item in sublist]
                 header_row['textdump'] = ' '.join(resources_extended_df[resources_extended_df['header']
