@@ -298,7 +298,8 @@ def _jsonload(x):
 
 
 def _resources_to_textarea(df):
-    df = df[~df['in_group'] | df['description'].str.contains('--')]
+    if len(df) > 0:
+        df = df[~df['in_group'] | df['description'].str.contains('--')]
 
     return "\n".join(["{0} | {1}".format(
         resource[1].resource_id, resource[1].description) for resource in df.iterrows()])
