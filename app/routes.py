@@ -263,15 +263,15 @@ def _fetch_resources(course_id, is_archive):
 
     resources_extended_df['in_group'] = False
     resources_extended_df['header'] = resources_extended_df['description'].apply(lambda x: x.split(
-        '/')[1].split('-')[0])
+        '/')[1].split('--')[0])
     resources_with_headers = pd.DataFrame()
     headers = set()
 
     for row in resources_extended_df.iterrows():
         desc = row[1]['description']
-        if '-' in desc:
+        if '--' in desc:
             row[1]['in_group'] = True
-            header = desc.split('/')[1].split('-')[0]
+            header = desc.split('/')[1].split('--')[0]
             if header not in headers:
                 headers.add(header)
                 header_row = dict(row[1])
@@ -298,7 +298,7 @@ def _jsonload(x):
 
 
 def _resources_to_textarea(df):
-    df = df[~df['in_group'] | df['description'].str.contains('-')]
+    df = df[~df['in_group'] | df['description'].str.contains('--')]
 
     return "\n".join(["{0} | {1}".format(
         resource[1].resource_id, resource[1].description) for resource in df.iterrows()])
