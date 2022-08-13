@@ -2,6 +2,9 @@ a {
     text-decoration:none;
 }
 
+tr {
+    height:48px;
+}
 .subject-btn {
     padding: 0.125rem 0.25rem !important;
     font-size: 0.75rem;

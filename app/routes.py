@@ -260,7 +260,34 @@ def _fetch_resources(course_id, is_archive):
             lambda x: _jsonload(x))
 
     resources_extended_df = resources_extended_df.fillna(0)
-    return resources_extended_df
+
+    resources_extended_df['in_group'] = False
+    resources_extended_df['header'] = resources_extended_df['description'].apply(lambda x: x.split(
+        '/')[1].split('-')[0])
+    resources_with_headers = pd.DataFrame()
+    headers = set()
+
+    for row in resources_extended_df.iterrows():
+        desc = row[1]['description']
+        if '-' in desc:
+            row[1]['in_group'] = True
+            header = desc.split('/')[1].split('-')[0]
+            if header not in headers:
+                headers.add(header)
+                header_row = dict(row[1])
+                header_row['description'] = desc.split('/')[0] + '/' + header
+                header_row['done'] = resources_extended_df[resources_extended_df['header']
+                                                           == header]['done'].min()
+                header_row['subject'] = [item for sublist in resources_extended_df[resources_extended_df['header']
+                                                                                   == header]['subject'] for item in sublist]
+                header_row['textdump'] = ' '.join(resources_extended_df[resources_extended_df['header']
+                                                                        == header]['textdump'])
+                resources_with_headers = resources_with_headers.append(
+                    header_row, ignore_index=True)
+        resources_with_headers = resources_with_headers.append(
+            row[1], ignore_index=True)
+
+    return resources_with_headers
 
 
 def _jsonload(x):
@@ -271,6 +298,8 @@ def _jsonload(x):
 
 
 def _resources_to_textarea(df):
+    df = df[~df['in_group'] | df['description'].str.contains('-')]
+
     return "\n".join(["{0} | {1}".format(
         resource[1].resource_id, resource[1].description) for resource in df.iterrows()])
 
@@ -297,6 +326,8 @@ def _filter_resources(resources_extended_df, query, subject):
     if (query):
         resources_extended_df['occurrences'] = resources_extended_df['textdump'].str.count(
             query.lower())
+
+    resources_extended_df = resources_extended_df[resources_extended_df['show']]
 
     return resources_extended_df
 

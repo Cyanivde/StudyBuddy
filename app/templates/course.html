@@ -78,139 +78,168 @@
           </tr>
           {% for existing_resource in resources[directory].iterrows() %}
             <tr class="align-middle"
-                {% if existing_resource[1].show == False %}style="display:none"{% endif %}>
+                {% if '-' in existing_resource[1].description %} name="{{ existing_resource[1].header }}"{% endif %}
+                {% if existing_resource[1].show == False or (existing_resource[1].in_group and '-' in existing_resource[1].description) %}style="display:none"{% endif %}>
               <td colspan="2">
-                {% if existing_resource[1].link != "-" %}
-                  <a class="text-decoration-none"
-                     target="_blank"
-                     href="{{ existing_resource[1].link }}">
-                  {% endif %}
-                  {{ existing_resource[1].description }}
-                  {% if existing_resource[1].link != '-' %}</a>{% endif %}
-                  {% if existing_resource[1].specification %}
-                    / <a target="_blank"
+                {% if existing_resource[1].in_group and '-' not in existing_resource[1].description %}
+                  <a href="#" onclick='toggle("{{ existing_resource[1].header }}")'>{{ existing_resource[1].description }}</a>
+                {% else %}
+                  {% if existing_resource[1].in_group %}
+                    <div style="padding-right:25px">
+                    {% else %}
+                      <div>
+                      {% endif %}
+                      {% if existing_resource[1].link != "-" %}
+                        <a class="text-decoration-none"
+                           target="_blank"
+                           href="{{ existing_resource[1].link }}">
+                        {% endif %}
+                        {{ existing_resource[1].description }}
+                        {% if existing_resource[1].link != '-' %}</a>{% endif %}
+                        {% if existing_resource[1].specification %}
+                          / <a target="_blank"
     class="text-decoration-none"
     href="{{ existing_resource[1].specification }}">
-                    {% if 'panopto' in existing_resource[1].specification %}
-                      הקלטה
-                    {% else %}
-                      פתרון
+                          {% if 'panopto' in existing_resource[1].specification %}
+                            הקלטה
+                          {% else %}
+                            פתרון
+                          {% endif %}
+                        </a>
+                      {% endif %}
                     {% endif %}
-                  </a>
-                {% endif %}
-              </td>
-              <td>
-                {% for subj in existing_resource[1].subject %}
-                  {% if subj in filtered_subjects %}
-                    <button type="button"
-                            class="subject-btn btn btn-primary"
-                            onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
-                      {{ subj }}
-                    </button>
-                  {% else %}
-                    <button type="button"
-                            class="subject-btn btn btn-outline-primary"
-                            onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
-                      {{ subj }}
-                    </button>
-                  {% endif %}
-                {% endfor %}
-              </td>
-              <td>
-                {% if existing_resource[1].occurrences %}{{ existing_resource[1].occurrences }} התאמות{% endif %}
-              </td>
-              <td>
-                <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
-                     class="btn-group"
-                     role="group"
-                     aria-label="Basic radio toggle button group">
-                  <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 0);"
-                         type="radio"
-                         class="btn-check"
-                         name="btnradio-{{ existing_resource[1].name }}"
-                         id="btnradio1-{{ existing_resource[1].resource_id }}"
-                         value="0"
-                         autocomplete="off"
-                         {% if (existing_resource[1].done != 1) and (existing_resource[1].done != 2) %}checked{% endif %}
-                         {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                  <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
-                         class="btn btn-outline-primary"
-                         for="btnradio1-{{ existing_resource[1].resource_id }}">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="16"
-                         height="16"
-                         fill="currentColor"
-                         class="bi bi-dash"
-                         viewBox="0 0 16 16">
-                      <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
-                    </svg>
-                  </label>
-                  <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 1);"
-                         type="radio"
-                         class="btn-check"
-                         name="btnradio-{{ existing_resource[1].name }}"
-                         id="btnradio2-{{ existing_resource[1].resource_id }}"
-                         value="1"
-                         autocomplete="off"
-                         {% if existing_resource[1].done == 1 %}checked{% endif %}
-                         {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                  <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
-                         class="btn btn-outline-primary"
-                         for="btnradio2-{{ existing_resource[1].resource_id }}">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="16"
-                         height="16"
-                         fill="currentColor"
-                         class="bi bi-arrow-repeat"
-                         viewBox="0 0 16 16">
-                      <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-                      <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
-                    </svg>
-                  </label>
-                  <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 2);"
-                         type="radio"
-                         class="btn-check"
-                         name="btnradio-{{ existing_resource[1].name }}"
-                         id="btnradio3-{{ existing_resource[1].resource_id }}"
-                         value="2"
-                         autocomplete="off"
-                         {% if existing_resource[1].done == 2 %}checked{% endif %}
-                         {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                  <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="הושלם"{% endif %}
-                         class="btn btn-outline-primary"
-                         for="btnradio3-{{ existing_resource[1].resource_id }}">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="16"
-                         height="16"
-                         fill="currentColor"
-                         class="bi bi-check2"
-                         viewBox="0 0 16 16">
-                      <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                    </svg>
-                  </label>
-                </div>
-              </td>
-              {% if current_user.username in admins %}
-                <td>
-                  <a class="text-decoration-none"
-                     href="{{ url_for('edit',resource_id=existing_resource[1].resource_id, course_id=course.id) }}">עריכה</a>
+                  </div>
                 </td>
-              {% endif %}
-            </tr>
+                <td>
+                  {% if not existing_resource[1].in_group or '-' in existing_resource[1].description %}
+                    {% for subj in existing_resource[1].subject %}
+                      {% if subj in filtered_subjects %}
+                        <button type="button"
+                                class="subject-btn btn btn-primary"
+                                onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
+                          {{ subj }}
+                        </button>
+                      {% else %}
+                        <button type="button"
+                                class="subject-btn btn btn-outline-primary"
+                                onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
+                          {{ subj }}
+                        </button>
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if not existing_resource[1].in_group or '-' in existing_resource[1].description %}
+                    {% if existing_resource[1].occurrences %}{{ existing_resource[1].occurrences }} התאמות{% endif %}
+                  {% endif %}
+                </td>
+                <td>
+                  <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
+                       class="btn-group"
+                       {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %}id="{{ existing_resource[1].header }}-status"{% endif %}
+                       role="group"
+                       aria-label="Basic radio toggle button group">
+                    <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 0);"
+                           type="radio"
+                           class="btn-check"
+                           {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio1-{{ existing_resource[1].resource_id }}" {% endif %}
+                           value="0"
+                           autocomplete="off"
+                           {% if (existing_resource[1].done != 1) and (existing_resource[1].done != 2) %}checked{% endif %}
+                           {% if not current_user.is_authenticated %}disabled{% endif %}/>
+                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
+                           class="btn btn-outline-primary"
+                           for="btnradio1-{{ existing_resource[1].resource_id }}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-dash"
+                           viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+                      </svg>
+                    </label>
+                    <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 1);"
+                           type="radio"
+                           class="btn-check"
+                           {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio2-{{ existing_resource[1].resource_id }}" {% endif %}
+                           value="1"
+                           autocomplete="off"
+                           {% if existing_resource[1].done == 1 %}checked{% endif %}
+                           {% if not current_user.is_authenticated %}disabled{% endif %}/>
+                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
+                           class="btn btn-outline-primary"
+                           for="btnradio2-{{ existing_resource[1].resource_id }}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-arrow-repeat"
+                           viewBox="0 0 16 16">
+                        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                      </svg>
+                    </label>
+                    <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 2);"
+                           type="radio"
+                           class="btn-check"
+                           {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio3-{{ existing_resource[1].resource_id }}" {% endif %}
+                           value="2"
+                           autocomplete="off"
+                           {% if existing_resource[1].done == 2 %}checked{% endif %}
+                           {% if not current_user.is_authenticated %}disabled{% endif %}/>
+                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="הושלם"{% endif %}
+                           class="btn btn-outline-primary"
+                           for="btnradio3-{{ existing_resource[1].resource_id }}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-check2"
+                           viewBox="0 0 16 16">
+                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                      </svg>
+                    </label>
+                  </div>
+                </td>
+                {% if current_user.username in admins %}
+                  {% if not existing_resource[1].in_group or '-' in existing_resource[1].description %}
+                    <td>
+                      <a class="text-decoration-none"
+                         href="{{ url_for('edit',resource_id=existing_resource[1].resource_id, course_id=course.id) }}">עריכה</a>
+                    </td>
+                  {% endif %}
+                {% endif %}
+              </tr>
+            {% endfor %}
           {% endfor %}
-        {% endfor %}
-      </table>
-    </form>
-  </div>
-  <script type="text/javascript">
-    function updateRadio(resource_id, val) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "{{ url_for('updateresource')}}", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify({
-            resource_id: resource_id,
-            val: val
-        }));
-    }
-  </script>
-{% endblock content %}
+        </table>
+      </form>
+    </div>
+    <script type="text/javascript">
+      function updateRadio(resource_id, val) {
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "{{ url_for('updateresource')}}", true);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
+              resource_id: resource_id,
+              val: val
+          }));
+      }
+      
+      function toggle(header) {
+          var trs = document.getElementsByName(header);
+          for (let i = 0; i < trs.length; i++) {
+              if (trs[i].style.display == 'none') {
+                  trs[i].style.display = '';
+                  document.getElementById(header + '-status').style.display = 'none';
+              } else {
+                  trs[i].style.display = 'none';
+                  document.getElementById(header + '-status').style.display = '';
+              }
+      
+          }
+      }
+    </script>
+  {% endblock content %}
