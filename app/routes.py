@@ -8,7 +8,7 @@ from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource
 import pandas as pd
 import json
 
-admins = ['yaniv', 'gilad', 'hili.levy', 'admin']
+admins = ['yaniv', 'gilad', 'hili.levy', 'admin', 'badir']
 
 
 @app.route('/')
