@@ -78,10 +78,10 @@
           </tr>
           {% for existing_resource in resources[directory].iterrows() %}
             <tr class="align-middle"
-                {% if '-' in existing_resource[1].description %} name="{{ existing_resource[1].header }}"{% endif %}
-                {% if existing_resource[1].show == False or (existing_resource[1].in_group and '-' in existing_resource[1].description) %}style="display:none"{% endif %}>
+                {% if '--' in existing_resource[1].description %} name="{{ existing_resource[1].header }}"{% endif %}
+                {% if existing_resource[1].show == False or (existing_resource[1].in_group and '--' in existing_resource[1].description) %}style="display:none"{% endif %}>
               <td colspan="2">
-                {% if existing_resource[1].in_group and '-' not in existing_resource[1].description %}
+                {% if existing_resource[1].in_group and '--' not in existing_resource[1].description %}
                   <a href="#" onclick='toggle("{{ existing_resource[1].header }}")'>{{ existing_resource[1].description }}</a>
                 {% else %}
                   {% if existing_resource[1].in_group %}
@@ -111,7 +111,7 @@
                   </div>
                 </td>
                 <td>
-                  {% if not existing_resource[1].in_group or '-' in existing_resource[1].description %}
+                  {% if not existing_resource[1].in_group or '--' in existing_resource[1].description %}
                     {% for subj in existing_resource[1].subject %}
                       {% if subj in filtered_subjects %}
                         <button type="button"
@@ -130,20 +130,20 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% if not existing_resource[1].in_group or '-' in existing_resource[1].description %}
+                  {% if not existing_resource[1].in_group or '--' in existing_resource[1].description %}
                     {% if existing_resource[1].occurrences %}{{ existing_resource[1].occurrences }} התאמות{% endif %}
                   {% endif %}
                 </td>
                 <td>
                   <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
                        class="btn-group"
-                       {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %}id="{{ existing_resource[1].header }}-status"{% endif %}
+                       {% if (existing_resource[1].in_group) and '--' not in existing_resource[1].description %}id="{{ existing_resource[1].header }}-status"{% endif %}
                        role="group"
                        aria-label="Basic radio toggle button group">
                     <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 0);"
                            type="radio"
                            class="btn-check"
-                           {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio1-{{ existing_resource[1].resource_id }}" {% endif %}
+                           {% if (existing_resource[1].in_group) and '--' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio1-{{ existing_resource[1].resource_id }}" {% endif %}
                            value="0"
                            autocomplete="off"
                            {% if (existing_resource[1].done != 1) and (existing_resource[1].done != 2) %}checked{% endif %}
@@ -163,7 +163,7 @@
                     <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 1);"
                            type="radio"
                            class="btn-check"
-                           {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio2-{{ existing_resource[1].resource_id }}" {% endif %}
+                           {% if (existing_resource[1].in_group) and '--' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio2-{{ existing_resource[1].resource_id }}" {% endif %}
                            value="1"
                            autocomplete="off"
                            {% if existing_resource[1].done == 1 %}checked{% endif %}
@@ -184,7 +184,7 @@
                     <input onchange="updateRadio({{ existing_resource[1].resource_id }}, 2);"
                            type="radio"
                            class="btn-check"
-                           {% if (existing_resource[1].in_group) and '-' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio3-{{ existing_resource[1].resource_id }}" {% endif %}
+                           {% if (existing_resource[1].in_group) and '--' not in existing_resource[1].description %} disabled {% else %} name="btnradio-{{ existing_resource[1].name }}" id="btnradio3-{{ existing_resource[1].resource_id }}" {% endif %}
                            value="2"
                            autocomplete="off"
                            {% if existing_resource[1].done == 2 %}checked{% endif %}
@@ -204,7 +204,7 @@
                   </div>
                 </td>
                 {% if current_user.username in admins %}
-                  {% if not existing_resource[1].in_group or '-' in existing_resource[1].description %}
+                  {% if not existing_resource[1].in_group or '--' in existing_resource[1].description %}
                     <td>
                       <a class="text-decoration-none"
                          href="{{ url_for('edit',resource_id=existing_resource[1].resource_id, course_id=course.id) }}">עריכה</a>
