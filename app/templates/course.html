@@ -82,7 +82,8 @@
                 {% if existing_resource[1].show == False or (existing_resource[1].in_group and '--' in existing_resource[1].description) %}style="display:none"{% endif %}>
               <td colspan="2">
                 {% if existing_resource[1].in_group and '--' not in existing_resource[1].description %}
-                  <a href="#" onclick='toggle("{{ existing_resource[1].header }}")'>{{ existing_resource[1].description }}</a>
+                  <a href="javascript:void(0);"
+                     onclick='toggle("{{ existing_resource[1].header }}")'>{{ existing_resource[1].description }}</a>
                 {% else %}
                   {% if existing_resource[1].in_group %}
                     <div style="padding-right:25px">
