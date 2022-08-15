@@ -63,8 +63,11 @@ def upload(course_id):
         db.session.commit()
         db.session.refresh(resource)
 
+        existing_count = ResourceToCourse.query.filter_by(
+            course_id=course_id, importance=0).count()
+
         resource_to_course = ResourceToCourse(
-            course_id=course_id, resource_id=resource.id, description=form.description.data, importance=0)
+            course_id=course_id, resource_id=resource.id, description=form.description.data, importance=0, order=existing_count+1)
         db.session.add(resource_to_course)
         db.session.commit()
 
@@ -230,18 +233,26 @@ def updatecourse(course_id):
 
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
+
+        order = 1
         for resource in resources:
             resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[0], description=resource[1], importance=0)
+                course_id=course_id, resource_id=resource[0], description=resource[1], importance=0, order=order)
             db.session.add(resource_to_course)
+            order += 1
+
         for resource in archive:
             resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[0], description=resource[1], importance=1)
+                course_id=course_id, resource_id=resource[0], description=resource[1], importance=1, order=order)
             db.session.add(resource_to_course)
+            order += 1
+
         for resource in exams:
             resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[0], description=resource[1], importance=2)
+                course_id=course_id, resource_id=resource[0], description=resource[1], importance=2, order=order)
             db.session.add(resource_to_course)
+            order += 1
+
         db.session.commit()
 
         return render_template('updatecourse.html', form=form, course=course, admins=admins)
@@ -250,6 +261,8 @@ def updatecourse(course_id):
 def _fetch_resources(course_id, importance):
     resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(
         course_id=course_id, importance=importance).statement, db.session.bind)
+
+    resource_to_course_df.sort_values('order', inplace=True)
 
     resource_ids = set(resource_to_course_df['resource_id'])
 
