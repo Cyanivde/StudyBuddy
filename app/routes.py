@@ -157,6 +157,11 @@ def register():
     return render_template('register.html', title='register', form=form, admins=admins)
 
 
+@app.route('/exams/<course_id>', methods=['GET', 'POST'])
+def exams(course_id):
+    return _course(course_id, 2)
+
+
 @app.route('/archive/<course_id>', methods=['GET', 'POST'])
 def archive(course_id):
     return _course(course_id, 1)
@@ -167,10 +172,10 @@ def course(course_id):
     return _course(course_id, 0)
 
 
-def _course(course_id, is_archive):
+def _course(course_id, importance):
     course = Course.query.filter_by(id=course_id).first_or_404()
 
-    resources_df = _fetch_resources(course_id, is_archive)
+    resources_df = _fetch_resources(course_id, importance)
 
     if 'subject' not in resources_df.keys():
         return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict(), admins=admins)
@@ -182,7 +187,7 @@ def _course(course_id, is_archive):
 
     if request.method == "POST":
         if current_user.is_authenticated:
-            resources_df = _fetch_resources(course_id, is_archive)
+            resources_df = _fetch_resources(course_id, importance)
 
             all_subjects = _get_subjects(resources_df)
 
@@ -197,7 +202,7 @@ def _course(course_id, is_archive):
         for directory in resources_df['directory']:
             multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
-    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, admins=admins, is_archive=is_archive)
+    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, admins=admins, importance=importance)
 
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
@@ -207,9 +212,12 @@ def updatecourse(course_id):
     form = CourseResourcesForm()
     resources_df = _fetch_resources(course_id, 0)
     archive_df = _fetch_resources(course_id, 1)
+    exams_df = _fetch_resources(course_id, 2)
+
     if not form.validate_on_submit():
         form.resources.data = _resources_to_textarea(resources_df)
         form.archive.data = _resources_to_textarea(archive_df)
+        form.exams.data = _resources_to_textarea(exams_df)
         return render_template('updatecourse.html', form=form, course=course, admins=admins)
 
     else:
@@ -217,6 +225,8 @@ def updatecourse(course_id):
                      for line in form.resources.data.split('\n') if ' ' in line]
         archive = [(line.split(' | ')[0], line.split(' | ')[1])
                    for line in form.archive.data.split('\n') if ' ' in line]
+        exams = [(line.split(' | ')[0], line.split(' | ')[1])
+                 for line in form.exams.data.split('\n') if ' ' in line]
 
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
@@ -228,14 +238,18 @@ def updatecourse(course_id):
             resource_to_course = ResourceToCourse(
                 course_id=course_id, resource_id=resource[0], description=resource[1], importance=1)
             db.session.add(resource_to_course)
+        for resource in exams:
+            resource_to_course = ResourceToCourse(
+                course_id=course_id, resource_id=resource[0], description=resource[1], importance=2)
+            db.session.add(resource_to_course)
         db.session.commit()
 
         return render_template('updatecourse.html', form=form, course=course, admins=admins)
 
 
-def _fetch_resources(course_id, is_archive):
+def _fetch_resources(course_id, importance):
     resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(
-        course_id=course_id, importance=is_archive).statement, db.session.bind)
+        course_id=course_id, importance=importance).statement, db.session.bind)
 
     resource_ids = set(resource_to_course_df['resource_id'])
 

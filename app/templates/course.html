@@ -5,14 +5,19 @@
       <h4>{{ course.name }}</h4>
     </li>
     <li class="list-group-item list-group-item-link">
-      {% if not is_archive %}<b>{% endif %}
-      <a href="{{ url_for('course', course_id=course.id) }}">חומרים עדכניים</a>
-      {% if not is_archive %}</b>{% endif %}
+      {% if importance == 0 %}<b>{% endif %}
+      <a href="{{ url_for('course', course_id=course.id) }}">סמסטר</a>
+      {% if importance == 0 %}</b>{% endif %}
     </li>
     <li class="list-group-item list-group-item-link">
-      {% if is_archive %}<b>{% endif %}
+      {% if importance == 2 %}<b>{% endif %}
+      <a href="{{ url_for('exams', course_id=course.id) }}">מבחנים</a>
+      {% if importance == 2 %}</b>{% endif %}
+    </li>
+    <li class="list-group-item list-group-item-link">
+      {% if importance == 1 %}<b>{% endif %}
       <a href="{{ url_for('archive', course_id=course.id) }}">ארכיון</a>
-      {% if is_archive %}</b>{% endif %}
+      {% if importance == 1 %}</b>{% endif %}
     </li>
     {% if current_user.username in admins %}
       <li class="list-group-item list-group-item-link">
