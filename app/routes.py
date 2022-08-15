@@ -241,12 +241,14 @@ def updatecourse(course_id):
             db.session.add(resource_to_course)
             order += 1
 
+        order = 1
         for resource in archive:
             resource_to_course = ResourceToCourse(
                 course_id=course_id, resource_id=resource[0], description=resource[1], importance=1, order=order)
             db.session.add(resource_to_course)
             order += 1
 
+        order = 1
         for resource in exams:
             resource_to_course = ResourceToCourse(
                 course_id=course_id, resource_id=resource[0], description=resource[1], importance=2, order=order)
