@@ -55,7 +55,7 @@ def upload(course_id):
             form.description.data = "ללא קטגוריה/"+form.description.data
 
         resource = Resource(link=form.link.data,
-                            specification=form.specification.data,
+                            solution=form.solution.data,
                             subject=json.dumps(form.subject.data),
                             textdump=form.textdump.data.lower())
         db.session.add(resource)
@@ -90,7 +90,7 @@ def edit(resource_id):
 
     if form.validate_on_submit():
         resource.link = form.link.data
-        resource.specification = form.specification.data
+        resource.solution = form.solution.data
         resource.subject = json.dumps(form.subject.data)
         resource.textdump = form.textdump.data.lower()
         db.session.commit()
@@ -99,7 +99,7 @@ def edit(resource_id):
 
     else:
         form.link.data = resource.link
-        form.specification.data = resource.specification
+        form.solution.data = resource.solution
         form.subject.data = json.loads(resource.subject)
         form.textdump.data = resource.textdump
 

@@ -19,10 +19,10 @@
       קישור
       {% if resource.link != '-' %}</a>{% endif %}
     </li>
-    {% if resource.specification %}
+    {% if resource.solution %}
       <li>
-        <a href="{{ resource.specification }}" target="_blank">
-          {% if 'panopto' in resource.specification %}
+        <a href="{{ resource.solution }}" target="_blank">
+          {% if 'panopto' in resource.solution %}
             הקלטה
           {% else %}
             פתרון

@@ -20,11 +20,11 @@
                 {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>
-                {{ form.specification.label }}
+                {{ form.solution.label }}
                 <br/>
-                {{ form.specification(size=32) }}
+                {{ form.solution(size=32) }}
                 <br/>
-                {% for error in form.specification.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+                {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>
                 {{ form.subject.label }}

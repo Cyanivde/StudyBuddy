@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -27,7 +25,7 @@ class Subject(db.Model):
 class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
-    specification = db.Column(db.String(500))
+    solution = db.Column(db.String(500))
     subject = db.Column(db.Text)
     textdump = db.Column(db.Text)
 

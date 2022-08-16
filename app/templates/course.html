@@ -102,11 +102,11 @@
                         {% endif %}
                         {{ existing_resource[1].description }}
                         {% if existing_resource[1].link != '-' %}</a>{% endif %}
-                        {% if existing_resource[1].specification %}
+                        {% if existing_resource[1].solution %}
                           / <a target="_blank"
     class="text-decoration-none"
-    href="{{ existing_resource[1].specification }}">
-                          {% if 'panopto' in existing_resource[1].specification %}
+    href="{{ existing_resource[1].solution }}">
+                          {% if 'panopto' in existing_resource[1].solution %}
                             הקלטה
                           {% else %}
                             פתרון

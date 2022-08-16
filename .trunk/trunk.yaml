@@ -1,0 +1,12 @@
+version: 0.1
+cli:
+  version: 0.16.1-beta
+lint:
+  enabled:
+    - black@22.6.0
+    - flake8@5.0.4
+    - git-diff-check@SYSTEM
+    - gitleaks@8.10.3
+    - isort@5.10.1
+    - prettier@2.7.1
+    - svgo@2.8.0
