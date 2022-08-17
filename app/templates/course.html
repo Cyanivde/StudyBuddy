@@ -19,7 +19,7 @@
       <a href="{{ url_for('archive', course_id=course.id) }}">ארכיון</a>
       {% if importance == 1 %}</b>{% endif %}
     </li>
-    {% if current_user.username in admins %}
+    {% if current_user.is_admin %}
       <li class="list-group-item list-group-item-link">
         <a href="{{ url_for('upload', course_id=course.id) }}">העלאת חומר</a>
       </li>
@@ -72,7 +72,7 @@
               </div>
             </td>
             <td class="text-center">מעקב</td>
-            {% if current_user.username in admins %}<td class="text-center"></td>{% endif %}
+            {% if current_user.is_admin %}<td class="text-center"></td>{% endif %}
           </tr>
         </thead>
         {% for directory in resources.keys() %}
@@ -209,7 +209,7 @@
                     </label>
                   </div>
                 </td>
-                {% if current_user.username in admins %}
+                {% if current_user.is_admin %}
                   {% if not existing_resource[1].in_group or '--' in existing_resource[1].description %}
                     <td>
                       <a class="text-decoration-none"

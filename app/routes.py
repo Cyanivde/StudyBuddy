@@ -14,7 +14,7 @@ admins = ['yaniv', 'gilad', 'hili.levy', 'admin', 'badir']
 @app.route('/')
 def index():
     courses = Course.query.all()
-    return render_template("index.html", title='Home Page', courses=courses, admins=admins)
+    return render_template("index.html", title='Home Page', courses=courses)
 
 
 @app.route('/subjects', methods=['GET', 'POST'])
@@ -35,9 +35,9 @@ def subjects():
             db.session.add(subject)
         db.session.commit()
         form.subjects.data = "\n".join(all_subject_names)
-        return render_template("subjects.html", title='Home Page', form=form, admins=admins)
+        return render_template("subjects.html", title='Home Page', form=form)
     form.subjects.data = "\n".join(all_subject_names)
-    return render_template("subjects.html", title='Home Page', form=form, admins=admins)
+    return render_template("subjects.html", title='Home Page', form=form)
 
 
 @app.route('/upload/<course_id>', methods=['GET', 'POST'])
@@ -73,7 +73,7 @@ def upload(course_id):
 
         return redirect(url_for('course', course_id=course_id))
 
-    return render_template('upload.html', title='upload', form=form, options=all_subject_names, admins=admins, with_name=True)
+    return render_template('upload.html', title='upload', form=form, options=all_subject_names, with_name=True)
 
 
 @app.route('/edit/<resource_id>', methods=['GET', 'POST'])
@@ -103,7 +103,7 @@ def edit(resource_id):
         form.subject.data = json.loads(resource.subject)
         form.textdump.data = resource.textdump
 
-    return render_template('upload.html', title='upload', form=form, options=all_subject_names, admins=admins, with_name=False)
+    return render_template('upload.html', title='upload', form=form, options=all_subject_names, with_name=False)
 
 
 @app.route('/createcourse', methods=['GET', 'POST'])
@@ -116,7 +116,7 @@ def createcourse():
         db.session.commit()
         return redirect(url_for('index'))
 
-    return render_template('createcourse.html', title='createcourse', form=form, admins=admins)
+    return render_template('createcourse.html', title='createcourse', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -135,7 +135,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form, admins=admins)
+    return render_template('login.html', title='Sign In', form=form)
 
 
 @app.route('/logout')
@@ -151,13 +151,14 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data.lower(),
-                    email=form.email.data.lower())
+                    email=form.email.data.lower(),
+                    is_admin=False)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         login_user(user)
         return redirect(url_for('index'))
-    return render_template('register.html', title='register', form=form, admins=admins)
+    return render_template('register.html', title='register', form=form)
 
 
 @app.route('/exams/<course_id>', methods=['GET', 'POST'])
@@ -181,7 +182,7 @@ def _course(course_id, importance):
     resources_df = _fetch_resources(course_id, importance)
 
     if 'subject' not in resources_df.keys():
-        return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict(), admins=admins)
+        return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict())
 
     all_subjects = _get_subjects(resources_df)
 
@@ -205,7 +206,7 @@ def _course(course_id, importance):
         for directory in resources_df['directory']:
             multi_resources[directory] = resources_df[resources_df['directory'] == directory]
 
-    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, admins=admins, importance=importance)
+    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, current_search=request.form.get('query'), resources=multi_resources, importance=importance)
 
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
@@ -221,7 +222,7 @@ def updatecourse(course_id):
         form.resources.data = _resources_to_textarea(resources_df)
         form.archive.data = _resources_to_textarea(archive_df)
         form.exams.data = _resources_to_textarea(exams_df)
-        return render_template('updatecourse.html', form=form, course=course, admins=admins)
+        return render_template('updatecourse.html', form=form, course=course)
 
     else:
         resources = [(line.split(' | ')[0], line.split(' | ')[1])
@@ -257,7 +258,7 @@ def updatecourse(course_id):
 
         db.session.commit()
 
-        return render_template('updatecourse.html', form=form, course=course, admins=admins)
+        return render_template('updatecourse.html', form=form, course=course)
 
 
 def _fetch_resources(course_id, importance):
@@ -378,7 +379,7 @@ def updateresource():
         db.session.add(resource_to_user)
         db.session.commit()
 
-    return render_template("index.html", title='Home Page', admins=admins)
+    return render_template("index.html", title='Home Page')
 
 
 @ app.route('/resource/<resource_id>', methods=['GET', 'POST'])
@@ -395,7 +396,7 @@ def resource(resource_id):
         resource_tuples += [(res.description.split('/')
                              [1], course.name, res.course_id)]
 
-    return render_template('resource.html', resource=resource, resource_tuples=resource_tuples, admins=admins)
+    return render_template('resource.html', resource=resource, resource_tuples=resource_tuples)
 
 
 @ app.route('/delete/<resource_id>')
@@ -408,7 +409,7 @@ def delete(resource_id):
         courses_list += [result.course_id]
 
     if (len(courses_list) > 0):
-        return render_template('delete.html', message=message + str(courses_list), admins=admins)
+        return render_template('delete.html', message=message + str(courses_list))
 
     db.session.query(Resource).filter_by(
         id=resource_id).delete()
@@ -418,7 +419,7 @@ def delete(resource_id):
 
 @ app.route('/deletecourse/<course_id>')
 def deletecourse(course_id):
-    if current_user.is_authenticated and current_user.username in admins:
+    if current_user.is_authenticated and current_user.is_admin:
         db.session.query(ResourceToCourse).filter_by(
             course_id=course_id).delete()
         db.session.query(Course).filter_by(

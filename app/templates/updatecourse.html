@@ -2,7 +2,7 @@
 {% block content %}
     <b>{{ course.name }}</b>
     <hr />
-    {% if current_user.username in admins %}
+    {% if current_user.is_admin %}
         <hr />
         <form action="" method="post">
             {{ form.hidden_tag() }}

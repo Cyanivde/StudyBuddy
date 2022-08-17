@@ -31,7 +31,7 @@
       </li>
     {% endif %}
   </ul>
-  {% if current_user.username in admins %}
+  {% if current_user.is_admin %}
     <hr />
     <a href="{{ url_for('edit', resource_id=resource.id) }}">ערוך חומר</a>
   {% endif %}
