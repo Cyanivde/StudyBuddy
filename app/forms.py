@@ -38,9 +38,9 @@ class CourseResourcesForm(FlaskForm):
 
 class UploadForm(FlaskForm):
     description = StringField('שם')
-    link = StringField('קישור', validators=[
-        DataRequired(message=ERR_EMPTY)])
-    solution = StringField('פתרון/הקלטה')
+    link = StringField('קישור')
+    solution = StringField('פתרון')
+    recording = StringField('הקלטה')
     subject = SelectMultipleField('נושא', validate_choice=False)
     textdump = TextAreaField('העתקה של הטקסט', validators=[
         DataRequired(message=ERR_EMPTY)])

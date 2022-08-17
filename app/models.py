@@ -27,6 +27,8 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
     solution = db.Column(db.String(500))
+    recording = db.Column(db.String(500))
+    comments = db.Column(db.String(500))
     subject = db.Column(db.Text)
     textdump = db.Column(db.Text)
 

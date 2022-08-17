@@ -21,13 +21,12 @@
     </li>
     {% if resource.solution %}
       <li>
-        <a href="{{ resource.solution }}" target="_blank">
-          {% if 'panopto' in resource.solution %}
-            הקלטה
-          {% else %}
-            פתרון
-          {% endif %}
-        </a>
+        <a href="{{ resource.solution }}" target="_blank">פתרון</a>
+      </li>
+    {% endif %}
+    {% if resource.recording %}
+      <li>
+        <a href="{{ resource.recording }}" target="_blank">הקלטה</a>
       </li>
     {% endif %}
   </ul>

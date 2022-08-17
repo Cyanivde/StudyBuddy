@@ -8,8 +8,6 @@ from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource
 import pandas as pd
 import json
 
-admins = ['yaniv', 'gilad', 'hili.levy', 'admin', 'badir']
-
 
 @app.route('/')
 def index():
@@ -56,6 +54,7 @@ def upload(course_id):
 
         resource = Resource(link=form.link.data,
                             solution=form.solution.data,
+                            recording=form.recording.data,
                             subject=json.dumps(form.subject.data),
                             textdump=form.textdump.data.lower())
         db.session.add(resource)
@@ -91,6 +90,7 @@ def edit(resource_id):
     if form.validate_on_submit():
         resource.link = form.link.data
         resource.solution = form.solution.data
+        resource.recording = form.recording.data
         resource.subject = json.dumps(form.subject.data)
         resource.textdump = form.textdump.data.lower()
         db.session.commit()
@@ -100,6 +100,7 @@ def edit(resource_id):
     else:
         form.link.data = resource.link
         form.solution.data = resource.solution
+        form.recording.data = resource.recording
         form.subject.data = json.loads(resource.subject)
         form.textdump.data = resource.textdump
 

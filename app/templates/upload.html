@@ -27,6 +27,13 @@
                 {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
             </p>
             <p>
+                {{ form.recording.label }}
+                <br/>
+                {{ form.recording(size=32) }}
+                <br/>
+                {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            </p>
+            <p>
                 {{ form.subject.label }}
                 <br/>
                 <select name="subject"
