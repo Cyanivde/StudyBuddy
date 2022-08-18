@@ -35,7 +35,7 @@ def upgrade():
                     )
     op.create_table('resource_to_course',
                     sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('order', sa.Integer(), nullable=True),
+                    sa.Column('order_in_tab', sa.Integer(), nullable=True),
                     sa.Column('course_id', sa.Integer(), nullable=True),
                     sa.Column('resource_id', sa.Integer(), nullable=True),
                     sa.Column('description', sa.String(

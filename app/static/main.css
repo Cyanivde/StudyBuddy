@@ -1,33 +1,36 @@
 a {
-    text-decoration:none;
+  text-decoration: none;
 }
 
 tr {
-    height:48px;
+  height: 48px;
 }
 .subject-btn {
-    padding: 0.125rem 0.25rem !important;
-    font-size: 0.75rem;
-    border-radius: 0.3rem;
+  padding: 0.125rem 0.25rem !important;
+  font-size: 0.75rem;
+  border-radius: 0.3rem;
 }
 
 .breadcrumb-nav {
-    --bs-breadcrumb-divider: '>';
+  --bs-breadcrumb-divider: ">";
 }
 
 .list-group-item {
-    border: none;
+  border: none;
 }
 
 .list-group-item-link {
-    padding-top: 14px;
+  padding-top: 14px;
 }
 
 /* Override settings from libraries */
 .filter-option {
-    text-align: right !important;
+  text-align: right !important;
 }
 
-.btn-outline-primary {
-    padding: 0rem 0.5rem 0.2rem 0.5rem;
+.btn-outline-secondary {
+  padding: 0rem 0.5rem 0.2rem 0.5rem;
+}
+.btn-outline-success {
+  padding: 0rem 0.5rem 0.2rem 0.5rem;
 }

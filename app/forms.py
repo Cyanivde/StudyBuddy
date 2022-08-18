@@ -1,7 +1,7 @@
-from curses import ERR
+
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectMultipleField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp, Length
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, SelectMultipleField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp
 
 from app.models import User
 
@@ -14,21 +14,6 @@ def strip_whitespace(s):
     return s
 
 
-class SearchForm(FlaskForm):
-    query = StringField('שאילתה')
-    submit = SubmitField('חיפוש')
-
-
-class SubjectsForm(FlaskForm):
-    subjects = TextAreaField('עץ הנושאים')
-    submit = SubmitField('שמירה')
-
-
-class CreateCourseForm(FlaskForm):
-    name = StringField('שם הקורס')
-    submit = SubmitField('יצירה')
-
-
 class CourseResourcesForm(FlaskForm):
     resources = TextAreaField('חומרי הקורס')
     archive = TextAreaField('ארכיון חומרים')
@@ -37,13 +22,16 @@ class CourseResourcesForm(FlaskForm):
 
 
 class UploadForm(FlaskForm):
-    description = StringField('שם')
+    header = StringField('כותרת')
+    rname = StringField('שם')
+    rname_part = StringField('חלק')
+    tab = SelectField(
+        'לשונית', choices=[('semester', 'סמסטר'), ('exams', 'מבחנים'), ('archive', 'ארכיון')], validate_choice=False)
     link = StringField('קישור')
     solution = StringField('פתרון')
     recording = StringField('הקלטה')
     subject = SelectMultipleField('נושא', validate_choice=False)
-    textdump = TextAreaField('העתקה של הטקסט', validators=[
-        DataRequired(message=ERR_EMPTY)])
+    textdump = TextAreaField('העתקה של הטקסט')
     submit = SubmitField('שמירה')
 
 

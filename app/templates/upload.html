@@ -5,11 +5,21 @@
             {{ form.hidden_tag() }}
             {% if with_name %}
                 <p>
-                    {{ form.description.label }}
+                    {{ form.tab.label }}
+                    {{ form.tab() }}
+                </p>
+                <p>
+                    <p>
+                        נא לעקוב אחרי אחת התבניות:
+                        <ul>
+                            <li>שבוע 1 / הרצאה 1</li>
+                            <li>תרגיל בית 1 (עד 2022-01-01) / תרגיל בית 1 / שאלה 1</li>
+                            <li>מבחנים / מבחן חורף תשפא מועד א / שאלה 1</li>
+                        </ul>
+                    </p>
                     <br/>
-                    {{ form.description(size=32) }}
+                    {{ form.header(size=25) }} / {{ form.rname(size=25) }} / {{ form.rname_part(size=10) }}
                     <br/>
-                    {% for error in form.description.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
                 </p>
             {% endif %}
             <p>

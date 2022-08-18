@@ -41,11 +41,15 @@ class Course(db.Model):
 
 class ResourceToCourse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order = db.Column(db.Integer)
     course_id = db.Column(db.Integer)
     resource_id = db.Column(db.Integer)
     description = db.Column(db.String(140))
     importance = db.Column(db.Integer)
+    tab = db.Column(db.String(10))
+    order_in_tab = db.Column(db.Integer)
+    header = db.Column(db.String(140))
+    rname = db.Column(db.String(140))
+    rname_part = db.Column(db.String(140))
 
 
 class ResourceToUser(db.Model):
