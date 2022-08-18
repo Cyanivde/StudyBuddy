@@ -89,7 +89,7 @@
           </tr>
           {% for index, resource in resources[header].iterrows() %}
             <tr class="align-middle"
-                {% if resource.rname_part and not resource.is_fake_row %} name="{{ resource.name_md5 }}" {% if not filtered_subjects %} style="display: none"{% endif %}
+                {% if resource.rname_part and not resource.is_fake_row %} name="{{ resource.name_md5 }}" {% if not filtered_subjects and not resource.is_fake_row %} style="display: none"{% endif %}
                 {% endif %}>
               <td colspan="2">
                 {% if resource.is_fake_row %}
@@ -124,32 +124,34 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% if not (tab == 'exams' and resource.is_fake_row) %}
-                    {% for subj in resource.subject %}
-                      {% if subj in filtered_subjects %}
-                        <button type="button"
-                                class="subject-btn btn btn-secondary"
-                                onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
-                          {{ subj }}
-                        </button>
-                      {% else %}
-                        <button type="button"
-                                class="subject-btn btn btn-outline-secondary"
-                                onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
-                          {{ subj }}
-                        </button>
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
+                  <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" and filtered_subjects %} style="display: none"{% endif %}>
+                    {% if not (tab == 'exams' and resource.is_fake_row) %}
+                      {% for subj in resource.subject %}
+                        {% if subj in filtered_subjects %}
+                          <button type="button"
+                                  class="subject-btn btn btn-secondary"
+                                  onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
+                            {{ subj }}
+                          </button>
+                        {% else %}
+                          <button type="button"
+                                  class="subject-btn btn btn-outline-secondary"
+                                  onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
+                            {{ subj }}
+                          </button>
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  </div>
                 </td>
-                <td>
+                <td {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" and filtered_subjects %} style="display: none"{% endif %}>
                   {% if resource.occurrences %}{{ resource.occurrences }} התאמות{% endif %}
                 </td>
                 <td>
                   <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
                        class="btn-group"
                        role="group"
-                       {% if resource.is_fake_row %} id="{{ resource.name_md5 }}-status" {% if tab == "exams" and filtered_subjects %} style="display: none"{% endif %}
+                       {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" and filtered_subjects %} style="display: none"{% endif %}
                        {% endif %}
                        aria-label="Basic radio toggle button group">
                     <input onchange="updateRadio({{ resource.id }}, 0);"
@@ -248,10 +250,10 @@
           for (let i = 0; i < trs.length; i++) {
               if (trs[i].style.display == 'none') {
                   trs[i].style.display = '';
-                  document.getElementById(header + '-status').style.display = 'none';
+                  document.getElementsByName(header + '-hidable').style.display = 'none';
               } else {
                   trs[i].style.display = 'none';
-                  document.getElementById(header + '-status').style.display = '';
+                  document.getElementsByName(header + '-hidable').style.display = '';
               }
           }
       }
