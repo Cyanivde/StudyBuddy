@@ -89,7 +89,7 @@
           </tr>
           {% for index, resource in resources[header].iterrows() %}
             <tr class="align-middle"
-                {% if resource.rname_part and not resource.is_fake_row %} name="{{ resource.name_md5 }}" {% if not (tab == "exams" and filtered_subjects) %} style="display: none"{% endif %}
+                {% if resource.rname_part and not resource.is_fake_row %} name="{{ resource.name_md5 }}" {% if not filtered_subjects %} style="display: none"{% endif %}
                 {% endif %}>
               <td colspan="2">
                 {% if resource.is_fake_row %}
@@ -124,7 +124,7 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% if tab == 'exams' and resource.is_fake_row %}
+                  {% if not (tab == 'exams' and resource.is_fake_row) %}
                     {% for subj in resource.subject %}
                       {% if subj in filtered_subjects %}
                         <button type="button"
