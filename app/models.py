@@ -36,6 +36,7 @@ class Resource(db.Model):
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(140))
+    maintainer = db.Column(db.String(140))
 
 
 class ResourceToCourse(db.Model):
