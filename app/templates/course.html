@@ -124,24 +124,26 @@
                   {% endif %}
                 </td>
                 <td>
-                  <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab != exams or filtered_subjects %} style="display: none"{% endif %}
-                       {% endif %}>
-                    {% for subj in resource.subject %}
-                      {% if subj in filtered_subjects %}
-                        <button type="button"
-                                class="subject-btn btn btn-secondary"
-                                onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
-                          {{ subj }}
-                        </button>
-                      {% else %}
-                        <button type="button"
-                                class="subject-btn btn btn-outline-secondary"
-                                onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
-                          {{ subj }}
-                        </button>
-                      {% endif %}
-                    {% endfor %}
-                  </div>
+                  {% if not resource.is_fake_row or tab != "exams" %}
+                    <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" or filtered_subjects %} style="display: none"{% endif %}
+                         {% endif %}>
+                      {% for subj in resource.subject %}
+                        {% if subj in filtered_subjects %}
+                          <button type="button"
+                                  class="subject-btn btn btn-secondary"
+                                  onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
+                            {{ subj }}
+                          </button>
+                        {% else %}
+                          <button type="button"
+                                  class="subject-btn btn btn-outline-secondary"
+                                  onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
+                            {{ subj }}
+                          </button>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </td>
                 <td>
                   <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if filtered_subjects %} style="display: none"{% endif %}

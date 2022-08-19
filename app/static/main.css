@@ -2,6 +2,10 @@ a {
   text-decoration: none;
 }
 
+li {
+  white-space: nowrap;
+}
+
 tr {
   height: 48px;
 }
