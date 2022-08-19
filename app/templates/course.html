@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-  <ul class="list-group list-group-horizontal">
-    <li class="list-group-item">
-      <h4>{{ course.name }}</h4>
-    </li>
-  </ul>
   <div class="overflow-auto">
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item">
+        <h4>{{ course.name }}</h4>
+      </li>
+    </ul>
     <ul class="list-group list-group-horizontal">
       <li class="list-group-item list-group-item-link">
         <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_id=course.id) }}">סמסטר</a></span>
