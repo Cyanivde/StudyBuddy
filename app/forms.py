@@ -46,14 +46,14 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('username', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_EMPTY), Regexp('^\w{5,20}$', message=".שם המשתמש חייב להכיל 5-20 תווים: אותיות, ספרות או קו תחתון")])
+        DataRequired(message=ERR_EMPTY), Regexp(r"^\w{5,20}$", message=".שם המשתמש חייב להכיל 5-20 תווים: אותיות, ספרות או קו תחתון")])
     email = StringField('email', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_EMPTY),  Email()])
+        DataRequired(message=ERR_EMPTY),  Email(message="כתובת המייל אינה תקינה.")])
     password = PasswordField('password', validators=[
         DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
     password2 = PasswordField(
         'confirm password', validators=[DataRequired(ERR_EMPTY), EqualTo('password')])
-    submit = SubmitField('register')
+    submit = SubmitField('הרשמה')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data.lower()).first()

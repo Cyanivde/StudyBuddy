@@ -17,6 +17,29 @@ def index():
     return render_template("index.html", courses=Course.query.all())
 
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = RegistrationForm()
+
+    # Form was not yet submitted, or form was submitted with invalid input
+    if not form.validate_on_submit():
+        return render_template('register.html', form=form)
+
+    # Form was submitted with valid input
+    else:
+        user = User(username=form.username.data.lower(),
+                    email=form.email.data.lower(),
+                    is_admin=False)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        return redirect(url_for('index'))
+
+
 @app.route('/upload/<course_id>', methods=['GET', 'POST'])
 def upload(course_id):
     all_subjects = Subject.query.all()
@@ -127,23 +150,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data.lower(),
-                    email=form.email.data.lower(),
-                    is_admin=False)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        login_user(user)
-        return redirect(url_for('index'))
-    return render_template('register.html', title='register', form=form)
 
 
 @app.route('/exams/<course_id>', methods=['GET', 'POST'])
