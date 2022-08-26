@@ -14,8 +14,7 @@ import json
 
 @app.route('/')
 def index():
-    courses = Course.query.all()
-    return render_template("index.html", title='Home Page', courses=courses)
+    return render_template("index.html", courses=Course.query.all())
 
 
 @app.route('/upload/<course_id>', methods=['GET', 'POST'])
