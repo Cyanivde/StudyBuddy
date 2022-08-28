@@ -7,17 +7,17 @@
             <br/>
             {{ form.username(size=30) }}
             <br/>
-            {% for error in form.username.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {% for error in form.username.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
         </p>
         <p>
             {{ form.password.label }}
             <br/>
             {{ form.password(size=30) }}
             <br/>
-            {% for error in form.password.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {% for error in form.password.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    {% for message in messages %}<span class="text-danger">[{{ message }}]</span>{% endfor %}
+                    {% for message in messages %}<span class="text-danger">{{ message }}</span>{% endfor %}
                 {% endif %}
             {% endwith %}
         </p>

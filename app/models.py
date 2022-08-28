@@ -5,7 +5,7 @@ from app import db, login
 
 
 class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     is_admin = db.Column(db.Boolean)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -19,12 +19,12 @@ class User(UserMixin, db.Model):
 
 
 class Subject(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500))
+    subject_id = db.Column(db.Integer, primary_key=True)
+    subject_name = db.Column(db.String(500))
 
 
 class Resource(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    resource_id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
     solution = db.Column(db.String(500))
     recording = db.Column(db.String(500))
@@ -34,8 +34,8 @@ class Resource(db.Model):
 
 
 class Course(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(140))
+    course_id = db.Column(db.Integer, primary_key=True)
+    course_name = db.Column(db.String(140))
     maintainer = db.Column(db.String(140))
 
 

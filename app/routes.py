@@ -1,6 +1,5 @@
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, abort
 from flask_login import current_user, login_user, logout_user
-from werkzeug.urls import url_parse
 from sqlalchemy import func
 import hashlib
 
@@ -30,9 +29,7 @@ def register():
 
     # Form was submitted with valid input
     else:
-        user = User(username=form.username.data.lower(),
-                    email=form.email.data.lower(),
-                    is_admin=False)
+        user = User(username=form.username.data.lower(), email=form.email.data.lower(), is_admin=False)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -40,10 +37,58 @@ def register():
         return redirect(url_for('index'))
 
 
-@app.route('/upload/<course_id>', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = LoginForm()
+
+    # Form was not yet submitted, or form was submitted with invalid input
+    if not form.validate_on_submit():
+        return render_template('login.html', title='Sign In', form=form)
+
+    # Form was submitted with valid input
+    else:
+        user = User.query.filter_by(username=form.username.data.lower()).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('שם המשתמש או הסיסמה שגויים')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        return redirect(url_for('index'))
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/resource/<resource_id>', methods=['GET', 'POST'])
+def resource(resource_id):
+    resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
+
+    if len(resource_df) == 0:
+        abort(404)
+
+    resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(resource_id=resource_id).statement, db.session.bind)
+
+    if len(resource_to_course_df) == 0:
+        abort(404)
+
+    course_df = pd.read_sql(Course.query.filter(Course.course_id.in_(resource_to_course_df['course_id'])).statement, db.session.bind)
+
+    merged_resource_df = pd.merge(left=resource_df, right=resource_to_course_df, on='resource_id')
+
+    merged_resource_df = pd.merge(left=merged_resource_df, right=course_df, on='course_id')
+
+    return render_template('resource.html', resource=merged_resource_df.iloc[0], resource_df=merged_resource_df[['course_id', 'course_name', 'rname', 'rname_part']])
+
+
+@ app.route('/upload/<course_id>', methods=['GET', 'POST'])
 def upload(course_id):
     all_subjects = Subject.query.all()
-    all_subject_names = [subject.name for subject in all_subjects]
+    all_subject_names = [subject.subject_name for subject in all_subjects]
     if (all_subject_names is not None):
         all_subject_names.sort()
 
@@ -84,7 +129,7 @@ def upload(course_id):
             course_id=course_id, tab=form.tab.data).update({'order_in_tab': ResourceToCourse.order_in_tab + 1})
 
         resource_to_course = ResourceToCourse(
-            course_id=course_id, resource_id=resource.id, header=form.header.data, rname=form.rname.data, rname_part=form.rname_part.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
+            course_id=course_id, resource_id=resource.resource_id, header=form.header.data, rname=form.rname.data, rname_part=form.rname_part.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
         db.session.add(resource_to_course)
 
         db.session.commit()
@@ -97,14 +142,14 @@ def upload(course_id):
 @app.route('/edit/<resource_id>', methods=['GET', 'POST'])
 def edit(resource_id):
     all_subjects = Subject.query.all()
-    all_subject_names = [subject.name for subject in all_subjects]
+    all_subject_names = [subject.subject_name for subject in all_subjects]
     if (all_subject_names is not None):
         all_subject_names.sort()
 
     form = UploadForm()
     form.subject.choices = all_subject_names
 
-    resource = Resource.query.filter_by(id=resource_id).first()
+    resource = Resource.query.filter_by(resource_id=resource_id).first()
 
     if form.validate_on_submit():
         resource.link = form.link.data
@@ -117,7 +162,6 @@ def edit(resource_id):
         return redirect(url_for('course', course_id=request.args.get('course_id')))
 
     else:
-        print("hi")
         form.link.data = resource.link
         form.solution.data = resource.solution
         form.recording.data = resource.recording
@@ -125,31 +169,6 @@ def edit(resource_id):
         form.textdump.data = resource.textdump
 
     return render_template('upload.html', title='upload', form=form, options=all_subject_names, with_name=False)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(
-            username=form.username.data.lower()).first()
-        if user is None or not user.check_password(form.password.data):
-            flash('שם המשתמש או הסיסמה שגויים')
-            return redirect(url_for('login'))
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
-        return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
 
 
 @app.route('/exams/<course_id>', methods=['GET', 'POST'])
@@ -168,7 +187,7 @@ def course(course_id):
 
 
 def _course(course_id, tab):
-    course = Course.query.filter_by(id=course_id).first_or_404()
+    course = Course.query.filter_by(course_id=course_id).first_or_404()
 
     resources_df = _fetch_resources(course_id, tab)
     if len(resources_df) == 0:
@@ -199,7 +218,7 @@ def _course(course_id, tab):
 
 @app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
 def updatecourse(course_id):
-    course = Course.query.filter_by(id=course_id).first_or_404()
+    course = Course.query.filter_by(course_id=course_id).first_or_404()
 
     form = CourseResourcesForm()
 
@@ -263,24 +282,23 @@ def _fetch_resources(course_id, tab):
     resource_ids = set(resource_to_course_df['resource_id'])
 
     resources_df = pd.read_sql(Resource.query.filter(
-        Resource.id.in_(resource_ids)).statement, db.session.bind)
+        Resource.resource_id.in_(resource_ids)).statement, db.session.bind)
 
     resources_extended_df = resource_to_course_df
     if len(resources_df) > 0:
         resource_to_course_df.drop('tab', axis=1, inplace=True)
         resources_extended_df = pd.merge(how='right', left=resources_df, right=resource_to_course_df,
-                                         left_on="id", right_on="resource_id").drop('resource_id', axis=1)
-        resources_extended_df
+                                         on="resource_id")
 
     if current_user.is_authenticated:
         resource_to_user = pd.read_sql(ResourceToUser.query.filter_by(
-            user_id=current_user.id).statement, db.session.bind)
+            user_id=current_user.user_id).statement, db.session.bind)
 
         if len(resource_to_user) > 0:
             resource_to_user.drop('id', axis=1, inplace=True)
             resource_to_user.drop('user_id', axis=1, inplace=True)
             resources_extended_df = pd.merge(how='left',
-                                             left=resources_extended_df, right=resource_to_user, left_on="id", right_on="resource_id").drop('resource_id', axis=1)
+                                             left=resources_extended_df, right=resource_to_user, on="resource_id")
 
     if 'subject' in resources_extended_df.keys():
         resources_extended_df['subject'] = resources_extended_df['subject'].apply(
@@ -328,7 +346,7 @@ def _jsonload(x):
 
 def _resources_to_textarea(df):
     return "\r\n".join(["{0} | {1} / {2} / {3}".format(
-        resource.id, resource.header, resource.rname, resource.rname_part or '') for index, resource in df.iterrows()])
+        resource.resource_id, resource.header, resource.rname, resource.rname_part or '') for index, resource in df.iterrows()])
 
 
 def _get_subjects(resources_df):
@@ -366,31 +384,14 @@ def updateresource():
 
     if current_user.is_authenticated:
         db.session.query(ResourceToUser).filter_by(
-            user_id=current_user.id, resource_id=resource_id).delete()
+            user_id=current_user.user_id, resource_id=resource_id).delete()
 
         resource_to_user = ResourceToUser(
-            user_id=current_user.id, resource_id=resource_id, done=val)
+            user_id=current_user.user_id, resource_id=resource_id, done=val)
         db.session.add(resource_to_user)
         db.session.commit()
 
     return render_template("index.html", title='Home Page')
-
-
-@ app.route('/resource/<resource_id>', methods=['GET', 'POST'])
-def resource(resource_id):
-    resource = Resource.query.filter_by(id=resource_id).first_or_404()
-
-    resource_tuples = []
-
-    resource_descriptions = ResourceToCourse.query.filter_by(
-        resource_id=resource_id).all()
-
-    for res in resource_descriptions:
-        course = Course.query.filter_by(id=res.course_id).first()
-        resource_tuples += [(res.description.split('/')
-                             [1], course.name, res.course_id)]
-
-    return render_template('resource.html', resource=resource, resource_tuples=resource_tuples)
 
 
 class Object(object):
