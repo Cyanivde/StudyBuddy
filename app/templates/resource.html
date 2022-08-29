@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-  {% for index, resource in resource_df.iterrows() %}
+  {% for index, resource_title in resource_titles__df.iterrows() %}
     <nav class="breadcrumb-nav" aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="{{ url_for('course', course_id=resource.course_id)}}">{{ resource.course_name }}</a>
+          <a href="{{ url_for('course', course_id=resource_title.course_id)}}">{{ resource_title.course_name }}</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
-          {{ resource.rname }}
-          {% if resource.rname_part %}- {{ resource.rname_part }}{% endif %}
+          {{ resource_title.rname }}
+          {% if resource_title.rname_part %}- {{ resource_title.rname_part }}{% endif %}
         </li>
       </ol>
     </nav>
