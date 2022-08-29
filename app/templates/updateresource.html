@@ -3,7 +3,7 @@
     {% if current_user.is_admin %}
         <form action="" method="post">
             {{ form.hidden_tag() }}
-            {% if with_name %}
+            {% if not is_existing_resource %}
                 <p>
                     {{ form.tab.label }}
                     {{ form.tab() }}
@@ -57,9 +57,9 @@
                         data-none-selected-text="נושאים"
                         data-select-all-text="בחר הכל"
                         data-deselect-all-text="איפוס">
-                    {% for opt in options %}
-                        <option {% if form.subject.data and opt in form.subject.data %}selected{% endif %}>
-                            {{ opt }}
+                    {% for subj in form.subject.choices %}
+                        <option {% if form.subject.data and subj in form.subject.data %}selected{% endif %}>
+                            {{ subj }}
                         </option>
                     {% endfor %}
                 </select>

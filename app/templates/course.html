@@ -30,7 +30,7 @@
       </li>
       {% if current_user.is_admin %}
         <li class="list-group-item list-group-item-link">
-          <a href="{{ url_for('upload', course_id=course.course_id) }}">העלאת חומר</a>
+          <a href="{{ url_for('createresource', course_id=course.course_id) }}">העלאת חומר</a>
         </li>
         <li class="list-group-item list-group-item-link">
           <a href="{{ url_for('updatecourse', course_id=course.course_id) }}">עריכת קורס</a>
@@ -228,7 +228,7 @@
                   <td>
                     {% if not resource.is_fake_row %}
                       <a class="text-decoration-none"
-                         href="{{ url_for('edit',resource_id=resource.resource_id, course_id=course.course_id) }}">עריכה</a>
+                         href="{{ url_for('editresource', course_id=course.course_id, resource_id=resource.resource_id) }}">עריכה</a>
                     {% endif %}
                   </td>
                 {% endif %}

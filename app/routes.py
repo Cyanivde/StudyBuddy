@@ -5,7 +5,7 @@ import hashlib
 
 
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, UploadForm, CourseResourcesForm
+from app.forms import LoginForm, RegistrationForm, UpdateResourceForm, CourseResourcesForm
 from app.models import ResourceToCourse, ResourceToUser, User, Subject, Resource, Course
 import pandas as pd
 import json
@@ -66,109 +66,20 @@ def logout():
 
 @app.route('/resource/<resource_id>', methods=['GET', 'POST'])
 def resource(resource_id):
-    resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
-
-    if len(resource_df) == 0:
-        abort(404)
-
-    resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(resource_id=resource_id).statement, db.session.bind)
-
-    if len(resource_to_course_df) == 0:
-        abort(404)
-
-    course_df = pd.read_sql(Course.query.filter(Course.course_id.in_(resource_to_course_df['course_id'])).statement, db.session.bind)
-
-    merged_resource_df = pd.merge(left=resource_df, right=resource_to_course_df, on='resource_id')
-
-    merged_resource_df = pd.merge(left=merged_resource_df, right=course_df, on='course_id')
-
-    return render_template('resource.html', resource=merged_resource_df.iloc[0], resource_titles_df=merged_resource_df[['course_id', 'course_name', 'rname', 'rname_part']])
+    resource_df = _fetch_resource_df(resource_id)
+    resource = resource_df.iloc[0]
+    resource_titles_df = resource_df[['course_id', 'course_name', 'rname', 'rname_part']]
+    return render_template('resource.html', resource, resource_titles_df)
 
 
-@ app.route('/upload/<course_id>', methods=['GET', 'POST'])
-def upload(course_id):
-    all_subjects = Subject.query.all()
-    all_subject_names = [subject.subject_name for subject in all_subjects]
-    if (all_subject_names is not None):
-        all_subject_names.sort()
-
-    form = UploadForm()
-    form.subject.choices = all_subject_names
-
-    if form.validate_on_submit():
-        if not form.header.data:
-            form.header.data = "ללא כותרת"
-
-        resource = Resource(link=form.link.data,
-                            solution=form.solution.data,
-                            recording=form.recording.data,
-                            subject=json.dumps(form.subject.data),
-                            textdump=form.textdump.data.lower())
-        db.session.add(resource)
-
-        db.session.commit()
-        db.session.refresh(resource)
-
-        same_tab_count = ResourceToCourse.query.filter_by(
-            course_id=course_id, tab=form.tab.data).count()
-
-        same_tab_and_header_max = db.session.query(func.max(ResourceToCourse.order_in_tab)).filter_by(
-            course_id=course_id, tab=form.tab.data, header=form.header.data).scalar()
-        if not same_tab_and_header_max:
-            same_tab_and_header_max = 0
-
-        new_resource_order_in_tab = same_tab_and_header_max+1
-        if new_resource_order_in_tab == 1:
-            new_resource_order_in_tab = same_tab_count + 1
-
-        if not form.rname_part.data:
-            form.rname_part.data = None
-        # Adjust order of existing entries
-        ResourceToCourse.query.filter(
-            ResourceToCourse.order_in_tab >= new_resource_order_in_tab).filter_by(
-            course_id=course_id, tab=form.tab.data).update({'order_in_tab': ResourceToCourse.order_in_tab + 1})
-
-        resource_to_course = ResourceToCourse(
-            course_id=course_id, resource_id=resource.resource_id, header=form.header.data, rname=form.rname.data, rname_part=form.rname_part.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
-        db.session.add(resource_to_course)
-
-        db.session.commit()
-
-        return redirect(url_for('course', course_id=course_id))
-
-    return render_template('upload.html', title='upload', form=form, options=all_subject_names, with_name=True)
+@ app.route('/createresource/<course_id>', methods=['GET', 'POST'])
+def createresource(course_id):
+    return _update_resource(course_id=course_id, is_existing_resource=False)
 
 
-@app.route('/edit/<resource_id>', methods=['GET', 'POST'])
-def edit(resource_id):
-    all_subjects = Subject.query.all()
-    all_subject_names = [subject.subject_name for subject in all_subjects]
-    if (all_subject_names is not None):
-        all_subject_names.sort()
-
-    form = UploadForm()
-    form.subject.choices = all_subject_names
-
-    resource = Resource.query.filter_by(resource_id=resource_id).first()
-
-    if form.validate_on_submit():
-        resource.link = form.link.data
-        resource.solution = form.solution.data
-        resource.recording = form.recording.data
-        resource.subject = json.dumps(form.subject.data)
-        resource.textdump = form.textdump.data.lower()
-        db.session.commit()
-        db.session.refresh(resource)
-        return redirect(url_for('course', course_id=request.args.get('course_id')))
-
-    else:
-        form.link.data = resource.link
-        form.solution.data = resource.solution
-        form.recording.data = resource.recording
-        form.subject.data = json.loads(resource.subject)
-        form.textdump.data = resource.textdump
-
-    return render_template('upload.html', title='upload', form=form, options=all_subject_names, with_name=False)
+@app.route('/editresource/<course_id>', methods=['GET', 'POST'])
+def editresource(course_id):
+    return _update_resource(course_id=course_id, is_existing_resource=True, resource_id=request.args.get('resource_id'))
 
 
 @app.route('/exams/<course_id>', methods=['GET', 'POST'])
@@ -184,6 +95,34 @@ def archive(course_id):
 @app.route('/course/<course_id>', methods=['GET', 'POST'])
 def course(course_id):
     return _course(course_id, "semester")
+
+
+def _update_resource(course_id, is_existing_resource, resource_id=None):
+    form = UpdateResourceForm()
+
+    subject_list = _fetch_subject_list()
+    form.subject.choices = subject_list
+
+    # Form was not yet submitted, or form was submitted with invalid input
+    if not form.validate_on_submit():
+        if is_existing_resource:
+            resource_df = _fetch_resource_df(resource_id)
+            resource = resource_df.iloc[0]
+            form = _update_form_according_to_resource(form, resource)
+
+        return render_template('updateresource.html', form=form, is_existing_resource=is_existing_resource)
+
+    # Form was submitted with valid input
+    if form.validate_on_submit():
+        if is_existing_resource:
+            resource_df = _fetch_resource_df(resource_id)
+            resource = resource_df.iloc[0]
+            _update_resource_according_to_form(resource, form)
+
+        else:
+            _insert_resource_according_to_form(form, course_id)
+
+        return redirect(url_for('course', course_id=course_id))
 
 
 def _course(course_id, tab):
@@ -396,3 +335,92 @@ def updateresource():
 
 class Object(object):
     pass
+
+
+###### END ######
+
+def _fetch_subject_list():
+    subject_names = [subject.subject_name for subject in Subject.query.all()]
+    if subject_names is not None:
+        subject_names.sort()
+
+    return subject_names
+
+
+def _fetch_resource_df(resource_id):
+    resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
+
+    if len(resource_df) == 0:
+        abort(404)
+
+    resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(resource_id=resource_id).statement, db.session.bind)
+
+    if len(resource_to_course_df) == 0:
+        abort(404)
+
+    course_df = pd.read_sql(Course.query.filter(Course.course_id.in_(resource_to_course_df['course_id'])).statement, db.session.bind)
+
+    merged_resource_df = pd.merge(left=resource_df, right=resource_to_course_df, on='resource_id')
+
+    merged_resource_df = pd.merge(left=merged_resource_df, right=course_df, on='course_id')
+
+    return merged_resource_df
+
+
+def _update_form_according_to_resource(form, resource):
+    form.link.data = resource.link
+    form.solution.data = resource.solution
+    form.recording.data = resource.recording
+    form.subject.data = json.loads(resource.subject)
+    form.textdump.data = resource.textdump
+    return form
+
+
+def _update_resource_according_to_form(resource, form):
+    actual_resource = db.session.query(Resource).filter_by(resource_id=int(resource.resource_id)).first()
+
+    actual_resource.link = form.link.data
+    actual_resource.solution = form.solution.data
+    actual_resource.recording = form.recording.data
+    actual_resource.subject = json.dumps(form.subject.data)
+    actual_resource.textdump = form.textdump.data.lower()
+
+    db.session.commit()
+    db.session.refresh(actual_resource)
+
+
+def _insert_resource_according_to_form(form, course_id):
+    if not form.header.data:
+        form.header.data = "ללא כותרת"
+
+    if not form.rname_part.data:
+        form.rname_part.data = None
+
+    resource = Resource(link=form.link.data,
+                        solution=form.solution.data,
+                        recording=form.recording.data,
+                        subject=json.dumps(form.subject.data),
+                        textdump=form.textdump.data.lower())
+    db.session.add(resource)
+    db.session.commit()
+    db.session.refresh(resource)
+
+    same_tab_and_header_max = db.session.query(func.max(ResourceToCourse.order_in_tab)).filter_by(
+        course_id=course_id, tab=form.tab.data, header=form.header.data).scalar()
+    if not same_tab_and_header_max:
+        same_tab_and_header_max = 0
+
+    same_tab_count = ResourceToCourse.query.filter_by(course_id=course_id, tab=form.tab.data).count()
+
+    new_resource_order_in_tab = same_tab_and_header_max + 1
+    if new_resource_order_in_tab == 1:
+        new_resource_order_in_tab = same_tab_count + 1
+
+    ResourceToCourse.query.filter(
+        ResourceToCourse.order_in_tab >= new_resource_order_in_tab).filter_by(
+        course_id=course_id, tab=form.tab.data).update({'order_in_tab': ResourceToCourse.order_in_tab + 1})
+
+    resource_to_course = ResourceToCourse(course_id=course_id, resource_id=resource.resource_id, header=form.header.data,
+                                          rname=form.rname.data, rname_part=form.rname_part.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
+    db.session.add(resource_to_course)
+    db.session.commit()

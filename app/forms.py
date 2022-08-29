@@ -21,7 +21,7 @@ class CourseResourcesForm(FlaskForm):
     submit = SubmitField('שמירה')
 
 
-class UploadForm(FlaskForm):
+class UpdateResourceForm(FlaskForm):
     header = StringField('כותרת')
     rname = StringField('שם')
     rname_part = StringField('חלק')
