@@ -82,7 +82,7 @@ def resource(resource_id):
 
     merged_resource_df = pd.merge(left=merged_resource_df, right=course_df, on='course_id')
 
-    return render_template('resource.html', resource=merged_resource_df.iloc[0], resource_df=merged_resource_df[['course_id', 'course_name', 'rname', 'rname_part']])
+    return render_template('resource.html', resource=merged_resource_df.iloc[0], resource_titles_df=merged_resource_df[['course_id', 'course_name', 'rname', 'rname_part']])
 
 
 @ app.route('/upload/<course_id>', methods=['GET', 'POST'])
