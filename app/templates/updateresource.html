@@ -1,78 +1,91 @@
 {% extends "base.html" %}
 {% block content %}
-    {% if current_user.is_admin %}
-        <form action="" method="post">
-            {{ form.hidden_tag() }}
-            {% if not is_existing_resource %}
-                <p>
-                    {{ form.tab.label }}
-                    {{ form.tab() }}
-                </p>
-                <p>
-                    <p>
-                        נא לעקוב אחרי אחת התבניות:
-                        <ul>
-                            <li>שבוע 1 / הרצאה 1</li>
-                            <li>תרגיל בית 1 (עד 2022-01-01) / תרגיל בית 1 / שאלה 1</li>
-                            <li>מבחנים / מבחן חורף תשפא מועד א / שאלה 1</li>
-                        </ul>
-                    </p>
-                    <br/>
-                    {{ form.header(size=25) }} / {{ form.rname(size=25) }} / {{ form.rname_part(size=10) }}
-                    <br/>
-                </p>
-            {% endif %}
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        {% if not is_existing_resource %}
             <p>
-                {{ form.link.label }}
-                <br/>
-                {{ form.link(size=32) }}
-                <br/>
-                {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+                {{ form.tab.label }}
+                {{ form.tab() }}
             </p>
             <p>
-                {{ form.solution.label }}
-                <br/>
-                {{ form.solution(size=32) }}
-                <br/>
-                {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+                תיאור
+                <table>
+                    <tr>
+                        <td>{{ form.header(size=25) }}</td>
+                        <td>{{ form.rname(size=25) }}</td>
+                        <td>{{ form.rname_part(size=10) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="xs fw-bold">נא למלא לפי אחת התבניות:</td>
+                    </tr>
+                    <tr class="xs">
+                        <td>שבוע 1</td>
+                        <td>הרצאה 1</td>
+                        <td></td>
+                    </tr>
+                    <tr class="xs">
+                        <td>תרגיל בית 1 (עד 2022-01-01)</td>
+                        <td>תרגיל בית 1</td>
+                        <td>שאלה 1</td>
+                    </tr>
+                    <tr class="xs">
+                        <td>מבחנים</td>
+                        <td>מבחן חורף תשפ"א מועד א</td>
+                        <td>שאלה 1</td>
+                    </tr>
+                </table>
             </p>
-            <p>
-                {{ form.recording.label }}
-                <br/>
-                {{ form.recording(size=32) }}
-                <br/>
-                {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            </p>
-            <p>
-                {{ form.subject.label }}
-                <br/>
-                <select name="subject"
-                        class="selectpicker"
-                        multiple
-                        data-style=""
-                        data-style-base="form-control"
-                        data-none-results-text="אין תוצאות עבור {0}"
-                        data-live-search="true"
-                        data-width="200px"
-                        data-none-selected-text="נושאים"
-                        data-select-all-text="בחר הכל"
-                        data-deselect-all-text="איפוס">
-                    {% for subj in form.subject.choices %}
-                        <option {% if form.subject.data and subj in form.subject.data %}selected{% endif %}>
-                            {{ subj }}
-                        </option>
-                    {% endfor %}
-                </select>
-                {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            </p>
-            <p>
-                {{ form.textdump.label }}
-                <br/>
-                {{ form.textdump(rows='10',cols='100')}}
-                <br/>
-                {% for error in form.textdump.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            </p>
-            <p>{{ form.submit() }}</p>
-        </form>
-    {% endif %}
+        {% endif %}
+        <p>
+            {{ form.link.label }}
+            <br/>
+            {{ form.link(size=32) }}
+            <br/>
+            {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            {{ form.solution.label }}
+            <br/>
+            {{ form.solution(size=32) }}
+            <br/>
+            {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            {{ form.recording.label }}
+            <br/>
+            {{ form.recording(size=32) }}
+            <br/>
+            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            {{ form.subject.label }}
+            <br/>
+            <select name="subject"
+                    class="selectpicker"
+                    multiple
+                    data-style=""
+                    data-style-base="form-control"
+                    data-none-results-text="אין תוצאות עבור {0}"
+                    data-live-search="true"
+                    data-width="200px"
+                    data-none-selected-text="נושאים"
+                    data-select-all-text="בחר הכל"
+                    data-deselect-all-text="איפוס">
+                {% for subj in form.subject.choices %}
+                    <option {% if form.subject.data and subj in form.subject.data %}selected{% endif %}>
+                        {{ subj }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            {{ form.textdump.label }}
+            <br/>
+            {{ form.textdump(rows='10',cols='100')}}
+            <br/>
+            {% for error in form.textdump.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 {% endblock content %}

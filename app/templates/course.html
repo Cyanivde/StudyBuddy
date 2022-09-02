@@ -41,7 +41,7 @@
     <form class="d-flex" method="post">
       <table class="table w-auto col-auto small">
         <thead>
-          <tr class="align-middle">
+          <tr class="align-middle course-tr">
             <td class="text-center" colspan="2">חומר לימוד</td>
             <td>
               <div class="input-group">
@@ -84,11 +84,11 @@
           </tr>
         </thead>
         {% for header in resources.keys() %}
-          <tr class="small">
+          <tr class="small  course-tr">
             <td colspan="7" class="pt-3 fw-bold">{{ header }}</td>
           </tr>
           {% for index, resource in resources[header].iterrows() %}
-            <tr class="align-middle"
+            <tr class="align-middle  course-tr"
                 {% if resource.rname_part and not resource.is_fake_row %} name="{{ resource.name_md5 }}" {% if not filtered_subjects and not resource.is_fake_row %} style="display: none"{% endif %}
                 {% endif %}>
               <td colspan="2">

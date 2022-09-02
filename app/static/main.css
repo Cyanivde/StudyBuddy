@@ -6,13 +6,17 @@ li {
   white-space: nowrap;
 }
 
-tr {
+.course-tr {
   height: 48px;
 }
 .subject-btn {
   padding: 0.125rem 0.25rem !important;
   font-size: 0.75rem;
   border-radius: 0.3rem;
+}
+
+.xs {
+  font-size: 0.75rem;
 }
 
 .breadcrumb-nav {

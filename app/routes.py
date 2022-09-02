@@ -74,11 +74,15 @@ def resource(resource_id):
 
 @ app.route('/createresource/<course_id>', methods=['GET', 'POST'])
 def createresource(course_id):
+    if not current_user.is_authenticated or not current_user.is_admin:
+        abort(404)
     return _update_resource(course_id=course_id, is_existing_resource=False)
 
 
 @app.route('/editresource/<course_id>', methods=['GET', 'POST'])
 def editresource(course_id):
+    if not current_user.is_authenticated or not current_user.is_admin:
+        abort(404)
     return _update_resource(course_id=course_id, is_existing_resource=True, resource_id=request.args.get('resource_id'))
 
 
@@ -100,8 +104,7 @@ def course(course_id):
 def _update_resource(course_id, is_existing_resource, resource_id=None):
     form = UpdateResourceForm()
 
-    subject_list = _fetch_subject_list()
-    form.subject.choices = subject_list
+    form.subject.choices = _fetch_subject_list()
 
     # Form was not yet submitted, or form was submitted with invalid input
     if not form.validate_on_submit():
@@ -332,12 +335,6 @@ def updateresource():
 
     return render_template("index.html", title='Home Page')
 
-
-class Object(object):
-    pass
-
-
-###### END ######
 
 def _fetch_subject_list():
     subject_names = [subject.subject_name for subject in Subject.query.all()]
