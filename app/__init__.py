@@ -11,4 +11,6 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 
+# trunk-ignore(flake8/F401)
+# trunk-ignore(flake8/E402)
 from app import routes, models

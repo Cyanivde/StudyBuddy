@@ -241,7 +241,7 @@
     <script type="text/javascript">
       function updateRadio(resource_id, val) {
           var xhr = new XMLHttpRequest();
-          xhr.open("POST", "{{ url_for('updateresource')}}", true);
+          xhr.open("POST", "{{ url_for('update_resource_to_user')}}", true);
           xhr.setRequestHeader('Content-Type', 'application/json');
           xhr.send(JSON.stringify({
               resource_id: resource_id,
