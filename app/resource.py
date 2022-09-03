@@ -8,4 +8,4 @@ def _resource(resource_id):
     resource_df = _fetch_resource_df(resource_id)
     resource = resource_df.iloc[0]
     resource_titles_df = resource_df[['course_id', 'course_name', 'rname', 'rname_part']]
-    return render_template('resource.html', resource, resource_titles_df)
+    return render_template('resource.html', resource=resource, resource_titles_df=resource_titles_df)
