@@ -40,6 +40,7 @@ class Course(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)
     course_name = db.Column(db.String(140))
     maintainer = db.Column(db.String(140))
+    maintainer_email = db.Column(db.String(140))
 
 
 class ResourceToCourse(db.Model):
