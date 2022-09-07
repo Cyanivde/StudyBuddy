@@ -4,7 +4,7 @@
     <ul>
         {% for course in courses %}
             <li>
-                <a href="{{ url_for('course', course_id=course.course_id) }}">{{ course.course_name }}</a>
+                <a href="{{ url_for('course', course_id=course.course_id) }}">[{{ course.course_institute }} {{ course.course_institute_id }}] {{ course.course_name }}</a>
             </li>
         {% endfor %}
     </ul>
