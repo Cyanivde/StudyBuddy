@@ -2,7 +2,7 @@
 from flask_wtf import FlaskForm
 from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp
-
+from app.constants.dates import SEMESTER_WEEK
 from app.models import User
 
 ERR_EMPTY = "לא ניתן להשאיר ריק"
@@ -25,8 +25,9 @@ class UpdateResourceForm(FlaskForm):
     header = StringField('כותרת')
     rname = StringField('שם')
     rname_part = StringField('חלק')
+    week = SelectField('שבוע', choices=SEMESTER_WEEK, validate_choice=False)
     tab = SelectField(
-        'לשונית', choices=[('semester', 'סמסטר'), ('exams', 'מבחנים'), ('archive', 'ארכיון')], validate_choice=False)
+        'לשונית', choices=[('semester', 'סמסטר'), ('exams', 'מבחנים'), ('archive', 'ארכיון')], validate_choice=False, description="שבוע")
     link = StringField('קישור')
     solution = StringField('פתרון')
     recording = StringField('הקלטה')

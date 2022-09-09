@@ -1,4 +1,4 @@
 
-SEMESTER_WEEK = [(f"w{i}",f"{i}שבוע ") for i in range(1,14)]
+SEMESTER_WEEK = [(None, "שבוע")] + [(f"w{i}",f"{i}") for i in range(1,14)]
 
 
