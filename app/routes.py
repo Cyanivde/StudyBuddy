@@ -9,6 +9,7 @@ from app.resource import _resource
 from app.update_resource import _update_resource
 from app.update_resource_to_user import _update_resource_to_user
 from app.course import _course
+from app.course_preview import _course_preview
 from app.update_course import _update_course
 
 
@@ -59,6 +60,10 @@ def update_resource_to_user():
 @app.route('/course/<course_id>', methods=['GET', 'POST'])
 def course(course_id):
     return _course(course_id, "semester")
+
+@app.route('/course_preview/<course_id>', methods=['GET', 'POST'])
+def course_preview(course_id):
+    return _course_preview(course_id)
 
 
 @app.route('/exams/<course_id>', methods=['GET', 'POST'])

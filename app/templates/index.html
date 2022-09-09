@@ -6,6 +6,7 @@
             <li>
                 <a href="{{ url_for('course', course_id=course.course_id) }}">[{{ course.course_institute }} {{ course.course_institute_id }}] {{ course.course_name }}</a>
             </li>
-        {% endfor %}
+            <iframe style="border: 3px solid lightgray; background-color:rgb(247, 240, 240);" src="{{ url_for('course_preview', course_id=course.course_id) }}"></iframe>
+            {% endfor %}
     </ul>
 {% endblock content %}
