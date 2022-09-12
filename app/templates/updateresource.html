@@ -79,13 +79,6 @@
             </select>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
-        <p>
-            {{ form.textdump.label }}
-            <br/>
-            {{ form.textdump(rows='10',cols='100')}}
-            <br/>
-            {% for error in form.textdump.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock content %}

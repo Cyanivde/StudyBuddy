@@ -31,7 +31,6 @@ class UpdateResourceForm(FlaskForm):
     solution = StringField('פתרון')
     recording = StringField('הקלטה')
     subject = SelectMultipleField('נושא', validate_choice=False)
-    textdump = TextAreaField('העתקה של הטקסט')
     submit = SubmitField('שמירה')
 
 
