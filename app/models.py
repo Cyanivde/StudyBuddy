@@ -33,7 +33,6 @@ class Resource(db.Model):
     recording = db.Column(db.String(500))
     comments = db.Column(db.String(500))
     subject = db.Column(db.Text)
-    textdump = db.Column(db.Text)
 
 
 class Course(db.Model):

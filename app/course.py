@@ -9,12 +9,12 @@ def _course(course_id, tab):
 
     resources_df = _fetch_resources(course_id, tab)
     if len(resources_df) == 0:
-        return render_template('course.html', subjects=[], filtered_subject=[], course=course, current_search=request.form.get('query'), resources=dict())
+        return render_template('course.html', subjects=[], filtered_subject=[], course=course, resources=dict())
 
     resources_df = _add_fake_rows(resources_df)
     all_subjects = _get_subjects(resources_df)
 
-    resources_df = _filter_resources(resources_df, query=request.form.get('query'), subject=request.form.getlist('subject'))
+    resources_df = _filter_resources(resources_df, subject=request.form.getlist('subject'))
 
     if request.method == "POST":
         if current_user.is_authenticated:

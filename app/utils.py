@@ -41,7 +41,6 @@ def _update_form_according_to_resource(form, resource):
     form.solution.data = resource.solution
     form.recording.data = resource.recording
     form.subject.data = json.loads(resource.subject)
-    form.textdump.data = resource.textdump
     return form
 
 
@@ -52,7 +51,6 @@ def _update_resource_according_to_form(resource, form):
     actual_resource.solution = form.solution.data
     actual_resource.recording = form.recording.data
     actual_resource.subject = json.dumps(form.subject.data)
-    actual_resource.textdump = form.textdump.data.lower()
 
     db.session.commit()
     db.session.refresh(actual_resource)
@@ -68,8 +66,7 @@ def _insert_resource_according_to_form(form, course_id):
     resource = Resource(link=form.link.data,
                         solution=form.solution.data,
                         recording=form.recording.data,
-                        subject=json.dumps(form.subject.data),
-                        textdump=form.textdump.data.lower())
+                        subject=json.dumps(form.subject.data))
     db.session.add(resource)
     db.session.commit()
     db.session.refresh(resource)
@@ -101,22 +98,12 @@ def _get_subjects(resources_df):
     return set([x for xs in list_of_lists for x in xs])
 
 
-def _filter_resources(resources_extended_df, query, subject):
-    if query and subject:
-        resources_extended_df['show'] = (resources_extended_df['textdump'].str.contains(query.lower())) & (
-            resources_extended_df['subject'].apply(lambda x: any([subj in x for subj in subject])))
-    elif query:
-        resources_extended_df['show'] = resources_extended_df['textdump'].str.contains(
-            query.lower())
-    elif subject:
+def _filter_resources(resources_extended_df, subject):
+    if subject:
         resources_extended_df['show'] = resources_extended_df['subject'].apply(
             lambda x: any([subj in x for subj in subject]))
     else:
         resources_extended_df['show'] = True
-
-    if (query):
-        resources_extended_df['occurrences'] = resources_extended_df['textdump'].str.count(
-            query.lower())
 
     resources_extended_df = resources_extended_df[resources_extended_df['show']]
 
@@ -179,8 +166,6 @@ def _add_fake_rows(resources_extended_df):
                                                            == folded_row_name]['done'].min()
             folded_row['subject'] = set([item for sublist in resources_extended_df[resources_extended_df['rname']
                                                                                    == folded_row_name]['subject'] for item in sublist])
-            folded_row['textdump'] = ' '.join(resources_extended_df[resources_extended_df['rname']
-                                                                    == folded_row_name]['textdump'])
             resources_with_folded_rows = resources_with_folded_rows.append(
                 folded_row, ignore_index=True)
         resources_with_folded_rows = resources_with_folded_rows.append(

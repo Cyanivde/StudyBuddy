@@ -4,7 +4,7 @@
     <ul class="list-group list-group-horizontal">
       <li class="list-group-item">
         <h4>{{ course.course_name }}</h4>
-        <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  דף זה מתוחזק על ידי <a href="mailto:{{ course.maintainer_email }}">{{ course.maintainer }}</a></span>
+        <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  מתוחזק על ידי <a href="mailto:{{ course.maintainer_email }}">{{ course.maintainer }}</a></span>
       </li>
     </ul>
     <ul class="list-group list-group-horizontal">
@@ -16,6 +16,11 @@
       </li>
       <li class="list-group-item list-group-item-link">
         <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', course_id=course.course_id) }}">ארכיון</a></span>
+      </li>
+      <li class="list-group-item list-group-item-link">
+        <a target="_blank"
+           href="https://technionmail-my.sharepoint.com/personal/yaniv_carmel_campus_technion_ac_il/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fyaniv%5Fcarmel%5Fcampus%5Ftechnion%5Fac%5Fil%2FDocuments%2FStudyBuddy%2FTechnion%2F{{ course.course_institute_id }}">
+        OneDrive</a>
       </li>
       {% if current_user.is_admin %}
         <li class="list-group-item list-group-item-link">
@@ -55,17 +60,6 @@
                   {% endfor %}
                 </select>
                 <button class="btn btn-outline-secondary" type="submit">סינון</button>
-              </div>
-            </td>
-            <td>
-              <div class="input-group">
-                <input name="query"
-                       class="form-control"
-                       type="search"
-                       value="{% if current_search %}{{ current_search }}{% else %}{% endif %}"
-                       placeholder="חיפוש בגוף הטקסט"
-                       aria-label="Search"/>
-                <button class="btn btn-outline-secondary" type="submit">חיפוש</button>
               </div>
             </td>
             <td class="text-center">מעקב</td>
@@ -133,12 +127,6 @@
                       {% endfor %}
                     </div>
                   {% endif %}
-                </td>
-                <td>
-                  <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if filtered_subjects %} style="display: none"{% endif %}
-                       {% endif %}>
-                    {% if resource.occurrences %}{{ resource.occurrences }} התאמות{% endif %}
-                  </div>
                 </td>
                 <td>
                   <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
