@@ -28,7 +28,7 @@ class DiscordClientForCreatingThread(discord.Client):
             thread = await msg.create_thread(name=thread_name.strip('?'))
             await msg.delete()
             await thread.send("<https://studybuddy.co.il/resource/{0}>".format(i[0]))
-            _update_resource_discord_link(i[0], thread.jump_url)
+            _update_resource_discord_link(i[0], thread.jump_url.replace("https:", "discord:"))
         await self.close()
 
 async def create_discord_threads(channel_id, uploaded_resources):
