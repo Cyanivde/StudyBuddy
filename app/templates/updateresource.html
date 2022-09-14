@@ -26,12 +26,6 @@
             {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
 
-        {% if not is_existing_resource %}
-        <p>
-            {{ form.tab.label }}
-            {{ form.tab() }}
-        </p>
-        
         <p>
             {{ form.subject.label }}
             <br/>
@@ -54,6 +48,14 @@
             </select>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
+
+        {% if not is_existing_resource %}
+        <p>
+            {{ form.tab.label }}
+            {{ form.tab() }}
+        </p>
+        
+
         
         <p>
             <span style="color:red">*</span> {{ form.header.label }} (למשל "שבוע 1", "מבחנים")
