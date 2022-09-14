@@ -1,6 +1,6 @@
 
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, SelectMultipleField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, SelectMultipleField, FieldList
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp
 
 from app.models import User
@@ -22,14 +22,14 @@ class CourseResourcesForm(FlaskForm):
 
 
 class UpdateResourceForm(FlaskForm):
-    header = StringField('כותרת')
+    header = StringField('שיוך')
     rname = StringField('שם')
-    rname_part = StringField('חלק')
+    rname_parts = FieldList(StringField(''), min_entries=40)
     tab = SelectField(
         'לשונית', choices=[('semester', 'סמסטר'), ('exams', 'מבחנים'), ('archive', 'ארכיון')], validate_choice=False)
     link = StringField('קישור')
-    solution = StringField('פתרון')
-    recording = StringField('הקלטה')
+    solution = StringField('קישור לפתרון')
+    recording = StringField('קישור להקלטה')
     subject = SelectMultipleField('נושא', validate_choice=False)
     submit = SubmitField('שמירה')
 

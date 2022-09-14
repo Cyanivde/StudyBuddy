@@ -2,61 +2,9 @@
 {% block content %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        {% if not is_existing_resource %}
-            <p>
-                {{ form.tab.label }}
-                {{ form.tab() }}
-            </p>
-            <p>
-                תיאור
-                <table>
-                    <tr>
-                        <td>{{ form.header(size=25) }}</td>
-                        <td>{{ form.rname(size=25) }}</td>
-                        <td>{{ form.rname_part(size=10) }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="xs fw-bold">נא למלא לפי אחת התבניות:</td>
-                    </tr>
-                    <tr class="xs">
-                        <td>שבוע 1</td>
-                        <td>הרצאה 1</td>
-                        <td></td>
-                    </tr>
-                    <tr class="xs">
-                        <td>תרגיל בית 1 (עד 2022-01-01)</td>
-                        <td>תרגיל בית 1</td>
-                        <td>שאלה 1</td>
-                    </tr>
-                    <tr class="xs">
-                        <td>מבחנים</td>
-                        <td>מבחן חורף תשפ"א מועד א</td>
-                        <td>שאלה 1</td>
-                    </tr>
-                </table>
-            </p>
-        {% endif %}
-        <p>
-            {{ form.link.label }}
-            <br/>
-            {{ form.link(size=32) }}
-            <br/>
-            {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.solution.label }}
-            <br/>
-            {{ form.solution(size=32) }}
-            <br/>
-            {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.recording.label }}
-            <br/>
-            {{ form.recording(size=32) }}
-            <br/>
-            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
+        
+        {% if is_existing_resource %}
+
         <p>
             {{ form.subject.label }}
             <br/>
@@ -79,6 +27,55 @@
             </select>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
+        
+        {% endif %}
+        <p>
+            {{ form.link.label }}
+            <br/>
+            {{ form.link(size=32) }}
+            <br/>
+            {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            {{ form.solution.label }}
+            <br/>
+            {{ form.solution(size=32) }}
+            <br/>
+            {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            {{ form.recording.label }}
+            <br/>
+            {{ form.recording(size=32) }}
+            <br/>
+            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+
+        {% if not is_existing_resource %}
+        <p>
+            {{ form.tab.label }}
+            {{ form.tab() }}
+        </p>
+        <p>
+            <span style="color:red">*</span> {{ form.header.label }} (למשל "שבוע 1", "מבחנים")
+            <br/>
+            {{ form.header(size=32) }}
+            <br/>
+            {% for error in form.header.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            <span style="color:red">*</span> {{ form.rname.label }} (למשל "הרצאה 1", "מבחן חורף תשפ"א מועד ב")
+            <br/>
+            {{ form.rname(size=32) }}
+            <br/>
+            {% for error in form.rname.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        חלקים (למשל "שאלה 1")
+
+        {{ form.rname_parts() }}
+    {% endif %}
+
+
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock content %}

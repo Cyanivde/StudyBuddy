@@ -7,7 +7,6 @@ import pandas as pd
 import json
 import hashlib
 
-
 def _fetch_resource_df(resource_id):
     resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
 
@@ -35,6 +34,9 @@ def _fetch_subject_list():
 
     return subject_names
 
+def _fetch_course(course_id):
+    return Course.query.filter_by(course_id=course_id)[0]
+
 
 def _update_form_according_to_resource(form, resource):
     form.link.data = resource.link
@@ -60,36 +62,48 @@ def _insert_resource_according_to_form(form, course_id):
     if not form.header.data:
         form.header.data = "ללא כותרת"
 
-    if not form.rname_part.data:
-        form.rname_part.data = None
+    rname_parts = [entry for entry in form.rname_parts.entries if entry.data]
 
-    resource = Resource(link=form.link.data,
-                        solution=form.solution.data,
-                        recording=form.recording.data,
-                        subject=json.dumps(form.subject.data))
-    db.session.add(resource)
-    db.session.commit()
-    db.session.refresh(resource)
+    if (len(rname_parts) == 0):
+        rname_parts = [form.rname_parts.entries[0]]
 
-    same_tab_and_header_max = db.session.query(func.max(ResourceToCourse.order_in_tab)).filter_by(
-        course_id=course_id, tab=form.tab.data, header=form.header.data).scalar()
-    if not same_tab_and_header_max:
-        same_tab_and_header_max = 0
+    uploaded_resources = []
 
-    same_tab_count = ResourceToCourse.query.filter_by(course_id=course_id, tab=form.tab.data).count()
+    for r in rname_parts:
+        if not r.data:
+            r.data = None
 
-    new_resource_order_in_tab = same_tab_and_header_max + 1
-    if new_resource_order_in_tab == 1:
-        new_resource_order_in_tab = same_tab_count + 1
+        resource = Resource(link=form.link.data,
+                            solution=form.solution.data,
+                            recording=form.recording.data,
+                            subject=json.dumps(form.subject.data))
+        db.session.add(resource)
+        db.session.commit()
+        db.session.refresh(resource)
 
-    ResourceToCourse.query.filter(
-        ResourceToCourse.order_in_tab >= new_resource_order_in_tab).filter_by(
-        course_id=course_id, tab=form.tab.data).update({'order_in_tab': ResourceToCourse.order_in_tab + 1})
+        uploaded_resources.append((resource.resource_id, form.rname.data, r.data))
 
-    resource_to_course = ResourceToCourse(course_id=course_id, resource_id=resource.resource_id, header=form.header.data,
-                                          rname=form.rname.data, rname_part=form.rname_part.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
-    db.session.add(resource_to_course)
-    db.session.commit()
+        same_tab_and_header_max = db.session.query(func.max(ResourceToCourse.order_in_tab)).filter_by(
+            course_id=course_id, tab=form.tab.data, header=form.header.data).scalar()
+        if not same_tab_and_header_max:
+            same_tab_and_header_max = 0
+
+        same_tab_count = ResourceToCourse.query.filter_by(course_id=course_id, tab=form.tab.data).count()
+
+        new_resource_order_in_tab = same_tab_and_header_max + 1
+        if new_resource_order_in_tab == 1:
+            new_resource_order_in_tab = same_tab_count + 1
+
+        ResourceToCourse.query.filter(
+            ResourceToCourse.order_in_tab >= new_resource_order_in_tab).filter_by(
+            course_id=course_id, tab=form.tab.data).update({'order_in_tab': ResourceToCourse.order_in_tab + 1})
+
+        resource_to_course = ResourceToCourse(course_id=course_id, resource_id=resource.resource_id, header=form.header.data,
+                                            rname=form.rname.data, rname_part=r.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
+        db.session.add(resource_to_course)
+        db.session.commit()
+
+    return uploaded_resources
 
 
 def _get_subjects(resources_df):
@@ -186,3 +200,7 @@ def _jsonload(x):
 def _resources_to_textarea(df):
     return "\r\n".join(["{0} | {1} / {2} / {3}".format(
         resource.resource_id, resource.header, resource.rname, resource.rname_part or '') for index, resource in df.iterrows()])
+
+def _update_resource_discord_link(resource_id, discord_link):
+    Resource.query.filter_by(resource_id = resource_id).update({'comments': discord_link})
+    db.session.commit()
