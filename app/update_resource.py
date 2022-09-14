@@ -24,7 +24,8 @@ class DiscordClientForCreatingThread(discord.Client):
         channel = self.get_channel(self.channel_id)
         for i in self.uploaded_resources:
             msg = await channel.send("חומר לימוד חדש")
-            thread = await msg.create_thread(name=i[1] + ' ' + (i[2] or ''))
+            thread_name = i[1] + ' - ' + (i[2] or '')
+            thread = await msg.create_thread(name=thread_name.strip('?'))
             await msg.delete()
             await thread.send("<https://studybuddy.co.il/resource/{0}>".format(i[0]))
             _update_resource_discord_link(i[0], thread.jump_url)
