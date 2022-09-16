@@ -51,17 +51,6 @@ class Course(db.Model):
     discord_channel_id = db.Column(db.String(50))
 
 
-class ResourceToCourse(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer)
-    resource_id = db.Column(db.Integer)
-    tab = db.Column(db.String(10))
-    order_in_tab = db.Column(db.Integer)
-    header = db.Column(db.String(140))
-    rname = db.Column(db.String(140))
-    rname_part = db.Column(db.String(140))
-
-
 class ResourceToUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
