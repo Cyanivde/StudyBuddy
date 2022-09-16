@@ -20,11 +20,6 @@
       <li class="list-group-item list-group-item-link">
         <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', course_id=course.course_id) }}">ארכיון</a></span>
       </li>
-      <li class="list-group-item list-group-item-link">
-        <a target="_blank"
-           href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FStudyBuddy%2FShared%20Documents%2F{{ course.course_institute_id }}">
-        OneDrive</a>
-      </li>
       {% if current_user.is_admin %}
         <li class="list-group-item list-group-item-link">
           <a href="{{ url_for('createresource', course_id=course.course_id) }}">העלאת חומר</a>
