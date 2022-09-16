@@ -1,7 +1,7 @@
 from flask import render_template
 from app import app, db
 from app.forms import CourseResourcesForm
-from app.models import ResourceToCourse, Course
+from app.models import Course, Resource
 from app.utils import _fetch_resources, _resources_to_textarea
 
 
@@ -29,28 +29,21 @@ def _update_course(course_id):
         exams = [(line.split(' | ')[0], line.split(' | ')[1].split(' / ')[0], line.split(' | ')[1].split(' / ')[1], line.split(' | ')[1].split(' / ')[2] or None)
                  for line in form.exams.data.split('\r\n') if ' ' in line]
 
-        db.session.query(ResourceToCourse).filter_by(
-            course_id=course_id).delete()
+        Resource.query.filter_by(course_id = course_id).update({'tab': 'archive'})
 
         order_in_tab = 1
         for resource in resources:
-            resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[0], header=resource[1], rname=resource[2], rname_part=resource[3], tab="semester", order_in_tab=order_in_tab)
-            db.session.add(resource_to_course)
+            Resource.query.filter_by(resource_id = resource[0]).update({'header': resource[1], 'rname':resource[2], 'rname_part': resource[3], 'tab':'semester', 'order_in_tab':order_in_tab})
             order_in_tab += 1
 
         order_in_tab = 1
         for resource in archive:
-            resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[0], header=resource[1], rname=resource[2], rname_part=resource[3], tab="archive", order_in_tab=order_in_tab)
-            db.session.add(resource_to_course)
+            Resource.query.filter_by(resource_id = resource[0]).update({'header': resource[1], 'rname':resource[2], 'rname_part': resource[3], 'tab':'archive', 'order_in_tab':order_in_tab})
             order_in_tab += 1
 
         order_in_tab = 1
         for resource in exams:
-            resource_to_course = ResourceToCourse(
-                course_id=course_id, resource_id=resource[0], header=resource[1], rname=resource[2], rname_part=resource[3], tab="exams", order_in_tab=order_in_tab)
-            db.session.add(resource_to_course)
+            Resource.query.filter_by(resource_id = resource[0]).update({'header': resource[1], 'rname':resource[2], 'rname_part': resource[3], 'tab':'exams', 'order_in_tab':order_in_tab})
             order_in_tab += 1
 
         db.session.commit()

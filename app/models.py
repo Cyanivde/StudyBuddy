@@ -33,7 +33,12 @@ class Resource(db.Model):
     recording = db.Column(db.String(500))
     comments = db.Column(db.String(500))
     subject = db.Column(db.Text)
-
+    course_id = db.Column(db.Integer)
+    tab = db.Column(db.String(10))
+    order_in_tab = db.Column(db.Integer)
+    header = db.Column(db.String(140))
+    rname = db.Column(db.String(140))
+    rname_part = db.Column(db.String(140))
 
 class Course(db.Model):
     course_id = db.Column(db.Integer, primary_key=True)

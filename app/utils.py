@@ -2,7 +2,7 @@ from flask import abort
 from flask_login import current_user
 from sqlalchemy import func
 from app import db
-from app.models import ResourceToCourse, Subject, Resource, Course, ResourceToUser
+from app.models import Subject, Resource, Course, ResourceToUser
 import pandas as pd
 import json
 import hashlib
@@ -13,16 +13,9 @@ def _fetch_resource_df(resource_id):
     if len(resource_df) == 0:
         abort(404)
 
-    resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(resource_id=resource_id).statement, db.session.bind)
+    course_df = pd.read_sql(Course.query.filter(Course.course_id.in_(resource_df['course_id'])).statement, db.session.bind)
 
-    if len(resource_to_course_df) == 0:
-        abort(404)
-
-    course_df = pd.read_sql(Course.query.filter(Course.course_id.in_(resource_to_course_df['course_id'])).statement, db.session.bind)
-
-    merged_resource_df = pd.merge(left=resource_df, right=resource_to_course_df, on='resource_id')
-
-    merged_resource_df = pd.merge(left=merged_resource_df, right=course_df, on='course_id')
+    merged_resource_df = pd.merge(left=resource_df, right=course_df, on='course_id')
 
     return merged_resource_df
 
@@ -73,35 +66,32 @@ def _insert_resource_according_to_form(form, course_id):
         if not r.data:
             r.data = None
 
-        resource = Resource(link=form.link.data,
-                            solution=form.solution.data,
-                            recording=form.recording.data,
-                            subject=json.dumps(form.subject.data))
-        db.session.add(resource)
-        db.session.commit()
-        db.session.refresh(resource)
-
-        uploaded_resources.append((resource.resource_id, form.rname.data, r.data))
-
-        same_tab_and_header_max = db.session.query(func.max(ResourceToCourse.order_in_tab)).filter_by(
+        same_tab_and_header_max = db.session.query(func.max(Resource.order_in_tab)).filter_by(
             course_id=course_id, tab=form.tab.data, header=form.header.data).scalar()
         if not same_tab_and_header_max:
             same_tab_and_header_max = 0
 
-        same_tab_count = ResourceToCourse.query.filter_by(course_id=course_id, tab=form.tab.data).count()
+        same_tab_count = Resource.query.filter_by(course_id=course_id, tab=form.tab.data).count()
 
         new_resource_order_in_tab = same_tab_and_header_max + 1
         if new_resource_order_in_tab == 1:
             new_resource_order_in_tab = same_tab_count + 1
 
-        ResourceToCourse.query.filter(
-            ResourceToCourse.order_in_tab >= new_resource_order_in_tab).filter_by(
-            course_id=course_id, tab=form.tab.data).update({'order_in_tab': ResourceToCourse.order_in_tab + 1})
+        Resource.query.filter(
+            Resource.order_in_tab >= new_resource_order_in_tab).filter_by(
+            course_id=course_id, tab=form.tab.data).update({'order_in_tab': Resource.order_in_tab + 1})
 
-        resource_to_course = ResourceToCourse(course_id=course_id, resource_id=resource.resource_id, header=form.header.data,
+        resource = Resource(link=form.link.data,
+                            solution=form.solution.data,
+                            recording=form.recording.data,
+                            subject=json.dumps(form.subject.data),
+                            course_id=course_id, header=form.header.data,
                                             rname=form.rname.data, rname_part=r.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
-        db.session.add(resource_to_course)
+        db.session.add(resource)
         db.session.commit()
+        db.session.refresh(resource)
+
+        uploaded_resources.append((resource.resource_id, form.rname.data, r.data))
 
     return uploaded_resources
 
@@ -125,26 +115,15 @@ def _filter_resources(resources_extended_df, subject):
 
 
 def _fetch_resources(course_id, tab):
-    resource_to_course_df = pd.read_sql(ResourceToCourse.query.filter_by(
+    resource_df = pd.read_sql(Resource.query.filter_by(
         course_id=course_id, tab=tab).statement, db.session.bind)
 
-    if len(resource_to_course_df) == 0:
+    if len(resource_df) == 0:
         return pd.DataFrame()
 
-    resource_to_course_df.drop('id', axis=1, inplace=True)
-    resource_to_course_df.drop('course_id', axis=1, inplace=True)
-    resource_to_course_df.sort_values('order_in_tab', inplace=True)
-    resource_ids = set(resource_to_course_df['resource_id'])
+    resource_df.sort_values('order_in_tab', inplace=True)
 
-    resources_df = pd.read_sql(Resource.query.filter(
-        Resource.resource_id.in_(resource_ids)).statement, db.session.bind)
-
-    resources_extended_df = resource_to_course_df
-    if len(resources_df) > 0:
-        resource_to_course_df.drop('tab', axis=1, inplace=True)
-        resources_extended_df = pd.merge(how='right', left=resources_df, right=resource_to_course_df,
-                                         on="resource_id")
-
+    resources_extended_df = resource_df
     if current_user.is_authenticated:
         resource_to_user = pd.read_sql(ResourceToUser.query.filter_by(
             user_id=current_user.user_id).statement, db.session.bind)
@@ -153,7 +132,7 @@ def _fetch_resources(course_id, tab):
             resource_to_user.drop('id', axis=1, inplace=True)
             resource_to_user.drop('user_id', axis=1, inplace=True)
             resources_extended_df = pd.merge(how='left',
-                                             left=resources_extended_df, right=resource_to_user, on="resource_id")
+                                             left=resource_df, right=resource_to_user, on="resource_id")
 
     if 'subject' in resources_extended_df.keys():
         resources_extended_df['subject'] = resources_extended_df['subject'].apply(

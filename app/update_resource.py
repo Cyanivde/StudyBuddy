@@ -34,9 +34,9 @@ class DiscordClientForCreatingThread(discord.Client):
         await self.close()
 
 async def create_discord_threads(channel_id, uploaded_resources):
-    client = DiscordClientForCreatingThread(channel_id=channel_id, uploaded_resources=uploaded_resources)
-    await client.start(os.environ.get("DISCORD_TOKEN"))
-    return client.thread_link
+    if os.environ.get("DISCORD_TOKEN"):
+        client = DiscordClientForCreatingThread(channel_id=channel_id, uploaded_resources=uploaded_resources)
+        await client.start(os.environ.get("DISCORD_TOKEN"))
 
 def _update_resource(course_id, is_existing_resource, resource_id=None):
     form = UpdateResourceForm()
