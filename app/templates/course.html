@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="alert alert-info" role="alert">
+<!-- <div class="alert alert-info" role="alert">
   חדש: אזור תגובות ייעודי לכל חומר לימוד! כדי להשתתף, הצטרפו ל<a target="_blank" href="https://discord.gg/ByuK6nnK6d" class="alert-link">שרת ה-Discord</a>.
-</div>
+</div> -->
   <div class="overflow-auto">
     <ul class="list-group list-group-horizontal">
       <li class="list-group-item">
@@ -12,7 +12,7 @@
     </ul>
     <ul class="list-group list-group-horizontal">
       <li class="list-group-item list-group-item-link">
-        <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_id=course.course_id) }}">סמסטר</a></span>
+        <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_id=course.course_id) }}">סמסטר נוכחי</a></span>
       </li>
       <li class="list-group-item list-group-item-link">
         <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', course_id=course.course_id) }}">מבחנים</a></span>
@@ -101,10 +101,10 @@
     class="text-decoration-none"
     href="{{ resource.recording }}">הקלטה</a>
                       {% endif %}
-                      / <a target="_blank"
+                      <!-- <a target="_blank"
   class="text-decoration-none"
   href="{{ resource.comments }}">תגובות</a>
-                    </div>
+                    </div> -->
                   {% endif %}
                 </td>
                 <td>
