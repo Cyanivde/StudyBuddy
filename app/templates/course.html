@@ -4,7 +4,7 @@
   חדש: אזור תגובות ייעודי לכל חומר לימוד! כדי להשתתף, הצטרפו ל<a target="_blank" href="https://discord.gg/ByuK6nnK6d" class="alert-link">שרת ה-Discord</a>.
 </div> -->
   <div class="overflow-auto">
-    <div class="container" style="max-width: 800px">
+    <div class="container">
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
           <h4>{{ course.course_name }}</h4>
@@ -81,7 +81,7 @@
                       {% if not resource.is_fake_row or tab != "exams" %}
                         <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" or filtered_subjects %} style="display: none"{% endif %}
                              {% endif %}>
-                          {% for subj in resource.subject %}<span class="badge bg-secondary">{{ subj }}</span>{% endfor %}
+                          {% for subj in resource.subject %}<span class="badge bg-secondary">{{ subj }}</span>&nsbp;{% endfor %}
                         </div>
                       {% endif %}
                     </td>
