@@ -4,7 +4,7 @@
   חדש: אזור תגובות ייעודי לכל חומר לימוד! כדי להשתתף, הצטרפו ל<a target="_blank" href="https://discord.gg/ByuK6nnK6d" class="alert-link">שרת ה-Discord</a>.
 </div> -->
   <div class="overflow-auto">
-    <div class="container">
+    <div class="container"style="max-width:1100px">
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
           <h4>{{ course.course_name }}</h4>
@@ -36,8 +36,7 @@
           <thead>
             <tr class="align-middle course-tr">
               <th class="text-center">ראשי</th>
-              <th class="text-center">משני</th>
-              <th class="text-center" style="min-width: 150px">שם</th>
+              <th class="text-center" style="min-width: 200px">שם</th>
               <th class="text-center">פתרון</th>
               <th class="text-center">הקלטה</th>
               <th class="text-center">נושאים</th>
@@ -54,7 +53,6 @@
               {% for index, resource in resources[header].iterrows() %}
                 <tr class="align-middle  course-tr">
                   <td>{{ resource.header }}</td>
-                  <td>{{ resource.rname }}</td>
                   <td>
                     <div>
                       {% if resource.link %}<a class="text-decoration-none"
@@ -81,7 +79,7 @@
                       {% if not resource.is_fake_row or tab != "exams" %}
                         <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" or filtered_subjects %} style="display: none"{% endif %}
                              {% endif %}>
-                          {% for subj in resource.subject %}<span class="badge bg-secondary">{{ subj }}</span>&nsbp;{% endfor %}
+                          {% for subj in resource.subject %}<span class="badge bg-secondary">{{ subj }}</span>&nbsp;{% endfor %}
                         </div>
                       {% endif %}
                     </td>
@@ -209,10 +207,10 @@
           "paging": false,
           "bAutoWidth": false,
           rowGroup: {
-              dataSrc: [0, 1]
+              dataSrc: [0]
           },
           columnDefs: [{
-              targets: [0, 1],
+              targets: [0],
               visible: false
           }],
           language: {
