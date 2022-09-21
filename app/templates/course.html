@@ -1,220 +1,178 @@
 {% extends "base.html" %}
 {% block content %}
-<!-- <div class="alert alert-info" role="alert">
+  <!-- <div class="alert alert-info" role="alert">
   חדש: אזור תגובות ייעודי לכל חומר לימוד! כדי להשתתף, הצטרפו ל<a target="_blank" href="https://discord.gg/ByuK6nnK6d" class="alert-link">שרת ה-Discord</a>.
 </div> -->
   <div class="overflow-auto">
-    <ul class="list-group list-group-horizontal">
-      <li class="list-group-item">
-        <h4>{{ course.course_name }}</h4>
-        <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  מתוחזק על ידי <a href="mailto:{{ course.maintainer_email }}">{{ course.maintainer }}</a></span>
-      </li>
-    </ul>
-    <ul class="list-group list-group-horizontal">
-      <li class="list-group-item list-group-item-link">
-        <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_id=course.course_id) }}">סמסטר נוכחי</a></span>
-      </li>
-      <li class="list-group-item list-group-item-link">
-        <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', course_id=course.course_id) }}">מבחנים</a></span>
-      </li>
-      <li class="list-group-item list-group-item-link">
-        <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', course_id=course.course_id) }}">ארכיון</a></span>
-      </li>
-      {% if current_user.is_admin %}
+    <div class="container" style="max-width: 800px">
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item">
+          <h4>{{ course.course_name }}</h4>
+          <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  מתוחזק על ידי <a href="mailto:{{ course.maintainer_email }}">{{ course.maintainer }}</a></span>
+        </li>
+      </ul>
+      <ul class="list-group list-group-horizontal">
         <li class="list-group-item list-group-item-link">
-          <a href="{{ url_for('createresource', course_id=course.course_id) }}">העלאת חומר</a>
+          <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_id=course.course_id) }}">סמסטר נוכחי</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <a href="{{ url_for('updatecourse', course_id=course.course_id) }}">עריכת קורס</a>
+          <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', course_id=course.course_id) }}">מבחנים</a></span>
         </li>
-      {% endif %}
-    </ul>
-    <hr/>
-    <form class="d-flex" method="post">
-      <table class="table w-auto col-auto small">
-        <thead>
-          <tr class="align-middle course-tr">
-            <td style="width:310px" colspan="2">חומר לימוד</td>
-            <td>
-              <div class="input-group">
-                <select name="subject"
-                        class="selectpicker"
-                        multiple
-                        data-actions-box="true"
-                        data-style=""
-                        data-style-base="form-control"
-                        data-none-results-text="אין תוצאות עבור {0}"
-                        data-live-search="true"
-                        data-width="200px"
-                        data-none-selected-text="בחירת נושאים"
-                        data-select-all-text="בחר הכל"
-                        data-deselect-all-text="איפוס"
-                        data-selected-text-format="static">
-                  {% for subject in subjects %}
-                    <option id="subj-{{ subject }}"
-                            {% if subject in filtered_subjects %} selected{% endif %}>
-                      {{ subject }}
-                    </option>
-                  {% endfor %}
-                </select>
-                <button class="btn btn-outline-secondary" type="submit">סינון</button>
-              </div>
-            </td>
-            <td class="text-center">מעקב</td>
-            {% if current_user.is_admin %}<td class="text-center"></td>{% endif %}
-          </tr>
-        </thead>
-        {% for header in resources.keys() %}
+        <li class="list-group-item list-group-item-link">
+          <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', course_id=course.course_id) }}">ארכיון</a></span>
+        </li>
+        {% if current_user.is_admin %}
+          <li class="list-group-item list-group-item-link">
+            <a href="{{ url_for('createresource', course_id=course.course_id) }}">העלאת חומר</a>
+          </li>
+          <li class="list-group-item list-group-item-link">
+            <a href="{{ url_for('updatecourse', course_id=course.course_id) }}">עריכת קורס</a>
+          </li>
+        {% endif %}
+      </ul>
+      <hr/>
+      <div class="col-md-12">
+        <table id="myTable" class="ui table hover">
+          <thead>
+            <tr class="align-middle course-tr">
+              <th class="text-center">ראשי</th>
+              <th class="text-center">משני</th>
+              <th class="text-center" style="min-width: 150px">שם</th>
+              <th class="text-center">פתרון</th>
+              <th class="text-center">הקלטה</th>
+              <th class="text-center">נושאים</th>
+              <th class="text-center">מעקב</th>
+              {% if current_user.is_admin %}<th class="text-center">אדמין</th>{% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for header in resources.keys() %}
+              <!--
           <tr class="small  course-tr">
             <td colspan="7" class="pt-3 fw-bold">{{ header }}</td>
-          </tr>
-          {% for index, resource in resources[header].iterrows() %}
-            <tr class="align-middle  course-tr"
-                {% if resource.rname_part and not resource.is_fake_row %} name="{{ resource.name_md5 }}" {% if not filtered_subjects and not resource.is_fake_row %} style="display: none"{% endif %}
-                {% endif %}>
-              <td colspan="2">
-                {% if resource.is_fake_row %}
-                  <a href="javascript:void(0);"
-                     onclick='toggle("{{ resource.name_md5 }}")'>{{ resource.rname }}</a>
-                {% else %}
-                  {% if resource.rname_part %}
-                    <div style="padding-right:25px">
-                    {% else %}
-                      <div>
-                      {% endif %}
+          </tr> -->
+              {% for index, resource in resources[header].iterrows() %}
+                <tr class="align-middle  course-tr">
+                  <td>{{ resource.header }}</td>
+                  <td>{{ resource.rname }}</td>
+                  <td>
+                    <div>
                       {% if resource.link %}<a class="text-decoration-none"
    target="_blank"
    href="{{ resource.link }}">{% endif %}
-                      {% if resource.rname_part %}
-                        {{ resource.rname_part }}
-                      {% else %}
-                        {{ resource.rname }}
-                      {% endif %}
+                      {{ resource.rname_part }}
                       {% if resource.link %}</a>{% endif %}
+                    </td>
+                    <td class="text-center">
                       {% if resource.solution %}
-                        / <a target="_blank"
-    class="text-decoration-none"
-    href="{{ resource.solution }}">פתרון</a>
+                        <a target="_blank"
+                           class="text-decoration-none"
+                           href="{{ resource.solution }}">פתרון</a>
                       {% endif %}
+                    </td>
+                    <td class="text-center">
                       {% if resource.recording %}
-                        / <a target="_blank"
-    class="text-decoration-none"
-    href="{{ resource.recording }}">הקלטה</a>
+                        <a target="_blank"
+                           class="text-decoration-none"
+                           href="{{ resource.recording }}">הקלטה</a>
                       {% endif %}
-                      <!-- <a target="_blank"
-  class="text-decoration-none"
-  href="{{ resource.comments }}">תגובות</a>
-                    </div> -->
-                  {% endif %}
-                </td>
-                <td>
-                  {% if not resource.is_fake_row or tab != "exams" %}
-                    <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" or filtered_subjects %} style="display: none"{% endif %}
-                         {% endif %}>
-                      {% for subj in resource.subject %}
-                        {% if subj in filtered_subjects %}
-                          <button type="button"
-                                  class="subject-btn btn btn-secondary"
-                                  onClick="document.getElementById('subj-{{ subj }}').selected = false; this.form.submit();">
-                            {{ subj }}
-                          </button>
-                        {% else %}
-                          <button type="button"
-                                  class="subject-btn btn btn-outline-secondary"
-                                  onClick="document.getElementById('subj-{{ subj }}').selected = true; this.form.submit();">
-                            {{ subj }}
-                          </button>
+                    </td>
+                    <td class="text-center">
+                      {% if not resource.is_fake_row or tab != "exams" %}
+                        <div {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if tab == "exams" or filtered_subjects %} style="display: none"{% endif %}
+                             {% endif %}>
+                          {% for subj in resource.subject %}<span class="badge bg-secondary">{{ subj }}</span>{% endfor %}
+                        </div>
+                      {% endif %}
+                    </td>
+                    <td class="text-center">
+                      <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
+                           class="btn-group"
+                           role="group"
+                           {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if filtered_subjects %} style="display: none"{% endif %}
+                           {% endif %}
+                           aria-label="Basic radio toggle button group">
+                        <input onchange="updateRadio({{ resource.resource_id }}, 0);"
+                               type="radio"
+                               class="btn-check"
+                               value="0"
+                               autocomplete="off"
+                               {% if not resource.is_fake_row %}name="btnradio-{{ resource.resource_id }}"{% endif %}
+                               {% if not resource.is_fake_row %} id="btnradio1-{{ resource.resource_id }}"{% endif %}
+                               {% if (resource.done != 1) and (resource.done != 2) %}checked{% endif %}
+                               {% if not current_user.is_authenticated or resource.is_fake_row %}disabled{% endif %}/>
+                        <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
+                               class="btn btn-outline-secondary"
+                               for="btnradio1-{{ resource.resource_id }}">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                               width="16"
+                               height="16"
+                               fill="currentColor"
+                               class="bi bi-dash"
+                               viewBox="0 0 16 16">
+                            <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+                          </svg>
+                        </label>
+                        <input onchange="updateRadio({{ resource.resource_id }}, 1);"
+                               type="radio"
+                               class="btn-check"
+                               value="1"
+                               autocomplete="off"
+                               {% if not resource.is_fake_row %}name="btnradio-{{ resource.resource_id }}"{% endif %}
+                               {% if not resource.is_fake_row %} id="btnradio2-{{ resource.resource_id }}"{% endif %}
+                               {% if resource.done == 1 %}checked{% endif %}
+                               {% if not current_user.is_authenticated or resource.is_fake_row %}disabled{% endif %}/>
+                        <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
+                               class="btn btn-outline-secondary"
+                               for="btnradio2-{{ resource.resource_id }}">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                               width="16"
+                               height="16"
+                               fill="currentColor"
+                               class="bi bi-arrow-repeat"
+                               viewBox="0 0 16 16">
+                            <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                            <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                          </svg>
+                        </label>
+                        <input onchange="updateRadio({{ resource.resource_id }}, 2);"
+                               type="radio"
+                               class="btn-check"
+                               value="2"
+                               autocomplete="off"
+                               {% if not resource.is_fake_row %}name="btnradio-{{ resource.resource_id }}"{% endif %}
+                               {% if not resource.is_fake_row %} id="btnradio3-{{ resource.resource_id }}"{% endif %}
+                               {% if resource.done == 2 %}checked{% endif %}
+                               {% if not current_user.is_authenticated or resource.is_fake_row %}disabled{% endif %}/>
+                        <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="הושלם"{% endif %}
+                               class="btn btn-outline-success"
+                               for="btnradio3-{{ resource.resource_id }}">
+                          <svg xmlns="http://www.w3.org/2000/svg"
+                               width="16"
+                               height="16"
+                               fill="currentColor"
+                               class="bi bi-check2"
+                               viewBox="0 0 16 16">
+                            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                          </svg>
+                        </label>
+                      </div>
+                    </td class="text-center">
+                    {% if current_user.is_admin %}
+                      <td class="text-center">
+                        {% if not resource.is_fake_row %}
+                          <a class="text-decoration-none"
+                             href="{{ url_for('editresource', course_id=course.course_id, resource_id=resource.resource_id) }}">עריכה</a>
                         {% endif %}
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                </td>
-                <td>
-                  <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
-                       class="btn-group"
-                       role="group"
-                       {% if resource.is_fake_row %} name="{{ resource.name_md5 }}-hidable" {% if filtered_subjects %} style="display: none"{% endif %}
-                       {% endif %}
-                       aria-label="Basic radio toggle button group">
-                    <input onchange="updateRadio({{ resource.resource_id }}, 0);"
-                           type="radio"
-                           class="btn-check"
-                           value="0"
-                           autocomplete="off"
-                           {% if not resource.is_fake_row %}name="btnradio-{{ resource.resource_id }}"{% endif %}
-                           {% if not resource.is_fake_row %} id="btnradio1-{{ resource.resource_id }}"{% endif %}
-                           {% if (resource.done != 1) and (resource.done != 2) %}checked{% endif %}
-                           {% if not current_user.is_authenticated or resource.is_fake_row %}disabled{% endif %}/>
-                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
-                           class="btn btn-outline-secondary"
-                           for="btnradio1-{{ resource.resource_id }}">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="16"
-                           height="16"
-                           fill="currentColor"
-                           class="bi bi-dash"
-                           viewBox="0 0 16 16">
-                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
-                      </svg>
-                    </label>
-                    <input onchange="updateRadio({{ resource.resource_id }}, 1);"
-                           type="radio"
-                           class="btn-check"
-                           value="1"
-                           autocomplete="off"
-                           {% if not resource.is_fake_row %}name="btnradio-{{ resource.resource_id }}"{% endif %}
-                           {% if not resource.is_fake_row %} id="btnradio2-{{ resource.resource_id }}"{% endif %}
-                           {% if resource.done == 1 %}checked{% endif %}
-                           {% if not current_user.is_authenticated or resource.is_fake_row %}disabled{% endif %}/>
-                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
-                           class="btn btn-outline-secondary"
-                           for="btnradio2-{{ resource.resource_id }}">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="16"
-                           height="16"
-                           fill="currentColor"
-                           class="bi bi-arrow-repeat"
-                           viewBox="0 0 16 16">
-                        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-                        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
-                      </svg>
-                    </label>
-                    <input onchange="updateRadio({{ resource.resource_id }}, 2);"
-                           type="radio"
-                           class="btn-check"
-                           value="2"
-                           autocomplete="off"
-                           {% if not resource.is_fake_row %}name="btnradio-{{ resource.resource_id }}"{% endif %}
-                           {% if not resource.is_fake_row %} id="btnradio3-{{ resource.resource_id }}"{% endif %}
-                           {% if resource.done == 2 %}checked{% endif %}
-                           {% if not current_user.is_authenticated or resource.is_fake_row %}disabled{% endif %}/>
-                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="הושלם"{% endif %}
-                           class="btn btn-outline-success"
-                           for="btnradio3-{{ resource.resource_id }}">
-                      <svg xmlns="http://www.w3.org/2000/svg"
-                           width="16"
-                           height="16"
-                           fill="currentColor"
-                           class="bi bi-check2"
-                           viewBox="0 0 16 16">
-                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                      </svg>
-                    </label>
-                  </div>
-                </td>
-                {% if current_user.is_admin %}
-                  <td>
-                    {% if not resource.is_fake_row %}
-                      <a class="text-decoration-none"
-                         href="{{ url_for('editresource', course_id=course.course_id, resource_id=resource.resource_id) }}">עריכה</a>
+                      </td>
                     {% endif %}
-                  </td>
-                {% endif %}
-              </tr>
-            {% endfor %}
-          {% endfor %}
-        </table>
-      </form>
+                  </tr>
+                {% endfor %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
     <script type="text/javascript">
       function updateRadio(resource_id, val) {
@@ -245,5 +203,36 @@
               }
           }
       }
+      var myTable = $('#myTable').DataTable({
+          "ordering": false,
+          "info": false,
+          "paging": false,
+          "bAutoWidth": false,
+          rowGroup: {
+              dataSrc: [0, 1]
+          },
+          columnDefs: [{
+              targets: [0, 1],
+              visible: false
+          }],
+          language: {
+              processing: 'מעבד...',
+              lengthMenu: 'הצג _MENU_ פריטים',
+              zeroRecords: 'לא נמצאו רשומות מתאימות',
+              emptyTable: 'לא נמצאו רשומות מתאימות',
+              info: '_START_ עד _END_ מתוך _TOTAL_ רשומות',
+              infoEmpty: '0 עד 0 מתוך 0 רשומות',
+              infoFiltered: '(מסונן מסך _MAX_ רשומות)',
+              infoPostFix: '',
+              search: 'סינון: ',
+              url: '',
+              paginate: {
+                  first: 'ראשון',
+                  previous: 'קודם',
+                  next: 'הבא',
+                  last: 'אחרון'
+              }
+          },
+      });
     </script>
   {% endblock content %}

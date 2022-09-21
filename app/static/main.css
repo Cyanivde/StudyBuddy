@@ -46,3 +46,11 @@ li {
 .btn-outline-success {
   padding: 0rem 0.5rem 0.2rem 0.5rem;
 }
+
+table.dataTable tr.dtrg-group th {
+  text-align: right !important;
+}
+
+#myTable_filter {
+  float: left;
+}
