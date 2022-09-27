@@ -109,7 +109,7 @@ def _fetch_resources(course_id, tab):
     if tab == 'exams':
         resource_df = resource_df[resource_df['is_official'] & (resource_df['type'] == 'exam')]
         resource_df.sort_values('display_name', inplace=True)
-        resource_df.sort_values('semester', inplace=True)
+        resource_df.sort_values('semester', ascending=False, inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'archive':
