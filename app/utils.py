@@ -1,3 +1,4 @@
+import re
 from flask import abort
 from flask_login import current_user
 from sqlalchemy import func
@@ -6,6 +7,7 @@ from app.models import Subject, Resource, Course, ResourceToUser
 import pandas as pd
 import json
 import hashlib
+
 
 def _fetch_resource_df(resource_id):
     resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
@@ -27,14 +29,22 @@ def _fetch_subject_list():
 
     return subject_names
 
+
 def _fetch_course(course_id):
     return Course.query.filter_by(course_id=course_id)[0]
 
 
 def _update_form_according_to_resource(form, resource):
+    form.display_name.data = resource.display_name
     form.link.data = resource.link
+    form.type.data = resource.type
     form.solution.data = resource.solution
     form.recording.data = resource.recording
+    form.is_official.data = resource.is_official
+    form.is_out_of_date.data = resource.is_out_of_date
+    form.semester.data = resource.semester
+    form.deadline_week.data = resource.deadline_week
+    form.deadline_date.data = resource.deadline_date
     form.subject.data = json.loads(resource.subject)
     return form
 
@@ -42,9 +52,16 @@ def _update_form_according_to_resource(form, resource):
 def _update_resource_according_to_form(resource, form):
     actual_resource = db.session.query(Resource).filter_by(resource_id=int(resource.resource_id)).first()
 
+    actual_resource.display_name = form.display_name.data
+    actual_resource.type = form.type.data
     actual_resource.link = form.link.data
     actual_resource.solution = form.solution.data
     actual_resource.recording = form.recording.data
+    actual_resource.is_official = form.is_official.data
+    actual_resource.is_out_of_date = form.is_out_of_date.data
+    actual_resource.deadline_week = form.deadline_week.data
+    actual_resource.semester = form.semester.data
+    actual_resource.deadline_date = _get_date_from_week(form.deadline_week.data, form.deadline_date.data)
     actual_resource.subject = json.dumps(form.subject.data)
 
     db.session.commit()
@@ -52,48 +69,21 @@ def _update_resource_according_to_form(resource, form):
 
 
 def _insert_resource_according_to_form(form, course_id):
-    if not form.header.data:
-        form.header.data = "ללא כותרת"
-
-    rname_parts = [entry for entry in form.rname_parts.entries if entry.data]
-
-    if (len(rname_parts) == 0):
-        rname_parts = [form.rname_parts.entries[0]]
-
-    uploaded_resources = []
-
-    for r in rname_parts:
-        if not r.data:
-            r.data = None
-
-        same_tab_and_header_max = db.session.query(func.max(Resource.order_in_tab)).filter_by(
-            course_id=course_id, tab=form.tab.data, header=form.header.data).scalar()
-        if not same_tab_and_header_max:
-            same_tab_and_header_max = 0
-
-        same_tab_count = Resource.query.filter_by(course_id=course_id, tab=form.tab.data).count()
-
-        new_resource_order_in_tab = same_tab_and_header_max + 1
-        if new_resource_order_in_tab == 1:
-            new_resource_order_in_tab = same_tab_count + 1
-
-        Resource.query.filter(
-            Resource.order_in_tab >= new_resource_order_in_tab).filter_by(
-            course_id=course_id, tab=form.tab.data).update({'order_in_tab': Resource.order_in_tab + 1})
-
-        resource = Resource(link=form.link.data,
-                            solution=form.solution.data,
-                            recording=form.recording.data,
-                            subject=json.dumps(form.subject.data),
-                            course_id=course_id, header=form.header.data,
-                                            rname=form.rname.data, rname_part=r.data, tab=form.tab.data, order_in_tab=new_resource_order_in_tab)
-        db.session.add(resource)
-        db.session.commit()
-        db.session.refresh(resource)
-
-        uploaded_resources.append((resource.resource_id, form.rname.data, r.data))
-
-    return uploaded_resources
+    resource = Resource(display_name=form.display_name.data,
+                        type=form.type.data,
+                        link=form.link.data,
+                        solution=form.solution.data,
+                        recording=form.recording.data,
+                        is_official=form.is_official.data,
+                        is_out_of_date=form.is_out_of_date.data,
+                        deadline_week=form.deadline_week.data,
+                        deadline_date=_get_date_from_week(form.deadline_week.data, form.deadline_date.data),
+                        semester=form.semester.data,
+                        likes=0,
+                        subject=json.dumps(form.subject.data),
+                        course_id=course_id)
+    db.session.add(resource)
+    db.session.commit()
 
 
 def _get_subjects(resources_df):
@@ -102,26 +92,29 @@ def _get_subjects(resources_df):
     return set([x for xs in list_of_lists for x in xs])
 
 
-def _filter_resources(resources_extended_df, subject):
-    if subject:
-        resources_extended_df['show'] = resources_extended_df['subject'].apply(
-            lambda x: any([subj in x for subj in subject]))
-    else:
-        resources_extended_df['show'] = True
-
-    resources_extended_df = resources_extended_df[resources_extended_df['show']]
-
-    return resources_extended_df
-
-
 def _fetch_resources(course_id, tab):
     resource_df = pd.read_sql(Resource.query.filter_by(
-        course_id=course_id, tab=tab).statement, db.session.bind)
+        course_id=course_id).statement, db.session.bind)
 
     if len(resource_df) == 0:
         return pd.DataFrame()
 
-    resource_df.sort_values('order_in_tab', inplace=True)
+    if tab == 'semester':
+        resource_df = resource_df[resource_df['is_official'] & (resource_df['semester'] == 'חורף תשפ"ג') & (resource_df['type'] != 'exam')]
+        resource_df.sort_values('display_name', inplace=True)
+        resource_df.sort_values('deadline_date', inplace=True)
+        resource_df['deadline_date'] = resource_df['deadline_date'].fillna('המבחן')
+        resource_df.insert(0, 'main', resource_df['deadline_date'].apply(lambda x: 'עד ' + str(x)[:10]))
+
+    if tab == 'exams':
+        resource_df = resource_df[resource_df['is_official'] & (resource_df['type'] == 'exam')]
+        resource_df.sort_values('semester', inplace=True)
+        resource_df.insert(0, 'main', resource_df['semester'])
+
+    if tab == 'archive':
+        resource_df = resource_df[~resource_df['is_official'] | ((resource_df['type'] != 'exam') & (resource_df['semester'] != 'חורף תשפ"ג'))]
+        resource_df.insert(0, 'main', resource_df['semester'])
+        resource_df.sort_values('likes', ascending=False, inplace=True)
 
     resources_extended_df = resource_df
     if current_user.is_authenticated:
@@ -142,33 +135,6 @@ def _fetch_resources(course_id, tab):
     return resources_extended_df
 
 
-def _add_fake_rows(resources_extended_df):
-    resources_extended_df['is_fake_row'] = False
-
-    resources_with_folded_rows = pd.DataFrame()
-    folded_row_names = set()
-
-    for index, row in resources_extended_df.iterrows():
-        folded_row_name = row['rname']
-        if row['rname_part'] and folded_row_name not in folded_row_names:
-            folded_row_names.add(folded_row_name)
-            folded_row = dict(row)
-            folded_row['is_fake_row'] = True
-            if 'done' in resources_extended_df.columns:
-                folded_row['done'] = resources_extended_df[resources_extended_df['rname']
-                                                           == folded_row_name]['done'].min()
-            folded_row['subject'] = set([item for sublist in resources_extended_df[resources_extended_df['rname']
-                                                                                   == folded_row_name]['subject'] for item in sublist])
-            resources_with_folded_rows = resources_with_folded_rows.append(
-                folded_row, ignore_index=True)
-        resources_with_folded_rows = resources_with_folded_rows.append(
-            row, ignore_index=True)
-
-    resources_with_folded_rows['name_md5'] = resources_with_folded_rows['rname'].apply(
-        lambda x: hashlib.md5(x.encode('utf-8')).hexdigest())
-    return resources_with_folded_rows
-
-
 def _jsonload(x):
     if isinstance(x, str):
         return json.loads(x)
@@ -176,10 +142,41 @@ def _jsonload(x):
         return ''
 
 
-def _resources_to_textarea(df):
-    return "\r\n".join(["{0} | {1} / {2} / {3}".format(
-        resource.resource_id, resource.header, resource.rname, resource.rname_part or '') for index, resource in df.iterrows()])
-
 def _update_resource_discord_link(resource_id, discord_link):
-    Resource.query.filter_by(resource_id = resource_id).update({'comments': discord_link})
+    Resource.query.filter_by(resource_id=resource_id).update({'comments': discord_link})
     db.session.commit()
+
+
+def _get_date_from_week(week, default_date):
+    if week == "presemester":
+        return "2022-10-23"
+    if week == "week1":
+        return "2022-10-30"
+    if week == "week2":
+        return "2022-11-07"
+    if week == "week3":
+        return "2022-11-14"
+    if week == "week4":
+        return "2022-11-21"
+    if week == "week5":
+        return "2022-11-28"
+    if week == "week6":
+        return "2022-12-05"
+    if week == "week7":
+        return "2022-12-12"
+    if week == "week8":
+        return "2022-12-25"
+    if week == "week9":
+        return "2023-01-01"
+    if week == "week10":
+        return "2023-01-08"
+    if week == "week11":
+        return "2023-01-15"
+    if week == "week12":
+        return "2023-01-22"
+    if week == "week13":
+        return "2023-01-29"
+    if week == "preexam":
+        return None
+    else:
+        return default_date

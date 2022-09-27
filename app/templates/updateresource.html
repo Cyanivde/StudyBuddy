@@ -2,8 +2,23 @@
 {% block content %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        
-
+        <p>
+            {{ form.semester.label }}
+            <br/>
+            {{ form.semester() }}
+        </p>
+        <p>
+            {{ form.type.label }}
+            <br/>
+            {{ form.type() }}
+        </p>
+        <p>
+            {{ form.display_name.label }}
+            <br/>
+            {{ form.display_name(size=32) }}
+            <br/>
+            {% for error in form.display_name.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
         <p>
             {{ form.link.label }}
             <br/>
@@ -25,7 +40,6 @@
             <br/>
             {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
-
         <p>
             {{ form.subject.label }}
             <br/>
@@ -48,35 +62,44 @@
             </select>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
-
-        {% if not is_existing_resource %}
         <p>
-            {{ form.tab.label }}
-            {{ form.tab() }}
+            דדליין
+            <br/>
+            {{ form.deadline_week() }}
+            {{ form.deadline_date() }}
         </p>
-        
-
-        
-        <p>
-            <span style="color:red">*</span> {{ form.header.label }} (למשל "שבוע 1", "מבחנים")
-            <br/>
-            {{ form.header(size=32) }}
-            <br/>
-            {% for error in form.header.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            <span style="color:red">*</span> {{ form.rname.label }} (למשל "הרצאה 1", "מבחן חורף תשפ"א מועד ב")
-            <br/>
-            {{ form.rname(size=32) }}
-            <br/>
-            {% for error in form.rname.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        חלקים (למשל "שאלה 1")
-
-        {{ form.rname_parts() }}
-    {% endif %}
-
-
+        <p>{{ form.is_official() }} {{ form.is_official.label }}</p>
+        <p>{{ form.is_out_of_date() }} {{ form.is_out_of_date.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
+    <script>
+        document.getElementById('deadline_date').style.display = "none";
+        document.getElementById("deadline_week").onchange =
+            function deadline() {
+                var deadlineWeek = document.getElementById("deadline_week");
+                if (deadlineWeek.options[deadlineWeek.selectedIndex].value == "exactdate") {
+                    document.getElementById('deadline_date').style.display = "inline";
+                } else {
+                    document.getElementById('deadline_date').style.display = "none";
+                }
+            }
+        document.getElementById("type").onchange =
+            function displayNamePlaceholder() {
+                var typeSelect = document.getElementById("type");
+                var val = typeSelect.options[typeSelect.selectedIndex].value;
+                if (val == "lecture") {
+                    document.getElementById('display_name').value = "הרצאה 1";
+                } else if (val == "tutorial") {
+                    document.getElementById('display_name').value = "תרגול 1";
+                } else if (val == "workshop") {
+                    document.getElementById('display_name').value = "סדנה 1";
+                } else if (val == "exercise") {
+                    document.getElementById('display_name').value = "תרגיל בית 1";
+                } else if (val == "exam") {
+                    document.getElementById('display_name').value = "מועד א";
+                } else {
+                    document.getElementById('display_name').value = "";
+                }
+            }
+    </script>
 {% endblock content %}

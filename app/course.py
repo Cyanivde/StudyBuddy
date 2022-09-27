@@ -1,7 +1,7 @@
 from flask import render_template, request
 from flask_login import current_user
 from app.models import Course
-from app.utils import _get_subjects, _filter_resources, _fetch_resources, _add_fake_rows
+from app.utils import _get_subjects, _fetch_resources
 
 
 def _course(course_id, tab):
@@ -14,15 +14,11 @@ def _course(course_id, tab):
     # resources_df = _add_fake_rows(resources_df)
     all_subjects = _get_subjects(resources_df)
 
-    resources_df = _filter_resources(resources_df, subject=request.form.getlist('subject'))
-
     if request.method == "POST":
         if current_user.is_authenticated:
             resources_df = _fetch_resources(course_id, tab)
             # resources_df = _add_fake_rows(resources_df)
             all_subjects = _get_subjects(resources_df)
-
-            resources_df = _filter_resources(resources_df, subject=request.form.getlist('subject'))
 
     multi_resources = dict()
     if len(resources_df) > 0:

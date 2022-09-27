@@ -9,7 +9,6 @@ from app.resource import _resource
 from app.update_resource import _update_resource
 from app.update_resource_to_user import _update_resource_to_user
 from app.course import _course
-from app.update_course import _update_course
 
 
 @app.route('/')
@@ -69,8 +68,3 @@ def exams(course_id):
 @app.route('/archive/<course_id>', methods=['GET', 'POST'])
 def archive(course_id):
     return _course(course_id, "archive")
-
-
-@app.route('/updatecourse/<course_id>', methods=['GET', 'POST'])
-def updatecourse(course_id):
-    return _update_course(course_id)

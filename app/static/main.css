@@ -40,6 +40,9 @@ li {
   text-align: right !important;
 }
 
+.btn-outline-danger {
+  padding: 0rem 0.5rem 0.2rem 0.5rem;
+}
 .btn-outline-secondary {
   padding: 0rem 0.5rem 0.2rem 0.5rem;
 }
@@ -49,6 +52,8 @@ li {
 
 table.dataTable tr.dtrg-group th {
   text-align: right !important;
+  background-color: #e7e7e7 !important;
+  font-size: 0.8rem;
 }
 
 #myTable_filter {
