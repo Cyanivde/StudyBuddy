@@ -101,15 +101,13 @@ def _fetch_resources(course_id, tab):
 
     if tab == 'semester':
         resource_df = resource_df[resource_df['is_official'] & (resource_df['semester'] == '2023-01 חורף תשפ"ג') & (resource_df['type'] != 'exam')]
-        resource_df.sort_values('display_name', inplace=True)
-        resource_df.sort_values('deadline_date', inplace=True)
+        resource_df.sort_values(['deadline_date', 'display_name'], inplace=True)
         resource_df['deadline_date'] = resource_df['deadline_date'].fillna('המבחן')
         resource_df.insert(0, 'main', resource_df['deadline_date'].apply(lambda x: 'עד ' + str(x)[:10]))
 
     if tab == 'exams':
         resource_df = resource_df[resource_df['is_official'] & (resource_df['type'] == 'exam')]
-        resource_df.sort_values('display_name', inplace=True)
-        resource_df.sort_values('semester', ascending=False, inplace=True)
+        resource_df.sort_values(['semester', 'display_name'], ascending=[False, True], inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'archive':
