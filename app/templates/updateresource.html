@@ -88,17 +88,17 @@
                 var typeSelect = document.getElementById("type");
                 var val = typeSelect.options[typeSelect.selectedIndex].value;
                 if (val == "lecture") {
-                    document.getElementById('display_name').value = "הרצאה 1";
+                    document.getElementById('display_name').placeholder = "הרצאה 1";
                 } else if (val == "tutorial") {
-                    document.getElementById('display_name').value = "תרגול 1";
+                    document.getElementById('display_name').placeholder = "תרגול 1";
                 } else if (val == "workshop") {
-                    document.getElementById('display_name').value = "סדנה 1";
+                    document.getElementById('display_name').placeholder = "סדנה 1";
                 } else if (val == "exercise") {
-                    document.getElementById('display_name').value = "תרגיל בית 1";
+                    document.getElementById('display_name').placeholder = "תרגיל בית 1";
                 } else if (val == "exam") {
-                    document.getElementById('display_name').value = "מועד א";
+                    document.getElementById('display_name').placeholder = "מועד א";
                 } else {
-                    document.getElementById('display_name').value = "";
+                    document.getElementById('display_name').placeholder = "";
                 }
             }
     </script>
