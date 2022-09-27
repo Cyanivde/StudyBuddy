@@ -112,9 +112,8 @@ def _fetch_resources(course_id, tab):
 
     if tab == 'archive':
         resource_df = resource_df[~resource_df['is_official'] | ((resource_df['type'] != 'exam') & (resource_df['semester'] != '2023-01 חורף תשפ"ג'))]
-        resource_df.sort_values('display_name', inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
-        resource_df.sort_values('likes', ascending=False, inplace=True)
+        resource_df.sort_values(['likes', 'display_name'], ascending=[False, True], inplace=True)
 
     resources_extended_df = resource_df
     if current_user.is_authenticated:

@@ -29,7 +29,7 @@
       </ul>
       <hr/>
       <div class="col-md-12">
-        <table id="myTable" class="display responsive mdl-data-table table hover">
+        <table id="myTable" class="responsive table hover">
           <thead>
             <tr class="align-middle course-tr">
               <th class="text-start">סמסטר</th>
@@ -38,9 +38,7 @@
               <th class="text-center min-tablet">הקלטה</th>
               <th class="text-center min-tablet">נושאים</th>
               <th class="text-center min-tablet">מעקב</th>
-              {% if tab == "archive" %}
-                <th class="text-center min-tablet">אהבתי</th>
-              {% endif %}
+              {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
               {% if current_user.is_admin %}<th class="text-center min-tablet">אדמין</th>{% endif %}
             </tr>
           </thead>
