@@ -100,7 +100,7 @@ def _fetch_resources(course_id, tab):
         return pd.DataFrame()
 
     if tab == 'semester':
-        resource_df = resource_df[resource_df['is_official'] & (resource_df['semester'] == 'חורף תשפג') & (resource_df['type'] != 'exam')]
+        resource_df = resource_df[resource_df['is_official'] & (resource_df['semester'] == '2023-01 חורף תשפ"ג') & (resource_df['type'] != 'exam')]
         resource_df.sort_values('display_name', inplace=True)
         resource_df.sort_values('deadline_date', inplace=True)
         resource_df['deadline_date'] = resource_df['deadline_date'].fillna('המבחן')
@@ -113,7 +113,7 @@ def _fetch_resources(course_id, tab):
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'archive':
-        resource_df = resource_df[~resource_df['is_official'] | ((resource_df['type'] != 'exam') & (resource_df['semester'] != 'חורף תשפג'))]
+        resource_df = resource_df[~resource_df['is_official'] | ((resource_df['type'] != 'exam') & (resource_df['semester'] != '2023-01 חורף תשפ"ג'))]
         resource_df.sort_values('display_name', inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
         resource_df.sort_values('likes', ascending=False, inplace=True)
