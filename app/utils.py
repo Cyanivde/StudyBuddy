@@ -94,10 +94,14 @@ def _get_subjects(resources_df):
 
 def _alternative_sort(series):
     if series.dtype == object:
-        series[series.str.startswith('הרצאה')] = 'אא' + series[series.str.startswith('הרצאה')]
+        series[series.str.startswith('מבוא להרצאה')] = 'אאאא' + series[series.str.startswith('מבוא להרצאה')]
+        series[series.str.startswith('הרצאה')] = 'אאא' + series[series.str.startswith('הרצאה')]
+        series[series.str.startswith('מבוא לתרגול')] = 'אא' + series[series.str.startswith('מבוא לתרגול')]
         series[series.str.startswith('תרגול')] = 'א' + series[series.str.startswith('תרגול')]
         for digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
             series[series.str.endswith(' '+digit)] = series[series.str.endswith(' '+digit)].apply(lambda x: x[:-1] + '0'+digit)
+            for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
+                series[series.str.endswith(' '+digit+addend)] = series[series.str.endswith(' '+digit+addend)].apply(lambda x: x[:-2] + '0'+digit+addend)
     return series
 
 
