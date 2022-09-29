@@ -28,8 +28,8 @@ class UpdateResourceForm(FlaskForm):
         ('lecture', 'הרצאה'),
         ('tutorial', 'תרגול'),
         ('workshop', 'סדנה'),
-        ('exercise', 'תרגיל בית'),
-        ('exam', 'מבחן'),
+        ('exercise', 'שאלה מתרגיל בית'),
+        ('exam', 'שאלה ממבחן'),
         ('other', 'אחר')])
     display_name = StringField('שם תצוגה')
     deadline_week = SelectField('שבוע בקורס', choices=[
