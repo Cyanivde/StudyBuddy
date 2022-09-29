@@ -102,6 +102,9 @@ def _alternative_sort(series):
             series[series.str.endswith(' '+digit)] = series[series.str.endswith(' '+digit)].apply(lambda x: x[:-1] + '0'+digit)
             for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
                 series[series.str.endswith(' '+digit+addend)] = series[series.str.endswith(' '+digit+addend)].apply(lambda x: x[:-2] + '0'+digit+addend)
+            for t in ['הרצאה', 'תרגול', 'תרגיל בית', 'גיליון', 'שאלה']:
+                series = series.str.replace(t + ' ' + digit + ' ', t+' 0' + digit+' ')
+
     return series
 
 
