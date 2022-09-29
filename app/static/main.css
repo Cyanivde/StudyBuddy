@@ -59,3 +59,11 @@ table.dataTable tr.dtrg-group th {
 #myTable_filter {
   float: left;
 }
+
+#myTable_paginate {
+  float: left;
+}
+
+#myTable_length {
+  display: none;
+}
