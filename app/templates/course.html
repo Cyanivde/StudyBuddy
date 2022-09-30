@@ -5,7 +5,7 @@
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
           <h4>{{ course.course_name }}</h4>
-          <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  מתוחזק על ידי <a href="mailto:{{ course.maintainer_email }}">{{ course.maintainer }}</a></span>
+          <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  להעלאת חומרי לימוד <a href="{{ url_for('createresource', course_id=course.course_id) }}">לחצו כאן</a></span>
         </li>
       </ul>
       <ul class="list-group list-group-horizontal">
@@ -16,13 +16,8 @@
           <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', course_id=course.course_id) }}">מבחנים</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', course_id=course.course_id) }}">ארכיון</a></span>
+          <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', course_id=course.course_id) }}">חומרי עזר</a></span>
         </li>
-        {% if current_user.is_admin %}
-          <li class="list-group-item list-group-item-link">
-            <a href="{{ url_for('createresource', course_id=course.course_id) }}">העלאת חומר</a>
-          </li>
-        {% endif %}
       </ul>
       <hr/>
       <div class="col-md-12">
@@ -36,7 +31,7 @@
               <th class="text-center min-tablet">נושאים</th>
               <th class="text-center min-tablet">מעקב</th>
               {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
-              {% if current_user.is_admin %}<th class="text-center min-tablet">אדמין</th>{% endif %}
+              <th class="text-center min-tablet">עריכה</th>
             </tr>
           </thead>
           <tbody>
@@ -170,12 +165,10 @@
                       </div>
                     </td class="text-center">
                   {% endif %}
-                  {% if current_user.is_admin %}
-                    <td class="text-center">
-                      <a class="text-decoration-none"
-                         href="{{ url_for('editresource', course_id=course.course_id, resource_id=resource.resource_id) }}">עריכה</a>
-                    </td>
-                  {% endif %}
+                  <td class="text-center">
+                    <a class="text-decoration-none"
+                       href="{{ url_for('editresource', course_id=course.course_id, resource_id=resource.resource_id) }}">עריכה</a>
+                  </td>
                 </tr>
               {% endfor %}
             </tbody>

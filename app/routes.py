@@ -38,15 +38,11 @@ def resource(resource_id):
 
 @ app.route('/createresource/<course_id>', methods=['GET', 'POST'])
 def createresource(course_id):
-    if not current_user.is_authenticated or not current_user.is_admin:
-        abort(404)
     return _update_resource(course_id=course_id, is_existing_resource=False)
 
 
 @app.route('/editresource/<course_id>', methods=['GET', 'POST'])
 def editresource(course_id):
-    if not current_user.is_authenticated or not current_user.is_admin:
-        abort(404)
     return _update_resource(course_id=course_id, is_existing_resource=True, resource_id=request.args.get('resource_id'))
 
 

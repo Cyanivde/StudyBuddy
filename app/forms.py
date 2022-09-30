@@ -23,15 +23,16 @@ class CourseResourcesForm(FlaskForm):
 
 
 class UpdateResourceForm(FlaskForm):
-    type = SelectField('סוג', choices=[
-        (None, ''),
-        ('lecture', 'הרצאה'),
-        ('tutorial', 'תרגול'),
-        ('workshop', 'סדנה'),
-        ('exercise', 'שאלה מתרגיל בית'),
-        ('exam', 'שאלה ממבחן'),
-        ('other', 'אחר')])
-    display_name = StringField('שם תצוגה')
+    type = SelectField('סוג',
+                       choices=[
+                           ('lecture', 'הרצאה'),
+                           ('tutorial', 'תרגול'),
+                           ('workshop', 'סדנה'),
+                           ('exercise', 'שאלה מתרגיל בית'),
+                           ('exam', 'שאלה ממבחן'),
+                           ('other', 'אחר')])
+    display_name = StringField('שם תצוגה', validators=[
+        DataRequired(message=ERR_EMPTY)])
     deadline_week = SelectField('שבוע בקורס', choices=[
         (None, ''),
         ('week1', 'שבוע 1'),
@@ -120,7 +121,7 @@ class UpdateResourceForm(FlaskForm):
     solution = StringField('קישור לפתרון')
     recording = StringField('קישור להקלטה')
     subject = StringField('נושאים (מופרדים בפסיק)')
-    is_official = BooleanField('חומר רשמי מהסגל')
+    is_official = BooleanField('חומר רשמי מהסגל', default=True,)
     is_out_of_date = BooleanField('כבר לא בחומר')
     submit = SubmitField('שמירה')
 
