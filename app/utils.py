@@ -55,8 +55,8 @@ def _update_resource_according_to_form(resource, form):
 
     actual_resource.display_name = form.display_name.data
     actual_resource.type = form.type.data
-    actual_resource.link = form.link.data
-    actual_resource.solution = form.solution.data
+    actual_resource.link = _strip_after_file_extension(form.link.data)
+    actual_resource.solution = _strip_after_file_extension(form.solution.data)
     actual_resource.recording = form.recording.data
     actual_resource.is_official = form.is_official.data
     actual_resource.is_out_of_date = form.is_out_of_date.data
@@ -69,11 +69,19 @@ def _update_resource_according_to_form(resource, form):
     db.session.refresh(actual_resource)
 
 
+def _strip_after_file_extension(s):
+    for extension in ['.pdf', '.docx', '.pptx']:
+        if extension in s:
+            return s.split(extension)[0] + extension
+    else:
+        return s
+
+
 def _insert_resource_according_to_form(form, course_id):
     resource = Resource(display_name=form.display_name.data,
                         type=form.type.data,
-                        link=form.link.data,
-                        solution=form.solution.data,
+                        link=_strip_after_file_extension(form.link.data),
+                        solution=_strip_after_file_extension(form.solution.data),
                         recording=form.recording.data,
                         is_official=form.is_official.data,
                         is_out_of_date=form.is_out_of_date.data,
