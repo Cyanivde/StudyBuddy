@@ -43,23 +43,8 @@
         <p>
             {{ form.subject.label }}
             <br/>
-            <select name="subject"
-                    class="selectpicker"
-                    multiple
-                    data-style=""
-                    data-style-base="form-control"
-                    data-none-results-text="אין תוצאות עבור {0}"
-                    data-live-search="true"
-                    data-width="200px"
-                    data-none-selected-text="נושאים"
-                    data-select-all-text="בחר הכל"
-                    data-deselect-all-text="איפוס">
-                {% for subj in form.subject.choices %}
-                    <option {% if form.subject.data and subj in form.subject.data %}selected{% endif %}>
-                        {{ subj }}
-                    </option>
-                {% endfor %}
-            </select>
+            {{ form.subject(size=32) }}
+            <br/>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
         <p>

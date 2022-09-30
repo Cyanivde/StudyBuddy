@@ -228,7 +228,18 @@
           columnDefs: [{
               targets: [0],
               visible: false
-          }],
+          },
+          {
+            targets: [4],
+            render: function ( data, type, row ) {
+               var s = data.split('</span>').slice(0,3).join('</span>')
+               if ((s != '') && (!s.endsWith('</span>'))) {
+                s = s + '</span> ⋯'
+               }
+                return s + '<span style="display:none">'+data+"</span>";
+            }
+          }
+          ],
           {%endif %}
           language: {
               processing: 'מעבד...',

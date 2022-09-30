@@ -21,5 +21,4 @@ def _course(course_id, tab):
             # resources_df = _add_fake_rows(resources_df)
             all_subjects = _get_subjects(resources_df)
 
-    print(resources_df)
     return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, resources=resources_df, tab=tab)

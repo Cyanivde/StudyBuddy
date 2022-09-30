@@ -10,6 +10,7 @@ import hashlib
 
 
 def _fetch_resource_df(resource_id):
+
     resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
 
     if len(resource_df) == 0:
@@ -45,7 +46,7 @@ def _update_form_according_to_resource(form, resource):
     form.semester.data = resource.semester
     form.deadline_week.data = resource.deadline_week
     form.deadline_date.data = resource.deadline_date
-    form.subject.data = json.loads(resource.subject)
+    form.subject.data = resource.subject
     return form
 
 
@@ -62,7 +63,7 @@ def _update_resource_according_to_form(resource, form):
     actual_resource.deadline_week = form.deadline_week.data
     actual_resource.semester = form.semester.data
     actual_resource.deadline_date = _get_date_from_week(form.deadline_week.data, form.deadline_date.data)
-    actual_resource.subject = json.dumps(form.subject.data)
+    actual_resource.subject = form.subject.data
 
     db.session.commit()
     db.session.refresh(actual_resource)
@@ -80,7 +81,7 @@ def _insert_resource_according_to_form(form, course_id):
                         deadline_date=_get_date_from_week(form.deadline_week.data, form.deadline_date.data),
                         semester=form.semester.data,
                         likes=0,
-                        subject=json.dumps(form.subject.data),
+                        subject=form.subject.data,
                         course_id=course_id)
     db.session.add(resource)
     db.session.commit()
@@ -144,17 +145,10 @@ def _fetch_resources(course_id, tab):
 
     if 'subject' in resources_extended_df.keys():
         resources_extended_df['subject'] = resources_extended_df['subject'].apply(
-            lambda x: _jsonload(x))
+            lambda x: x.split(',') if x else "")
 
     resources_extended_df = resources_extended_df.fillna(0)
     return resources_extended_df
-
-
-def _jsonload(x):
-    if isinstance(x, str):
-        return json.loads(x)
-    else:
-        return ''
 
 
 def _update_resource_discord_link(resource_id, discord_link):

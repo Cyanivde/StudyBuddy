@@ -119,7 +119,7 @@ class UpdateResourceForm(FlaskForm):
         validate_choice=False)
     solution = StringField('קישור לפתרון')
     recording = StringField('קישור להקלטה')
-    subject = SelectMultipleField('נושא', validate_choice=False)
+    subject = StringField('נושאים (מופרדים בפסיק)')
     is_official = BooleanField('חומר רשמי מהסגל')
     is_out_of_date = BooleanField('כבר לא בחומר')
     submit = SubmitField('שמירה')
