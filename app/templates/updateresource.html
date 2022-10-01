@@ -22,6 +22,14 @@
             <br/>
             {% for error in form.display_name.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
+        <p id="qcount">
+            <span style="color:red">*</span>
+            {{ form.questions_count.label }}
+            <br/>
+            {{ form.questions_count() }}
+            <br/>
+            {% for error in form.questions_count.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
         <p>
             {{ form.link.label }} (נא להעלות קבצים ל<a target="_blank"
    href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/">כאן</a>)
@@ -60,11 +68,18 @@
         </p>
         <p>{{ form.is_official() }} {{ form.is_official.label }}</p>
         <p>{{ form.is_out_of_date() }} {{ form.is_out_of_date.label }}</p>
+        <p>{{ form.is_solution_partial() }} {{ form.is_solution_partial.label }}</p>
         <p>{{ form.submit() }}</p>
     </form>
     <script>
+        {% if is_existing_resource %}
+        $("#type option[value='exercise_full']").remove();
+        $("#type option[value='exam_full']").remove();
+        {% endif %}
+
         document.getElementById('display_name').placeholder = "הרצאה 1";
         document.getElementById('deadline_date').style.display = "none";
+        document.getElementById('qcount').style.display = "none";
         document.getElementById("deadline_week").onchange =
             function deadline() {
                 var deadlineWeek = document.getElementById("deadline_week");
@@ -80,16 +95,28 @@
                 var val = typeSelect.options[typeSelect.selectedIndex].value;
                 if (val == "lecture") {
                     document.getElementById('display_name').placeholder = "הרצאה 1";
+                    document.getElementById('qcount').style.display = "none";
                 } else if (val == "tutorial") {
                     document.getElementById('display_name').placeholder = "תרגול 1";
+                    document.getElementById('qcount').style.display = "none";
                 } else if (val == "workshop") {
                     document.getElementById('display_name').placeholder = "סדנה 1";
+                    document.getElementById('qcount').style.display = "none";
                 } else if (val == "exercise") {
                     document.getElementById('display_name').placeholder = "תרגיל בית 1 שאלה 1";
+                    document.getElementById('qcount').style.display = "none";
                 } else if (val == "exam") {
                     document.getElementById('display_name').placeholder = "מועד א' שאלה 1";
+                    document.getElementById('qcount').style.display = "none";
+                } else if (val == "exercise_full") {
+                    document.getElementById('qcount').style.display = "block";
+                    document.getElementById('display_name').placeholder = "תרגיל בית 1";
+                } else if (val == "exam_full") { 
+                    document.getElementById('qcount').style.display = "block";
+                    document.getElementById('display_name').placeholder = "מועד א'";
                 } else {
                     document.getElementById('display_name').placeholder = "";
+                    document.getElementById('qcount').style.display = "none";
                 }
             }
     </script>

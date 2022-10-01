@@ -1,7 +1,7 @@
 
 from sqlite3 import Date
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, SelectMultipleField, DateField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, DateField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp, Optional
 
 from app.models import User
@@ -28,11 +28,14 @@ class UpdateResourceForm(FlaskForm):
                            ('lecture', 'הרצאה'),
                            ('tutorial', 'תרגול'),
                            ('workshop', 'סדנה'),
+                           ('exercise_full', 'תרגיל בית'),
+                           ('exam_full', 'מבחן'),
                            ('exercise', 'שאלה מתרגיל בית'),
                            ('exam', 'שאלה ממבחן'),
                            ('other', 'אחר')])
     display_name = StringField('שם תצוגה', validators=[
         DataRequired(message=ERR_EMPTY)])
+    questions_count = SelectField('כמה שאלות יש בגיליון?', choices=range(2, 26))
     deadline_week = SelectField('שבוע בקורס', choices=[
         (None, ''),
         ('week1', 'שבוע 1'),
@@ -123,6 +126,7 @@ class UpdateResourceForm(FlaskForm):
     subject = StringField('נושאים (מופרדים בפסיק)')
     is_official = BooleanField('חומר רשמי מהסגל', default=True,)
     is_out_of_date = BooleanField('כבר לא בחומר')
+    is_solution_partial = BooleanField('הפתרון חלקי')
     submit = SubmitField('שמירה')
 
 

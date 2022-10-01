@@ -40,6 +40,7 @@ class Resource(db.Model):
     deadline_date = db.Column(db.DateTime)
     is_official = db.Column(db.Boolean)
     is_out_of_date = db.Column(db.Boolean)
+    is_solution_partial = db.Column(db.Boolean)
     type = db.Column(db.String(20))
     likes = db.Column(db.Integer)
 

@@ -43,6 +43,7 @@ def _update_form_according_to_resource(form, resource):
     form.recording.data = resource.recording
     form.is_official.data = resource.is_official
     form.is_out_of_date.data = resource.is_out_of_date
+    form.is_solution_partial.data = resource.is_solution_partial
     form.semester.data = resource.semester
     form.deadline_week.data = resource.deadline_week
     form.deadline_date.data = resource.deadline_date
@@ -60,6 +61,7 @@ def _update_resource_according_to_form(resource, form):
     actual_resource.recording = form.recording.data
     actual_resource.is_official = form.is_official.data
     actual_resource.is_out_of_date = form.is_out_of_date.data
+    actual_resource.is_solution_partial = form.is_solution_partial.data
     actual_resource.deadline_week = form.deadline_week.data
     actual_resource.semester = form.semester.data
     actual_resource.deadline_date = _get_date_from_week(form.deadline_week.data, form.deadline_date.data)
@@ -78,21 +80,32 @@ def _strip_after_file_extension(s):
 
 
 def _insert_resource_according_to_form(form, course_id):
-    resource = Resource(display_name=form.display_name.data,
-                        type=form.type.data,
-                        link=_strip_after_file_extension(form.link.data),
-                        solution=_strip_after_file_extension(form.solution.data),
-                        recording=form.recording.data,
-                        is_official=form.is_official.data,
-                        is_out_of_date=form.is_out_of_date.data,
-                        deadline_week=form.deadline_week.data,
-                        deadline_date=_get_date_from_week(form.deadline_week.data, form.deadline_date.data),
-                        semester=form.semester.data,
-                        likes=0,
-                        subject=form.subject.data,
-                        course_id=course_id)
-    db.session.add(resource)
-    db.session.commit()
+    num = 1
+
+    if form.type.data in ['exercise_full', 'exam_full']:
+        form.type.data = form.type.data[:-5]
+        num = int(form.questions_count.data)
+
+    for i in range(num):
+        name = form.display_name.data
+        if num > 1:
+            name += ' שאלה ' + str((i+1))
+        resource = Resource(display_name=name,
+                            type=form.type.data,
+                            link=_strip_after_file_extension(form.link.data),
+                            solution=_strip_after_file_extension(form.solution.data),
+                            recording=form.recording.data,
+                            is_official=form.is_official.data,
+                            is_out_of_date=form.is_out_of_date.data,
+                            is_solution_partial=form.is_solution_partial.data,
+                            deadline_week=form.deadline_week.data,
+                            deadline_date=_get_date_from_week(form.deadline_week.data, form.deadline_date.data),
+                            semester=form.semester.data,
+                            likes=0,
+                            subject=form.subject.data,
+                            course_id=course_id)
+        db.session.add(resource)
+        db.session.commit()
 
 
 def _get_subjects(resources_df):

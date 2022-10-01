@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="overflow-auto">
-    <div class="container"style="max-width:1100px">
+    <div class="container"style="max-width:1200px">
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
           <h4>{{ course.course_name }}</h4>
@@ -45,12 +45,14 @@
    href="{{ resource.link }}">{% endif %}
                     {{ resource.display_name }}
                     {% if resource.link %}</a>{% endif %}
+                    {% if resource.is_out_of_date %}<span class="badge bg-danger ms-1">לא למבחן</span>{% endif %}
                   </td>
                   <td class="text-center">
                     {% if resource.solution %}
                       <a target="_blank"
                          class="text-decoration-none"
                          href="{{ resource.solution }}">פתרון</a>
+                      {% if resource.is_out_of_date %}<span class="badge bg-danger ms-1">פתרון חלקי</span>{% endif %}
                     {% endif %}
                   </td>
                   <td class="text-center">
@@ -231,7 +233,7 @@
                }
                 return s + '<span style="display:none">'+data+"</span>";
             }
-          }
+          },
           ],
           {%endif %}
           language: {
