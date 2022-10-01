@@ -35,7 +35,7 @@ class UpdateResourceForm(FlaskForm):
                            ('other', 'אחר')])
     display_name = StringField('שם תצוגה', validators=[
         DataRequired(message=ERR_EMPTY)])
-    questions_count = SelectField('כמה שאלות יש בגיליון?', choices=range(2, 26))
+    questions_count = SelectField('כמה שאלות יש בגיליון?', choices=range(1, 26))
     deadline_week = SelectField('שבוע בקורס', choices=[
         (None, ''),
         ('week1', 'שבוע 1'),

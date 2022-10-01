@@ -75,6 +75,9 @@
         {% if is_existing_resource %}
         $("#type option[value='exercise_full']").remove();
         $("#type option[value='exam_full']").remove();
+        {% else %}
+        $("#type option[value='exercise']").remove();
+        $("#type option[value='exam']").remove();
         {% endif %}
 
         document.getElementById('display_name').placeholder = "הרצאה 1";
