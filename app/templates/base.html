@@ -46,7 +46,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand navbar-light bg-light">
-      <div class="container-fluid" style="max-width: 1200px">
+      <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('index') }}">StudyBuddy</a>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
@@ -66,7 +66,7 @@
         </div>
       </div>
     </nav>
-    <div class="pt-4" style="max-width: 1100px; margin: 0 auto">
+    <div class="pt-4" style="margin: 0 auto">
       {% block content %}
       {% endblock content %}
     </div>

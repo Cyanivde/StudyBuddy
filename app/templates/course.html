@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="overflow-auto">
-    <div class="container"style="max-width:1200px">
+    <div class="container">
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
           <h4>{{ course.course_name }}</h4>
@@ -26,8 +26,8 @@
             <tr class="align-middle course-tr">
               <th class="text-start">סמסטר</th>
               <th class="all text-start">חומר לימוד</th>
-              <th class="text-center min-tablet">פתרון</th>
-              <th class="text-center min-tablet">הקלטה</th>
+              <th class="min-tablet text-start">פתרון</th>
+              <th class="min-tablet text-start">הקלטה</th>
               <th class="text-center min-tablet">נושאים</th>
               <th class="text-center min-tablet">מעקב</th>
               {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
@@ -47,15 +47,15 @@
                     {% if resource.link %}</a>{% endif %}
                     {% if resource.is_out_of_date %}<span class="badge bg-danger ms-1">לא למבחן</span>{% endif %}
                   </td>
-                  <td class="text-center">
+                  <td class="text-start">
                     {% if resource.solution %}
                       <a target="_blank"
                          class="text-decoration-none"
                          href="{{ resource.solution }}">פתרון</a>
-                      {% if resource.is_out_of_date %}<span class="badge bg-danger ms-1">פתרון חלקי</span>{% endif %}
+                      {% if resource.is_solution_partial %}<span class="badge bg-danger ms-1">פתרון חלקי</span>{% endif %}
                     {% endif %}
                   </td>
-                  <td class="text-center">
+                  <td class="text-start">
                     {% if resource.recording %}
                       <a target="_blank"
                          class="text-decoration-none"
