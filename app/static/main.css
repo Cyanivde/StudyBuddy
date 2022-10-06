@@ -67,12 +67,3 @@ table.dataTable tr.dtrg-group th {
 #myTable_length {
   display: none;
 }
-
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
-table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
-  display: none !important;
-}
-
-.list-group-item {
-  padding: 0.5rem 0.7rem !important;
-}

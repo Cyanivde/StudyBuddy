@@ -9,8 +9,6 @@ from app.resource import _resource
 from app.update_resource import _update_resource
 from app.update_resource_to_user import _update_resource_to_user
 from app.course import _course
-import pandas as pd
-from app import db
 
 
 @app.route('/')
@@ -38,20 +36,14 @@ def resource(resource_id):
     return _resource(resource_id)
 
 
-@ app.route('/<institute>/<institute_course_id>/createresource', methods=['GET', 'POST'])
-def createresource(institute, institute_course_id):
-    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
-    if len(course_df) == 0:
-        abort(404)
-    return _update_resource(course_id=str(course_df.iloc[0]['course_id']), institute=institute, institute_course_id=institute_course_id, is_existing_resource=False)
+@ app.route('/createresource/<course_id>', methods=['GET', 'POST'])
+def createresource(course_id):
+    return _update_resource(course_id=course_id, is_existing_resource=False)
 
 
-@app.route('/<institute>/<institute_course_id>/editresource/<resource_id>', methods=['GET', 'POST'])
-def editresource(institute, institute_course_id, resource_id):
-    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
-    if len(course_df) == 0:
-        abort(404)
-    return _update_resource(course_id=str(course_df.iloc[0]['course_id']), institute=institute, institute_course_id=institute_course_id, is_existing_resource=True, resource_id=resource_id)
+@app.route('/editresource/<course_id>', methods=['GET', 'POST'])
+def editresource(course_id):
+    return _update_resource(course_id=course_id, is_existing_resource=True, resource_id=request.args.get('resource_id'))
 
 
 @ app.route('/updateresourcetouser', methods=['POST'])
@@ -59,33 +51,16 @@ def update_resource_to_user():
     return _update_resource_to_user()
 
 
-@app.route('/<institute>/<institute_course_id>', methods=['GET', 'POST'])
-def course(institute, institute_course_id):
-    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
-    if len(course_df) == 0:
-        abort(404)
-    return _course(str(course_df.iloc[0]['course_id']), "semester")
+@app.route('/course/<course_id>', methods=['GET', 'POST'])
+def course(course_id):
+    return _course(course_id, "semester")
 
 
-@app.route('/<institute>/<institute_course_id>/exercises', methods=['GET', 'POST'])
-def exercises(institute, institute_course_id):
-    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
-    if len(course_df) == 0:
-        abort(404)
-    return _course(str(course_df.iloc[0]['course_id']), "exercises")
+@app.route('/exams/<course_id>', methods=['GET', 'POST'])
+def exams(course_id):
+    return _course(course_id, "exams")
 
 
-@app.route('/<institute>/<institute_course_id>/exams', methods=['GET', 'POST'])
-def exams(institute, institute_course_id):
-    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
-    if len(course_df) == 0:
-        abort(404)
-    return _course(str(course_df.iloc[0]['course_id']), "exams")
-
-
-@app.route('/<institute>/<institute_course_id>/archive', methods=['GET', 'POST'])
-def archive(institute, institute_course_id):
-    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
-    if len(course_df) == 0:
-        abort(404)
-    return _course(str(course_df.iloc[0]['course_id']), "archive")
+@app.route('/archive/<course_id>', methods=['GET', 'POST'])
+def archive(course_id):
+    return _course(course_id, "archive")

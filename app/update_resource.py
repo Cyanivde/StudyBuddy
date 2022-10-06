@@ -5,7 +5,6 @@ import discord
 import asyncio
 import os
 
-
 class DiscordClientForCreatingThread(discord.Client):
     channel_id = None
     uploaded_resources = None
@@ -34,14 +33,12 @@ class DiscordClientForCreatingThread(discord.Client):
             _update_resource_discord_link(i[0], thread.jump_url)
         await self.close()
 
-
 async def create_discord_threads(channel_id, uploaded_resources):
     if os.environ.get("DISCORD_TOKEN"):
         client = DiscordClientForCreatingThread(channel_id=channel_id, uploaded_resources=uploaded_resources)
         await client.start(os.environ.get("DISCORD_TOKEN"))
 
-
-def _update_resource(course_id, institute, institute_course_id, is_existing_resource, resource_id=None):
+def _update_resource(course_id, is_existing_resource, resource_id=None):
     form = UpdateResourceForm()
 
     form.subject.choices = _fetch_subject_list()
@@ -69,4 +66,4 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
             channel_id = int(course.discord_channel_id)
             asyncio.run(create_discord_threads(channel_id, uploaded_resources))
 
-        return redirect(url_for('course', institute=institute, institute_course_id=institute_course_id))
+        return redirect(url_for('course', course_id=course_id))
