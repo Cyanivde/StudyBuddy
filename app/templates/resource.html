@@ -4,7 +4,7 @@
     <nav class="breadcrumb-nav" aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
-          <a href="{{ url_for('course', course_id=resource_title.course_id)}}">{{ resource_title.course_name }}</a>
+          <a href="{{ url_for('course', institute=resource_title.course_institute_english, institute_course_id=resource_title.course_institute_id)}}">{{ resource_title.course_name }}</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
           {{ resource_title.rname }}
@@ -34,5 +34,5 @@
     {% endif %}
   </ul>
   <hr />
-  <a href="{{ url_for('editresource', course_id=resource.course_id, resource_id=resource.resource_id) }}">ערוך חומר</a>
+  <a href="{{ url_for('editresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">ערוך חומר</a>
 {% endblock content %}
