@@ -10,6 +10,7 @@ from app.update_resource import _update_resource
 from app.update_resource_to_user import _update_resource_to_user
 from app.course import _course
 import pandas as pd
+from app import db
 
 
 @app.route('/')
@@ -39,14 +40,18 @@ def resource(resource_id):
 
 @ app.route('/<institute>/<institute_course_id>/createresource', methods=['GET', 'POST'])
 def createresource(institute, institute_course_id):
-    course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _update_resource(course_id=str(course_df.course_id), institute=institute, institute_course_id=institute_course_id, is_existing_resource=False)
+    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
+    if len(course_df) == 0:
+        abort(404)
+    return _update_resource(course_id=str(course_df.iloc[0]['course_id']), institute=institute, institute_course_id=institute_course_id, is_existing_resource=False)
 
 
 @app.route('/<institute>/<institute_course_id>/editresource/<resource_id>', methods=['GET', 'POST'])
 def editresource(institute, institute_course_id, resource_id):
-    course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _update_resource(course_id=str(course_df.course_id), institute=institute, institute_course_id=institute_course_id, is_existing_resource=True, resource_id=resource_id)
+    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
+    if len(course_df) == 0:
+        abort(404)
+    return _update_resource(course_id=str(course_df.iloc[0]['course_id']), institute=institute, institute_course_id=institute_course_id, is_existing_resource=True, resource_id=resource_id)
 
 
 @ app.route('/updateresourcetouser', methods=['POST'])
@@ -56,23 +61,31 @@ def update_resource_to_user():
 
 @app.route('/<institute>/<institute_course_id>', methods=['GET', 'POST'])
 def course(institute, institute_course_id):
-    course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "semester")
+    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
+    if len(course_df) == 0:
+        abort(404)
+    return _course(str(course_df.iloc[0]['course_id']), "semester")
 
 
 @app.route('/<institute>/<institute_course_id>/exercises', methods=['GET', 'POST'])
 def exercises(institute, institute_course_id):
-    course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "exercises")
+    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
+    if len(course_df) == 0:
+        abort(404)
+    return _course(str(course_df.iloc[0]['course_id']), "exercises")
 
 
 @app.route('/<institute>/<institute_course_id>/exams', methods=['GET', 'POST'])
 def exams(institute, institute_course_id):
-    course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "exams")
+    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
+    if len(course_df) == 0:
+        abort(404)
+    return _course(str(course_df.iloc[0]['course_id']), "exams")
 
 
 @app.route('/<institute>/<institute_course_id>/archive', methods=['GET', 'POST'])
 def archive(institute, institute_course_id):
-    course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "archive")
+    course_df = pd.read_sql(Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).statement, db.session.bind)
+    if len(course_df) == 0:
+        abort(404)
+    return _course(str(course_df.iloc[0]['course_id']), "archive")
