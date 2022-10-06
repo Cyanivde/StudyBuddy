@@ -6,13 +6,14 @@ import pandas as pd
 
 
 def _fetch_resource_df(resource_id):
-
-    resource_df = pd.read_sql(Resource.query.filter_by(resource_id=resource_id).statement, db.session.bind)
+    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
+        resource_id=resource_id).all())])
 
     if len(resource_df) == 0:
         abort(404)
 
-    course_df = pd.read_sql(Course.query.filter(Course.course_id.in_(resource_df['course_id'])).statement, db.session.bind)
+    course_df = pd.DataFrame([vars(s) for s in pd.Series(Course.query.filter_by(
+        Course.course_id.in_(resource_df['course_id'])).all())])
 
     merged_resource_df = pd.merge(left=resource_df, right=course_df, on='course_id')
 
@@ -127,8 +128,7 @@ def _alternative_sort(series):
 
 
 def _fetch_resources(course_id, tab):
-    resource_df = pd.read_sql(Resource.query.filter_by(
-        course_id=course_id).statement, db.session.bind)
+    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(course_id=course_id).all())])
 
     if len(resource_df) == 0:
         return pd.DataFrame()
@@ -158,8 +158,8 @@ def _fetch_resources(course_id, tab):
 
     resources_extended_df = resource_df
     if current_user.is_authenticated:
-        resource_to_user = pd.read_sql(ResourceToUser.query.filter_by(
-            user_id=current_user.user_id).statement, db.session.bind)
+        resource_to_user = pd.DataFrame([vars(s) for s in pd.Series(ResourceToUser.query.filter_by(
+            user_id=current_user.user_id).all())])
 
         if len(resource_to_user) > 0:
             resource_to_user.drop('id', axis=1, inplace=True)
