@@ -12,7 +12,7 @@ def _fetch_resource_df(resource_id):
     if len(resource_df) == 0:
         abort(404)
 
-    course_df = pd.DataFrame([vars(s) for s in pd.Series(Course.query.filter_by(
+    course_df = pd.DataFrame([vars(s) for s in pd.Series(Course.query.filter(
         Course.course_id.in_(resource_df['course_id'])).all())])
 
     merged_resource_df = pd.merge(left=resource_df, right=course_df, on='course_id')
