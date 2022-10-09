@@ -1,187 +1,188 @@
 {% extends "base.html" %}
 {% block content %}
   <div class="overflow-auto">
-    <div class="container">
-      <ul class="list-group list-group-horizontal">
-        <li class="list-group-item">
-          <h4>{{ course.course_name }}</h4>
-          <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  להעלאת חומרי לימוד <a href="{{ url_for('createresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">לחצו כאן</a></span>
-        </li>
-      </ul>
-      <ul class="list-group list-group-horizontal">
-        <li class="list-group-item list-group-item-link">
-          <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
-        </li>
-        <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('exercises', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">תרגילי בית</a></span>
-        </li>
-        <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">מבחנים</a></span>
-        </li>
-        <li class="list-group-item list-group-item-link">
-          <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">חומרי עזר</a></span>
-        </li>
-      </ul>
-      <hr/>
-      <div class="col-md-12 table-responsive">
-        <table id="myTable" class="responsive table hover">
-          <thead>
+    <div class="header-paragraph">
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item">
+        <h4>{{ course.course_name }}</h4>
+        <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }} &nbsp;·&nbsp;  להעלאת חומרי לימוד <a href="{{ url_for('createresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">לחצו כאן</a></span>
+      </li>
+    </ul>
+  
+    <ul class="list-group list-group-horizontal">
+      <li class="list-group-item list-group-item-link">
+        <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
+      </li>
+      <li class="list-group-item list-group-item-link">
+        <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('exercises', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">תרגילי בית</a></span>
+      </li>
+      <li class="list-group-item list-group-item-link">
+        <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">מבחנים</a></span>
+      </li>
+      <li class="list-group-item list-group-item-link">
+        <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">חומרי עזר</a></span>
+      </li>
+    </ul>
+  </div>
+    <hr/>
+    <div class="col-md-12 table-responsive">
+      <table id="myTable" class="responsive table hover">
+        <thead>
+          <tr class="align-middle course-tr">
+            <th class="text-start">סמסטר</th>
+            <th class="all text-start">חומר לימוד</th>
+            <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
+            <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
+            <th class="text-center min-tablet">נושאים</th>
+            <th class="text-center min-tablet">הערות</th>
+            <th class="text-center min-tablet">מעקב</th>
+            {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
+            <th class="text-center min-tablet">עריכה</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, resource in resources.iterrows() %}
             <tr class="align-middle course-tr">
-              <th class="text-start">סמסטר</th>
-              <th class="all text-start">חומר לימוד</th>
-              <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
-              <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
-              <th class="text-center min-tablet">נושאים</th>
-              <th class="text-center min-tablet">הערות</th>
-              <th class="text-center min-tablet">מעקב</th>
-              {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
-              <th class="text-center min-tablet">עריכה</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for index, resource in resources.iterrows() %}
-              <tr class="align-middle course-tr">
-                <td>{{ resource.main }}</td>
-                <td>
-                  <div>
-                    {% if resource.link %}<a class="text-decoration-none"
+              <td>{{ resource.main }}</td>
+              <td>
+                <div>
+                  {% if resource.link %}<a class="text-decoration-none"
    target="_blank"
    href="{{ resource.link }}">{% endif %}
-                    {{ resource.display_name }}
-                    {% if resource.link %}</a>{% endif %}
-                  </td>
-                  <td class="text-start">
-                    {% if resource.solution %}
-                      <a target="_blank"
-                         class="text-decoration-none"
-                         href="{{ resource.solution }}">פתרון</a>
-                    {% endif %}
-                  </td>
-                  <td class="text-start">
-                    {% if resource.recording %}
-                      <a target="_blank"
-                         class="text-decoration-none"
-                         href="{{ resource.recording }}">הקלטה</a>
-                    {% endif %}
-                  </td>
-                  <td class="text-center">
-                    {% for subj in resource.subject %}<span class="badge bg-secondary me-1">{{ subj }}</span>{% endfor %}
-                  </td>
-                  <td class="text-center">
-                    {% if resource.is_out_of_date %}<span class="badge bg-danger me-1">לא למבחן</span>{% endif %}
-                    {% if resource.is_solution_partial %}<span class="badge bg-danger me-1">פתרון חלקי</span>{% endif %}
-                  </td>
+                  {{ resource.display_name }}
+                  {% if resource.link %}</a>{% endif %}
+                </td>
+                <td class="text-start">
+                  {% if resource.solution %}
+                    <a target="_blank"
+                       class="text-decoration-none"
+                       href="{{ resource.solution }}">פתרון</a>
+                  {% endif %}
+                </td>
+                <td class="text-start">
+                  {% if resource.recording %}
+                    <a target="_blank"
+                       class="text-decoration-none"
+                       href="{{ resource.recording }}">הקלטה</a>
+                  {% endif %}
+                </td>
+                <td class="text-center">
+                  {% for subj in resource.subject %}<span class="badge bg-secondary me-1">{{ subj }}</span>{% endfor %}
+                </td>
+                <td class="text-center">
+                  {% if resource.is_out_of_date %}<span class="badge bg-danger me-1">לא למבחן</span>{% endif %}
+                  {% if resource.is_solution_partial %}<span class="badge bg-danger me-1">פתרון חלקי</span>{% endif %}
+                </td>
+                <td class="text-center">
+                  <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
+                       class="btn-group"
+                       role="group"
+                       aria-label="Basic radio toggle button group">
+                    <input onchange="updateRadio({{ resource.resource_id }}, 0);"
+                           type="radio"
+                           class="btn-check"
+                           value="0"
+                           autocomplete="off"
+                           name="btnradio-{{ resource.resource_id }}"
+                           id="btnradio1-{{ resource.resource_id }}"
+                           {% if (resource.done != 1) and (resource.done != 2) %}checked{% endif %}
+                           {% if not current_user.is_authenticated %}disabled{% endif %}/>
+                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
+                           class="btn btn-outline-secondary"
+                           for="btnradio1-{{ resource.resource_id }}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-dash"
+                           viewBox="0 0 16 16">
+                        <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+                      </svg>
+                    </label>
+                    <input onchange="updateRadio({{ resource.resource_id }}, 1);"
+                           type="radio"
+                           class="btn-check"
+                           value="1"
+                           autocomplete="off"
+                           name="btnradio-{{ resource.resource_id }}"
+                           id="btnradio2-{{ resource.resource_id }}"
+                           {% if resource.done == 1 %}checked{% endif %}
+                           {% if not current_user.is_authenticated %}disabled{% endif %}/>
+                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
+                           class="btn btn-outline-secondary"
+                           for="btnradio2-{{ resource.resource_id }}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-arrow-repeat"
+                           viewBox="0 0 16 16">
+                        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                      </svg>
+                    </label>
+                    <input onchange="updateRadio({{ resource.resource_id }}, 2);"
+                           type="radio"
+                           class="btn-check"
+                           value="2"
+                           autocomplete="off"
+                           name="btnradio-{{ resource.resource_id }}"
+                           id="btnradio3-{{ resource.resource_id }}"
+                           {% if resource.done == 2 %}checked{% endif %}
+                           {% if not current_user.is_authenticated %}disabled{% endif %}/>
+                    <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="הושלם"{% endif %}
+                           class="btn btn-outline-success"
+                           for="btnradio3-{{ resource.resource_id }}">
+                      <svg xmlns="http://www.w3.org/2000/svg"
+                           width="16"
+                           height="16"
+                           fill="currentColor"
+                           class="bi bi-check2"
+                           viewBox="0 0 16 16">
+                        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                      </svg>
+                    </label>
+                  </div>
+                </td class="text-center">
+                {% if tab == "archive" %}
                   <td class="text-center">
                     <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
                          class="btn-group"
                          role="group"
                          aria-label="Basic radio toggle button group">
-                      <input onchange="updateRadio({{ resource.resource_id }}, 0);"
-                             type="radio"
+                      <input onchange="updateLike({{ resource.resource_id }});"
+                             type="checkbox"
                              class="btn-check"
                              value="0"
                              autocomplete="off"
-                             name="btnradio-{{ resource.resource_id }}"
-                             id="btnradio1-{{ resource.resource_id }}"
-                             {% if (resource.done != 1) and (resource.done != 2) %}checked{% endif %}
+                             name="btnlike-{{ resource.resource_id }}"
+                             id="btnlike-{{ resource.resource_id }}"
+                             {% if resource.like %}checked{% endif %}
                              {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                      <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
-                             class="btn btn-outline-secondary"
-                             for="btnradio1-{{ resource.resource_id }}">
+                      <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="אהבתי"{% endif %}
+                             class="btn btn-outline-danger"
+                             for="btnlike-{{ resource.resource_id }}">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              width="16"
                              height="16"
                              fill="currentColor"
-                             class="bi bi-dash"
+                             class="bi bi-suit-heart"
                              viewBox="0 0 16 16">
-                          <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+                          <path d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595L8 6.236zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.55 7.55 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z"/>
                         </svg>
-                      </label>
-                      <input onchange="updateRadio({{ resource.resource_id }}, 1);"
-                             type="radio"
-                             class="btn-check"
-                             value="1"
-                             autocomplete="off"
-                             name="btnradio-{{ resource.resource_id }}"
-                             id="btnradio2-{{ resource.resource_id }}"
-                             {% if resource.done == 1 %}checked{% endif %}
-                             {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                      <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
-                             class="btn btn-outline-secondary"
-                             for="btnradio2-{{ resource.resource_id }}">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             class="bi bi-arrow-repeat"
-                             viewBox="0 0 16 16">
-                          <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-                          <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
-                        </svg>
-                      </label>
-                      <input onchange="updateRadio({{ resource.resource_id }}, 2);"
-                             type="radio"
-                             class="btn-check"
-                             value="2"
-                             autocomplete="off"
-                             name="btnradio-{{ resource.resource_id }}"
-                             id="btnradio3-{{ resource.resource_id }}"
-                             {% if resource.done == 2 %}checked{% endif %}
-                             {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                      <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="הושלם"{% endif %}
-                             class="btn btn-outline-success"
-                             for="btnradio3-{{ resource.resource_id }}">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             width="16"
-                             height="16"
-                             fill="currentColor"
-                             class="bi bi-check2"
-                             viewBox="0 0 16 16">
-                          <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-                        </svg>
+                        <span id="likes-{{ resource.resource_id }}">{{ resource.likes }}</span>
                       </label>
                     </div>
                   </td class="text-center">
-                  {% if tab == "archive" %}
-                    <td class="text-center">
-                      <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
-                           class="btn-group"
-                           role="group"
-                           aria-label="Basic radio toggle button group">
-                        <input onchange="updateLike({{ resource.resource_id }});"
-                               type="checkbox"
-                               class="btn-check"
-                               value="0"
-                               autocomplete="off"
-                               name="btnlike-{{ resource.resource_id }}"
-                               id="btnlike-{{ resource.resource_id }}"
-                               {% if resource.like %}checked{% endif %}
-                               {% if not current_user.is_authenticated %}disabled{% endif %}/>
-                        <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="אהבתי"{% endif %}
-                               class="btn btn-outline-danger"
-                               for="btnlike-{{ resource.resource_id }}">
-                          <svg xmlns="http://www.w3.org/2000/svg"
-                               width="16"
-                               height="16"
-                               fill="currentColor"
-                               class="bi bi-suit-heart"
-                               viewBox="0 0 16 16">
-                            <path d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595L8 6.236zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.55 7.55 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z"/>
-                          </svg>
-                          <span id="likes-{{ resource.resource_id }}">{{ resource.likes }}</span>
-                        </label>
-                      </div>
-                    </td class="text-center">
-                  {% endif %}
-                  <td class="text-center">
-                    <a class="text-decoration-none"
-                       href="{{ url_for('editresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">עריכה</a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+                {% endif %}
+                <td class="text-center">
+                  <a class="text-decoration-none"
+                     href="{{ url_for('editresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">עריכה</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
     <script type="text/javascript">

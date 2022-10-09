@@ -1,18 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-  {% for index, resource_title in resource_titles_df.iterrows() %}
-    <nav class="breadcrumb-nav" aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="{{ url_for('course', institute=resource_title.course_institute_english, institute_course_id=resource_title.course_institute_id)}}">{{ resource_title.course_name }}</a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">
-          {{ resource_title.rname }}
-          {% if resource_title.rname_part %}- {{ resource_title.rname_part }}{% endif %}
-        </li>
-      </ol>
-    </nav>
-  {% endfor %}
+  <nav class="breadcrumb-nav" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('course', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">{{ resource.course_name }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ resource.display_name }}</li>
+    </ol>
+  </nav>
   <hr/>
   <ul>
     <li>
@@ -34,5 +29,5 @@
     {% endif %}
   </ul>
   <hr />
-  <a href="{{ url_for('editresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">ערוך חומר</a>
+  <a href="{{ url_for('editresource', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id, resource_id=resource.resource_id) }}">ערוך חומר</a>
 {% endblock content %}

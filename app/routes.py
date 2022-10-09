@@ -30,9 +30,9 @@ def logout():
     return _logout()
 
 
-@app.route('/resource/<resource_id>', methods=['GET', 'POST'])
-def resource(resource_id):
-    return _resource(resource_id)
+@app.route('/<institute>/<institute_course_id>/resource/<resource_id>', methods=['GET', 'POST'])
+def resource(institute, institute_course_id, resource_id):
+    return _resource(institute, institute_course_id, resource_id)
 
 
 @ app.route('/<institute>/<institute_course_id>/createresource', methods=['GET', 'POST'])

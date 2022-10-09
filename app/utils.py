@@ -44,12 +44,10 @@ def _update_form_according_to_resource(form, resource):
     form.type.data = resource.type
     form.solution.data = resource.solution
     form.recording.data = resource.recording
-    form.is_official.data = resource.is_official
     form.is_out_of_date.data = resource.is_out_of_date
     form.is_solution_partial.data = resource.is_solution_partial
     form.semester.data = resource.semester
     form.deadline_week.data = resource.deadline_week
-    form.deadline_date.data = resource.deadline_date
     form.subject.data = resource.subject
     return form
 
@@ -62,12 +60,10 @@ def _update_resource_according_to_form(resource, form):
     actual_resource.link = _strip_after_file_extension(form.link.data)
     actual_resource.solution = _strip_after_file_extension(form.solution.data)
     actual_resource.recording = form.recording.data
-    actual_resource.is_official = form.is_official.data
     actual_resource.is_out_of_date = form.is_out_of_date.data
     actual_resource.is_solution_partial = form.is_solution_partial.data
     actual_resource.deadline_week = form.deadline_week.data
     actual_resource.semester = form.semester.data
-    actual_resource.deadline_date = _get_date_from_week(form.deadline_week.data, form.deadline_date.data)
     actual_resource.subject = form.subject.data
 
     db.session.commit()
@@ -98,11 +94,9 @@ def _insert_resource_according_to_form(form, course_id):
                             link=_strip_after_file_extension(form.link.data),
                             solution=_strip_after_file_extension(form.solution.data),
                             recording=form.recording.data,
-                            is_official=form.is_official.data,
                             is_out_of_date=form.is_out_of_date.data,
                             is_solution_partial=form.is_solution_partial.data,
                             deadline_week=form.deadline_week.data,
-                            deadline_date=_get_date_from_week(form.deadline_week.data, form.deadline_date.data),
                             semester=form.semester.data,
                             likes=0,
                             subject=form.subject.data,
@@ -119,6 +113,8 @@ def _get_subjects(resources_df):
 
 def _alternative_sort(series):
     if series.dtype == object:
+        series[series.str.startswith('לקראת המבחן')] = 'תתת' + series[series.str.startswith('לקראת המבחן')]
+        series[series.str.startswith('קיץ ')] = 'ב' + series[series.str.startswith('קיץ ')]
         series[series.str.startswith('מבוא להרצאה')] = 'אאאא' + series[series.str.startswith('מבוא להרצאה')]
         series[series.str.startswith('הרצאה')] = 'אאא' + series[series.str.startswith('הרצאה')]
         series[series.str.startswith('מבוא לתרגול')] = 'אא' + series[series.str.startswith('מבוא לתרגול')]
@@ -140,25 +136,23 @@ def _fetch_resources(course_id, tab):
         return pd.DataFrame()
 
     if tab == 'semester':
-        resource_df = resource_df[resource_df['is_official'] & (resource_df['semester'] == '2023-01 חורף תשפ"ג')
-                                  & (resource_df['type'] != 'exam') & (resource_df['type'] != 'exercise')]
-        resource_df.sort_values(['deadline_date', 'display_name'], key=_alternative_sort, inplace=True)
-        resource_df['deadline_date'] = resource_df['deadline_date'].fillna('המבחן')
-        resource_df.insert(0, 'main', resource_df['deadline_date'].apply(lambda x: 'עד ' + str(x)[:10]))
+        resource_df = resource_df[(resource_df['type'] == 'lecture')]
+        resource_df.sort_values(['deadline_week', 'display_name'], key=_alternative_sort, inplace=True)
+        resource_df['deadline_week'] = resource_df['deadline_week'].fillna('המבחן')
+        resource_df.insert(0, 'main', resource_df['deadline_week'])
 
     if tab == 'exercises':
-        resource_df = resource_df[resource_df['is_official'] & (resource_df['type'] == 'exercise')]
+        resource_df = resource_df[resource_df['type'] == 'exercise']
         resource_df.sort_values(['semester', 'display_name'], key=_alternative_sort,  ascending=[False, True], inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'exams':
-        resource_df = resource_df[resource_df['is_official'] & (resource_df['type'] == 'exam')]
+        resource_df = resource_df[resource_df['type'] == 'exam']
         resource_df.sort_values(['semester', 'display_name'], key=_alternative_sort,  ascending=[False, True], inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'archive':
-        resource_df = resource_df[~resource_df['is_official'] | ((resource_df['type'] != 'exam') & (
-            resource_df['type'] != 'exercise') & (resource_df['semester'] != '2023-01 חורף תשפ"ג'))]
+        resource_df = resource_df[resource_df['type'] == 'other']
         resource_df.insert(0, 'main', resource_df['semester'])
         resource_df.sort_values(['likes', 'display_name'], key=_alternative_sort, ascending=[False, True], inplace=True)
 
@@ -184,38 +178,3 @@ def _fetch_resources(course_id, tab):
 def _update_resource_discord_link(resource_id, discord_link):
     Resource.query.filter_by(resource_id=resource_id).update({'comments': discord_link})
     db.session.commit()
-
-
-def _get_date_from_week(week, default_date):
-    if week == "presemester":
-        return "2022-10-23"
-    if week == "week1":
-        return "2022-10-30"
-    if week == "week2":
-        return "2022-11-07"
-    if week == "week3":
-        return "2022-11-14"
-    if week == "week4":
-        return "2022-11-21"
-    if week == "week5":
-        return "2022-11-28"
-    if week == "week6":
-        return "2022-12-05"
-    if week == "week7":
-        return "2022-12-12"
-    if week == "week8":
-        return "2022-12-25"
-    if week == "week9":
-        return "2023-01-01"
-    if week == "week10":
-        return "2023-01-08"
-    if week == "week11":
-        return "2023-01-15"
-    if week == "week12":
-        return "2023-01-22"
-    if week == "week13":
-        return "2023-01-29"
-    if week == "preexam":
-        return None
-    else:
-        return default_date

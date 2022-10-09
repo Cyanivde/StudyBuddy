@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+    <h4>
+        {% if is_existing_resource %}
+            שינוי
+        {% else %}
+            הוספת
+        {% endif %}
+        חומר לימוד
+    </h4>
+    <br/>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
@@ -14,13 +23,11 @@
             <br/>
             {{ form.type() }}
         </p>
-        <p>
+        <p id="dweek">
             <span style="color:red">*</span>
-            {{ form.display_name.label }}
+            שבוע בסמסטר
             <br/>
-            {{ form.display_name(size=32) }}
-            <br/>
-            {% for error in form.display_name.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {{ form.deadline_week() }}
         </p>
         <p id="qcount">
             <span style="color:red">*</span>
@@ -29,6 +36,14 @@
             {{ form.questions_count() }}
             <br/>
             {% for error in form.questions_count.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
+        <p>
+            <span style="color:red">*</span>
+            {{ form.display_name.label }}
+            <br/>
+            {{ form.display_name(size=32) }}
+            <br/>
+            {% for error in form.display_name.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
         <p>
             {{ form.link.label }} (נא להעלות קבצים ל<a target="_blank"
@@ -65,13 +80,6 @@
             <br/>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
-        <p>
-            דדליין
-            <br/>
-            {{ form.deadline_week() }}
-            {{ form.deadline_date() }}
-        </p>
-        <p>{{ form.is_official() }} {{ form.is_official.label }}</p>
         <p>{{ form.is_out_of_date() }} {{ form.is_out_of_date.label }}</p>
         <p>{{ form.is_solution_partial() }} {{ form.is_solution_partial.label }}</p>
         <p>{{ form.submit() }}</p>
@@ -97,17 +105,7 @@
         {% endif %}
 
         document.getElementById('display_name').placeholder = "הרצאה 1";
-        document.getElementById('deadline_date').style.display = "none";
         document.getElementById('qcount').style.display = "none";
-        document.getElementById("deadline_week").onchange =
-            function deadline() {
-                var deadlineWeek = document.getElementById("deadline_week");
-                if (deadlineWeek.options[deadlineWeek.selectedIndex].value == "exactdate") {
-                    document.getElementById('deadline_date').style.display = "inline";
-                } else {
-                    document.getElementById('deadline_date').style.display = "none";
-                }
-            }
         document.getElementById("type").onchange =
             function displayNamePlaceholder() {
                 var typeSelect = document.getElementById("type");
@@ -115,27 +113,27 @@
                 if (val == "lecture") {
                     document.getElementById('display_name').placeholder = "הרצאה 1";
                     document.getElementById('qcount').style.display = "none";
-                } else if (val == "tutorial") {
-                    document.getElementById('display_name').placeholder = "תרגול 1";
-                    document.getElementById('qcount').style.display = "none";
-                } else if (val == "workshop") {
-                    document.getElementById('display_name').placeholder = "סדנה 1";
-                    document.getElementById('qcount').style.display = "none";
+                    document.getElementById('dweek').style.display = "block";
                 } else if (val == "exercise") {
                     document.getElementById('display_name').placeholder = "תרגיל בית 1 שאלה 1";
                     document.getElementById('qcount').style.display = "none";
+                    document.getElementById('dweek').style.display = "none";
                 } else if (val == "exam") {
                     document.getElementById('display_name').placeholder = "מועד א' שאלה 1";
                     document.getElementById('qcount').style.display = "none";
+                    document.getElementById('dweek').style.display = "none";
                 } else if (val == "exercise_full") {
                     document.getElementById('qcount').style.display = "block";
                     document.getElementById('display_name').placeholder = "תרגיל בית 1";
+                    document.getElementById('dweek').style.display = "none";
                 } else if (val == "exam_full") { 
                     document.getElementById('qcount').style.display = "block";
                     document.getElementById('display_name').placeholder = "מועד א'";
+                    document.getElementById('dweek').style.display = "none";
                 } else {
                     document.getElementById('display_name').placeholder = "";
                     document.getElementById('qcount').style.display = "none";
+                    document.getElementById('dweek').style.display = "none";
                 }
             }
     </script>

@@ -67,4 +67,11 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
             channel_id = int(course.discord_channel_id)
             asyncio.run(create_discord_threads(channel_id, uploaded_resources))
 
-        return redirect(url_for('course', institute=institute, institute_course_id=institute_course_id))
+        if form.type.data == 'lecture':
+            return redirect(url_for('course', institute=institute, institute_course_id=institute_course_id))
+        if form.type.data.startswith('exercise'):
+            return redirect(url_for('exercises', institute=institute, institute_course_id=institute_course_id))
+        if form.type.data.startswith('exam'):
+            return redirect(url_for('exams', institute=institute, institute_course_id=institute_course_id))
+        if form.type.data == 'other':
+            return redirect(url_for('archive', institute=institute, institute_course_id=institute_course_id))

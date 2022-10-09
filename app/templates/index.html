@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-    כל הקורסים:
-    <ul>
-        {% for course in courses %}
-            <li>
-                <a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">[{{ course.course_institute }} {{ course.course_institute_id }}] {{ course.course_name }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="header-paragraph">
+        <h4 style="margin-bottom: 6px">ברוכים הבאים!</h4>
+        StudyBuddy היא פלטפורמה לשיתוף חומרי לימוד לקורסים אקדמיים, שכולם יכולים לערוך.
+        <br/>
+        <br/>
+        <strong>רשימת הקורסים הקיימים במערכת:</strong>
+        <ul>
+            {% for course in courses %}
+                <li>
+                    <a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">[{{ course.course_institute }} {{ course.course_institute_id }}] {{ course.course_name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <hr style="margin-top: 25px" />
+        <div style="font-size: 0.75rem; margin-top: 20px">
+            רוצים לעזור? <a href="https://api.whatsapp.com/send?phone=972502038523">צרו קשר</a> או <a href="https://github.com/Cyanivde/StudyBuddy">תרמו לקוד</a> :)
+        </div>
+    </div>
 {% endblock content %}

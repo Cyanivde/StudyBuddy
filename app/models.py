@@ -37,8 +37,6 @@ class Resource(db.Model):
     display_name = db.Column(db.String(140))
     semester = db.Column(db.String(30))
     deadline_week = db.Column(db.String(140))
-    deadline_date = db.Column(db.DateTime)
-    is_official = db.Column(db.Boolean)
     is_out_of_date = db.Column(db.Boolean)
     is_solution_partial = db.Column(db.Boolean)
     type = db.Column(db.String(20))
