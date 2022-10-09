@@ -87,3 +87,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
 .header-paragraph {
   margin-right: 10px;
 }
+
+.navbar {
+  padding-bottom: 0 !important;
+}
