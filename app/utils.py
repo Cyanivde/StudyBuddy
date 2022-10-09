@@ -1,3 +1,4 @@
+from re import sub
 from flask import abort
 from flask_login import current_user
 from app import db
@@ -20,12 +21,17 @@ def _fetch_resource_df(resource_id):
     return merged_resource_df
 
 
-def _fetch_subject_list():
-    subject_names = [subject.subject_name for subject in Subject.query.all()]
-    if subject_names is not None:
-        subject_names.sort()
+def _fetch_subject_list(course_id):
+    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
+        course_id=course_id).all())])
 
-    return subject_names
+    resource_df['subject'] = resource_df['subject'].str.split(',')
+    resource_df = resource_df.explode('subject')
+
+    resource_df = resource_df[resource_df['subject'] != '']
+    subject_hist = resource_df['subject'].value_counts()
+
+    return list(subject_hist[subject_hist >= 2].keys())
 
 
 def _fetch_course(course_id):

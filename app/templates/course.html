@@ -23,15 +23,16 @@
         </li>
       </ul>
       <hr/>
-      <div class="col-md-12">
+      <div class="col-md-12 table-responsive">
         <table id="myTable" class="responsive table hover">
           <thead>
             <tr class="align-middle course-tr">
               <th class="text-start">סמסטר</th>
               <th class="all text-start">חומר לימוד</th>
-              <th class="min-tablet text-start">פתרון</th>
-              <th class="min-tablet text-start">הקלטה</th>
+              <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
+              <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
               <th class="text-center min-tablet">נושאים</th>
+              <th class="text-center min-tablet">הערות</th>
               <th class="text-center min-tablet">מעקב</th>
               {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
               <th class="text-center min-tablet">עריכה</th>
@@ -48,14 +49,12 @@
    href="{{ resource.link }}">{% endif %}
                     {{ resource.display_name }}
                     {% if resource.link %}</a>{% endif %}
-                    {% if resource.is_out_of_date %}<span class="badge bg-danger ms-1">לא למבחן</span>{% endif %}
                   </td>
                   <td class="text-start">
                     {% if resource.solution %}
                       <a target="_blank"
                          class="text-decoration-none"
                          href="{{ resource.solution }}">פתרון</a>
-                      {% if resource.is_solution_partial %}<span class="badge bg-danger ms-1">פתרון חלקי</span>{% endif %}
                     {% endif %}
                   </td>
                   <td class="text-start">
@@ -67,6 +66,10 @@
                   </td>
                   <td class="text-center">
                     {% for subj in resource.subject %}<span class="badge bg-secondary me-1">{{ subj }}</span>{% endfor %}
+                  </td>
+                  <td class="text-center">
+                    {% if resource.is_out_of_date %}<span class="badge bg-danger me-1">לא למבחן</span>{% endif %}
+                    {% if resource.is_solution_partial %}<span class="badge bg-danger me-1">פתרון חלקי</span>{% endif %}
                   </td>
                   <td class="text-center">
                     <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}

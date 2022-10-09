@@ -57,6 +57,11 @@
             {{ form.subject.label }}
             <br/>
             {{ form.subject(size=32) }}
+            {% for subj in course_subjects %}
+                <button type="button"
+                        onClick="addSubj('{{ subj }}')"
+                        class="btn btn-outline-primary btn-sm">{{ subj }}</button>
+            {% endfor %}
             <br/>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
@@ -72,6 +77,17 @@
         <p>{{ form.submit() }}</p>
     </form>
     <script>
+        function addSubj(subj) {
+            var subjectInput = document.getElementById("subject");
+
+            if (!subjectInput.value.split(',').includes(subj)) {
+                if (subjectInput.value != '') {
+                    subjectInput.value = subjectInput.value + ','
+                }
+            subjectInput.value = subjectInput.value + subj;
+            }
+        }
+
         {% if is_existing_resource %}
         $("#type option[value='exercise_full']").remove();
         $("#type option[value='exam_full']").remove();

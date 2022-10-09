@@ -76,3 +76,10 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
 .list-group-item {
   padding: 0.5rem 0.7rem !important;
 }
+
+.btn-group-sm > .btn,
+.btn-sm {
+  padding: 0.15rem 0.35rem !important;
+  font-size: 0.6rem !important;
+  margin: 0px 0 4px 0 !important;
+}
