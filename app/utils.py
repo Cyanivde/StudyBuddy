@@ -113,8 +113,15 @@ def _get_subjects(resources_df):
 
 def _alternative_sort(series):
     if series.dtype == object:
+        series[series.str.startswith('אביב 20')] = series[series.str.startswith('אביב 20')] + 'א'
+        series[series.str.startswith('קיץ 20')] = series[series.str.startswith('קיץ 20')] + 'ב'
+
+        series[series.str.startswith('אביב 20')] = series[series.str.startswith('אביב 20')].str.replace('אביב', '')
+        series[series.str.startswith('קיץ 20')] = series[series.str.startswith('קיץ 20')].str.replace('קיץ', '')
+        series[series.str.startswith('חורף 20')] = series[series.str.startswith('חורף 20')].str.replace('חורף', '').str.replace('-', 'ג')
+
         series[series.str.startswith('לקראת המבחן')] = 'תתת' + series[series.str.startswith('לקראת המבחן')]
-        series[series.str.startswith('קיץ ')] = 'ב' + series[series.str.startswith('קיץ ')]
+
         series[series.str.startswith('מבוא להרצאה')] = 'אאאא' + series[series.str.startswith('מבוא להרצאה')]
         series[series.str.startswith('הרצאה')] = 'אאא' + series[series.str.startswith('הרצאה')]
         series[series.str.startswith('מבוא לתרגול')] = 'אא' + series[series.str.startswith('מבוא לתרגול')]
