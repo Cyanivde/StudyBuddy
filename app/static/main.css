@@ -15,12 +15,12 @@ li {
 }
 .subject-btn {
   padding: 0.125rem 0.25rem !important;
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   border-radius: 0.3rem;
 }
 
 .xs {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 .breadcrumb-nav {
@@ -53,7 +53,7 @@ li {
 table.dataTable tr.dtrg-group th {
   text-align: right !important;
   background-color: #e7e7e7 !important;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 #myTable_filter {
@@ -70,7 +70,13 @@ table.dataTable tr.dtrg-group th {
 
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
-  display: none !important;
+  right: 5px !important;
+  left: 0 !important;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
+  padding-left: 0px !important;
 }
 
 .list-group-item {
@@ -80,7 +86,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
 .btn-group-sm > .btn,
 .btn-sm {
   padding: 0.15rem 0.35rem !important;
-  font-size: 0.6rem !important;
+  font-size: 0.55rem !important;
   margin: 0px 0 4px 0 !important;
 }
 
@@ -90,4 +96,8 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
 
 .navbar {
   padding-bottom: 0 !important;
+}
+
+body {
+  font-size: 0.9rem;
 }

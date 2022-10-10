@@ -2,32 +2,45 @@
 {% block content %}
   <nav class="breadcrumb-nav" aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="{{ url_for('course', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">{{ resource.course_name }}</a>
+      <li class="breadcrumb-item active">{{ resource.course_name }}</li>
+      {% if resource.type == 'lecture' %}
+        <li class="breadcrumb-item active">
+          <a href="{{ url_for('course', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">שיעורים</a>
+        </li>
+      {% endif %}
+      {% if resource.type.startswith('exam') %}
+        <li class="breadcrumb-item active">
+          <a href="{{ url_for('exams', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">מבחנים</a>
+        </li>
+      {% endif %}
+      {% if resource.type.startswith('exercise') %}
+        <li class="breadcrumb-item active">
+          <a href="{{ url_for('exercises', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">תרגילי בית</a>
+        </li>
+      {% endif %}
+      {% if resource.type == 'other' %}
+        <li class="breadcrumb-item active">
+          <a href="{{ url_for('archive', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">חומרי עזר</a>
+        </li>
+      {% endif %}
+      <li class="breadcrumb-item active" aria-current="page">
+        {% if resource.link %}
+          <a class="text-decoration-none"
+             target="_blank"
+             href="{{ resource.link }}">{{ resource.display_name }}</a>
+        {% endif %}
+        {% if resource.solution %}
+          &nbsp;·&nbsp;&nbsp;<a class="text-decoration-none"
+   target="_blank"
+   href="{{ resource.solution }}">פתרון</a>
+        {% endif %}
+        {% if resource.recording %}
+          &nbsp;·&nbsp;&nbsp;<a class="text-decoration-none"
+   target="_blank"
+   href="{{ resource.recording }}">הקלטה</a>
+        {% endif %}
       </li>
-      <li class="breadcrumb-item active" aria-current="page">{{ resource.display_name }}</li>
     </ol>
   </nav>
   <hr/>
-  <ul>
-    <li>
-      {% if resource.link %}<a class="text-decoration-none"
-   target="_blank"
-   href="{{ resource.link }}">{% endif %}
-      קישור
-      {% if resource.link %}</a>{% endif %}
-    </li>
-    {% if resource.solution %}
-      <li>
-        <a href="{{ resource.solution }}" target="_blank">פתרון</a>
-      </li>
-    {% endif %}
-    {% if resource.recording %}
-      <li>
-        <a href="{{ resource.recording }}" target="_blank">הקלטה</a>
-      </li>
-    {% endif %}
-  </ul>
-  <hr />
-  <a href="{{ url_for('editresource', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id, resource_id=resource.resource_id) }}">ערוך חומר</a>
 {% endblock content %}
