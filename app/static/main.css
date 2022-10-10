@@ -74,6 +74,10 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
   left: 0 !important;
 }
 
+table.dataTable.dtr-column > tbody > tr > td.dtr-control:before {
+  display: none !important;
+}
+
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
   padding-left: 0px !important;

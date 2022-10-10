@@ -32,7 +32,7 @@
             <th class="all text-start">שם</th>
             <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
             <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
-            <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">תגובות</th>
+            {% if tab != "archive" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">הערות</th>
             <th class="text-center min-tablet">מעקב</th>
@@ -67,10 +67,12 @@
                        href="{{ resource.recording }}">הקלטה</a>
                   {% endif %}
                 </td>
-                <td class="text-start">
-                  <a class="text-decoration-none"
-                     href="{{ url_for('resource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">תגובות</a>
-                </td>
+                {% if tab != "archive" %}
+                  <td class="text-start">
+                    <a class="text-decoration-none"
+                       href="{{ url_for('resource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">תגובות</a>
+                  </td>
+                {% endif %}
                 <td class="text-center">
                   {% for subj in resource.subject %}<span class="badge bg-secondary me-1">{{ subj }}</span>{% endfor %}
                 </td>
@@ -239,7 +241,7 @@
           "pageLength": 100,
           "processing": true,
           "bAutoWidth": false,
-          {%if tab != "archive" %}
+
             responsive: {
                 details: {
                     type: 'column',
@@ -251,6 +253,7 @@
                 orderable: false,
                 targets:   -1
             } ],
+            {%if tab != "archive" %}
           rowGroup: {
               dataSrc: [0]
           },
