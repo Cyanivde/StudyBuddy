@@ -45,7 +45,7 @@ class DiscordClientForCreatingThread(discord.Client):
                     if channel.name != resource.display_name:
                         await channel.edit(name=resource.semester + ' ' + resource.display_name)
                 if resource.type == 'other':
-                    await channel.delete()
+                    await channel.edit(name="[אחר] " + resource.display_name)
                     _update_resource_discord_link(resource.resource_id, None)
 
             else:
