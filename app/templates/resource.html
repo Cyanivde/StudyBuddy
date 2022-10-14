@@ -24,11 +24,11 @@
         </li>
       {% endif %}
       <li class="breadcrumb-item active" aria-current="page">
-        {% if resource.link %}
-          <a class="text-decoration-none"
-             target="_blank"
-             href="{{ resource.link }}">{{ resource.display_name }}</a>
-        {% endif %}
+        {% if resource.link %}<a class="text-decoration-none"
+   target="_blank"
+   href="{{ resource.link }}">{% endif %}
+        {{ resource.display_name }}
+        {% if resource.link %}</a>{% endif %}
         {% if resource.solution %}
           &nbsp;·&nbsp;&nbsp;<a class="text-decoration-none"
    target="_blank"

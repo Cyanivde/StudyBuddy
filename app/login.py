@@ -1,5 +1,6 @@
 from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_user
+from sqlalchemy import true
 
 from app.forms import LoginForm
 from app.models import User
@@ -21,5 +22,5 @@ def _login():
         if user is None or not user.check_password(form.password.data):
             flash('שם המשתמש או הסיסמה שגויים')
             return redirect(url_for('login'))
-        login_user(user, remember=form.remember_me.data)
+        login_user(user, remember=True)
         return redirect(url_for('index'))
