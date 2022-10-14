@@ -52,6 +52,7 @@ class Course(db.Model):
     maintainer = db.Column(db.String(140))
     maintainer_email = db.Column(db.String(140))
     discord_channel_id = db.Column(db.String(50))
+    discord_invite = db.Column(db.String(200))
 
 
 class ResourceToUser(db.Model):
