@@ -69,6 +69,8 @@ def _update_resource_according_to_form(resource, form):
     db.session.commit()
     db.session.refresh(actual_resource)
 
+    return [actual_resource]
+
 
 def _strip_after_file_extension(s):
     for extension in ['.pdf', '.docx', '.pptx']:
@@ -79,6 +81,8 @@ def _strip_after_file_extension(s):
 
 
 def _insert_resource_according_to_form(form, course_id):
+    updated_resources = []
+
     num = 1
 
     if form.type.data in ['exercise_full', 'exam_full']:
@@ -103,6 +107,11 @@ def _insert_resource_according_to_form(form, course_id):
                             course_id=course_id)
         db.session.add(resource)
         db.session.commit()
+        db.session.refresh(resource)
+
+        updated_resources += [resource]
+
+    return updated_resources
 
 
 def _get_subjects(resources_df):

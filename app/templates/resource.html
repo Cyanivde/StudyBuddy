@@ -43,4 +43,13 @@
     </ol>
   </nav>
   <hr/>
+  {% if resource.comments %}
+    <widgetbot
+    server="{{ resource.comments.split('/')[4] }}"
+    channel="{{ resource.comments.split('/')[5] }}"
+    width="100%"
+    height="550"
+    ></widgetbot>
+    <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
+  {% endif %}
 {% endblock content %}

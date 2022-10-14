@@ -7,12 +7,13 @@ import os
 
 
 class DiscordClientForCreatingThread(discord.Client):
-    channel_id = None
+    course = None
+    guild = None
     uploaded_resources = None
     thread_link = None
 
-    def __init__(self, channel_id, uploaded_resources):
-        self.channel_id = channel_id
+    def __init__(self, course, uploaded_resources):
+        self.course = course
         self.uploaded_resources = uploaded_resources
         intents = discord.Intents.default()
         intents.guild_messages = True
@@ -22,22 +23,51 @@ class DiscordClientForCreatingThread(discord.Client):
         self.do = False
 
     async def on_ready(self):
-        channel = self.get_channel(self.channel_id)
-        for i in self.uploaded_resources:
-            msg = await channel.send("חומר לימוד חדש")
-            thread_name = i[1]
-            if i[2]:
-                thread_name += ' - ' + i[2]
-            thread = await msg.create_thread(name=thread_name.strip('?'))
-            await msg.delete()
-            await thread.send("<https://studybuddy.co.il/resource/{0}>".format(i[0]))
-            _update_resource_discord_link(i[0], thread.jump_url)
+
+        self.guild = self.get_guild(int(self.course.discord_channel_id))
+
+        lectures_category = [cat for cat in self.guild.categories if cat.name == 'שיעורים'][0]
+        exercises_category = [cat for cat in self.guild.categories if cat.name == 'תרגילי בית'][0]
+        exams_category = [cat for cat in self.guild.categories if cat.name == 'מבחנים'][0]
+
+        for resource in self.uploaded_resources:
+            channel = None
+
+            if resource.comments:
+                print(resource.comments)
+                channel = await self.guild.fetch_channel(int(resource.comments.split('/')[5]))
+
+            if channel:
+                if resource.type == 'lecture':
+                    if channel.name != resource.display_name:
+                        await channel.edit(name=resource.display_name)
+                if resource.type.startswith('exercise') or resource.type.startswith('exam'):
+                    if channel.name != resource.display_name:
+                        await channel.edit(name=resource.semester + ' ' + resource.display_name)
+                if resource.type == 'other':
+                    await channel.delete()
+                    _update_resource_discord_link(resource.resource_id, None)
+
+            else:
+                if resource.type == 'lecture':
+                    channel = await self.guild.create_text_channel(resource.display_name, category=lectures_category)
+                if resource.type.startswith('exercise'):
+                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, category=exercises_category)
+                if resource.type.startswith('exam'):
+                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, category=exams_category)
+
+                if channel:
+                    await channel.edit(topic="<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course.course_institute_english,
+                                                                                                      self.course.course_institute_id, resource.resource_id))
+                    _update_resource_discord_link(resource.resource_id, channel.jump_url)
+
         await self.close()
 
 
-async def create_discord_threads(channel_id, uploaded_resources):
+async def update_discord_threads(course, uploaded_resources):
     if os.environ.get("DISCORD_TOKEN"):
-        client = DiscordClientForCreatingThread(channel_id=channel_id, uploaded_resources=uploaded_resources)
+
+        client = DiscordClientForCreatingThread(course=course, uploaded_resources=uploaded_resources)
         await client.start(os.environ.get("DISCORD_TOKEN"))
 
 
@@ -55,17 +85,16 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
 
     # Form was submitted with valid input
     if form.validate_on_submit():
+        course = _fetch_course(course_id)
         if is_existing_resource:
             resource_df = _fetch_resource_df(resource_id)
             resource = resource_df.iloc[0]
-            _update_resource_according_to_form(resource, form)
+            updated_resources = _update_resource_according_to_form(resource, form)
 
         else:
-            course = _fetch_course(course_id)
-            uploaded_resources = _insert_resource_according_to_form(form, course_id)
+            updated_resources = _insert_resource_according_to_form(form, course_id)
 
-            channel_id = int(course.discord_channel_id)
-            asyncio.run(create_discord_threads(channel_id, uploaded_resources))
+        asyncio.run(update_discord_threads(course, updated_resources))
 
         if form.type.data == 'lecture':
             return redirect(url_for('course', institute=institute, institute_course_id=institute_course_id))
