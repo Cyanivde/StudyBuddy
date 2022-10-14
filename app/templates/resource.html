@@ -48,7 +48,7 @@
     server="{{ resource.comments.split('/')[4] }}"
     channel="{{ resource.comments.split('/')[5] }}"
     width="100%"
-    height="460"
+    height="450"
     ></widgetbot>
     <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
     <br/>
@@ -62,8 +62,10 @@
         <li>
           הצטרפו ל<a href="{{ course.discord_invite }}">שרת של הקורס</a>.
         </li>
-        <li>
-          לחצו <a href="{{ resource.comments.replace('https', 'discord') }}">כאן</a>.
+        <li style="margin-top: 5px">
+          לחצו כאן: <a target="_blank"
+    class="btn btn-dark"
+    href="{{ resource.comments.replace('https', 'discord') }}">פתיחה באפליקציה</a> / <a target="_blank" class="btn btn-dark" href="{{ resource.comments }}">פתיחה בדפדפן</a>.
         </li>
       </ol>
     </div>
