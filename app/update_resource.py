@@ -27,12 +27,10 @@ class DiscordClientForCreatingThread(discord.Client):
 
         self.guild = self.get_guild(int(self.course.discord_channel_id))
 
-        lectures_category = [cat for cat in self.guild.categories if cat.name == 'שיעורים'][0]
-        exercises_category = [cat for cat in self.guild.categories if cat.name == 'תרגילי בית'][0]
-        exams_category = [cat for cat in self.guild.categories if cat.name == 'מבחנים'][0]
-
         for resource in self.uploaded_resources:
             channel = None
+            topic = "<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course.course_institute_english,
+                                                                             self.course.course_institute_id, resource.resource_id)
 
             if resource.comments:
                 channel = await self.guild.fetch_channel(int(resource.comments.split('/')[5]))
@@ -40,25 +38,23 @@ class DiscordClientForCreatingThread(discord.Client):
             if channel:
                 if resource.type == 'lecture':
                     if channel.name != resource.display_name:
-                        await channel.edit(name=resource.display_name)
+                        await channel.edit(name=resource.display_name, topic=topic)
                 if resource.type.startswith('exercise') or resource.type.startswith('exam'):
                     if channel.name != resource.display_name:
-                        await channel.edit(name=resource.semester + ' ' + resource.display_name)
+                        await channel.edit(name=resource.semester + ' ' + resource.display_name, topic=topic)
                 if resource.type == 'other':
-                    await channel.edit(name="[אחר] " + resource.display_name)
+                    await channel.edit(name="[אחר] " + resource.display_name, topic=topic)
                     _update_resource_discord_link(resource.resource_id, None)
 
             else:
                 if resource.type == 'lecture':
-                    channel = await self.guild.create_text_channel(resource.display_name, category=lectures_category)
+                    channel = await self.guild.create_text_channel(resource.display_name, topic=topic)
                 if resource.type.startswith('exercise'):
-                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, category=exercises_category)
+                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, topic=topic)
                 if resource.type.startswith('exam'):
-                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, category=exams_category)
+                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, topic=topic)
 
                 if channel:
-                    await channel.edit(topic="<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course.course_institute_english,
-                                                                                                      self.course.course_institute_id, resource.resource_id))
                     _update_resource_discord_link(resource.resource_id, channel.jump_url)
 
         await self.close()
