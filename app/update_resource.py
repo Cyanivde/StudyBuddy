@@ -1,10 +1,13 @@
 from flask import redirect, render_template, url_for
 from app.forms import UpdateResourceForm
+from app import db
 from app.utils import _fetch_subject_list, _fetch_resource_df, _update_form_according_to_resource, _update_resource_according_to_form, _insert_resource_according_to_form, _fetch_course, _update_resource_discord_link
 import discord
 import asyncio
 import os
 from threading import Thread
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
 
 
 class DiscordClientForCreatingThread(discord.Client):
@@ -24,8 +27,9 @@ class DiscordClientForCreatingThread(discord.Client):
         self.do = False
 
     async def on_ready(self):
+        Session = scoped_session(sessionmaker(bind=db.engine))
+        Session()
         self.guild = await self.fetch_guild(int(self.course.discord_channel_id))
-
         for resource in self.uploaded_resources:
             channel = None
             topic = "<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course.course_institute_english,
@@ -56,6 +60,7 @@ class DiscordClientForCreatingThread(discord.Client):
                     _update_resource_discord_link(resource.resource_id, channel.jump_url)
 
         await self.close()
+        Session.remove()
 
 
 async def async_update_discord_threads(course, uploaded_resources):
@@ -90,7 +95,7 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
 
         else:
             updated_resources = _insert_resource_according_to_form(form, course_id)
-        print(course.discord_channel_id)
+
         thread = Thread(target=update_discord_threads, args=(course, updated_resources))
         thread.start()
 
