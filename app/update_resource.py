@@ -24,8 +24,7 @@ class DiscordClientForCreatingThread(discord.Client):
         self.do = False
 
     async def on_ready(self):
-
-        self.guild = self.get_guild(int(self.course.discord_channel_id))
+        self.guild = await self.fetch_guild(int(self.course.discord_channel_id))
 
         for resource in self.uploaded_resources:
             channel = None
@@ -33,8 +32,7 @@ class DiscordClientForCreatingThread(discord.Client):
                                                                              self.course.course_institute_id, resource.resource_id)
 
             if resource.comments:
-                channel = await self.guild.fetch_channel(int(resource.comments.split('/')[5]))
-
+                channel = self.guild.get_channel(int(resource.comments.split('/')[5]))
             if channel:
                 if resource.type == 'lecture':
                     if channel.name != resource.display_name:
@@ -60,11 +58,14 @@ class DiscordClientForCreatingThread(discord.Client):
         await self.close()
 
 
-async def update_discord_threads(course, uploaded_resources):
+async def async_update_discord_threads(course, uploaded_resources):
     if os.environ.get("DISCORD_TOKEN"):
-
         client = DiscordClientForCreatingThread(course=course, uploaded_resources=uploaded_resources)
         await client.start(os.environ.get("DISCORD_TOKEN"))
+
+
+def update_discord_threads(course, uploaded_resources):
+    asyncio.run(async_update_discord_threads(course, uploaded_resources))
 
 
 def _update_resource(course_id, institute, institute_course_id, is_existing_resource, resource_id=None):
@@ -89,8 +90,8 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
 
         else:
             updated_resources = _insert_resource_according_to_form(form, course_id)
-
-        thread = Thread(target=asyncio.run, args=(update_discord_threads(course, updated_resources), ), )
+        print(course.discord_channel_id)
+        thread = Thread(target=update_discord_threads, args=(course, updated_resources))
         thread.start()
 
         if form.type.data == 'lecture':
