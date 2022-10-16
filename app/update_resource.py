@@ -59,10 +59,10 @@ class DiscordClientForCreatingThread(discord.Client):
 
                     if channel:
                         _update_resource_discord_link(resource[0], channel.jump_url)
-
-            await self.close()
         except Exception as e:
             print(e)
+        finally:
+            await self.close()
 
 
 async def async_update_discord_threads(course, uploaded_resources):
