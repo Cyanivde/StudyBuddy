@@ -30,15 +30,15 @@
           <tr class="align-middle course-tr">
             <th class="text-start">סמסטר</th>
             <th class="all text-start">שם</th>
-            <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
+            <th class="{% if tab in ("archive","semester") %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
             <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
             {% if tab != "archive" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">הערות</th>
             <th class="text-center min-tablet">מעקב</th>
             {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
-            <th class="text-center none">עריכה</th>
-            <th></th>
+            <th class="text-center min-tablet">עריכה</th>
+            <th class="max-tablet"></th>
           </tr>
         </thead>
         <tbody>
