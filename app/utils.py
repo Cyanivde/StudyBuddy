@@ -8,13 +8,13 @@ import pandas as pd
 
 def _fetch_resource_df(resource_id):
     resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
-        resource_id=resource_id).all())])
+        resource_id=resource_id).all(), dtype=object)])
 
     if len(resource_df) == 0:
         abort(404)
 
     course_df = pd.DataFrame([vars(s) for s in pd.Series(Course.query.filter(
-        Course.course_id.in_(resource_df['course_id'])).all())])
+        Course.course_id.in_(resource_df['course_id'])).all(), dtype=object)])
 
     merged_resource_df = pd.merge(left=resource_df, right=course_df, on='course_id')
 
@@ -23,7 +23,7 @@ def _fetch_resource_df(resource_id):
 
 def _fetch_subject_list(course_id):
     resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
-        course_id=course_id).all())])
+        course_id=course_id).all(), dtype=object)])
 
     resource_df['subject'] = resource_df['subject'].str.split(',')
     resource_df = resource_df.explode('subject')
@@ -69,7 +69,7 @@ def _update_resource_according_to_form(resource, form):
     db.session.commit()
     db.session.refresh(actual_resource)
 
-    return [actual_resource]
+    return [(actual_resource.resource_id, actual_resource.display_name, actual_resource.type, actual_resource.semester, actual_resource.comments)]
 
 
 def _strip_after_file_extension(s):
@@ -109,7 +109,7 @@ def _insert_resource_according_to_form(form, course_id):
         db.session.commit()
         db.session.refresh(resource)
 
-        updated_resources += [resource]
+        updated_resources += [(resource.resource_id, resource.display_name, resource.type, resource.semester, resource.comments)]
 
     return updated_resources
 
@@ -148,7 +148,7 @@ def _alternative_sort(series):
 
 
 def _fetch_resources(course_id, tab):
-    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(course_id=course_id).all())])
+    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(course_id=course_id).all(), dtype=object)])
 
     if len(resource_df) == 0:
         return pd.DataFrame()
@@ -177,7 +177,7 @@ def _fetch_resources(course_id, tab):
     resources_extended_df = resource_df
     if current_user.is_authenticated:
         resource_to_user = pd.DataFrame([vars(s) for s in pd.Series(ResourceToUser.query.filter_by(
-            user_id=current_user.user_id).all())])
+            user_id=current_user.user_id).all(), dtype=object)])
 
         if len(resource_to_user) > 0:
             resource_to_user.drop('id', axis=1, inplace=True)

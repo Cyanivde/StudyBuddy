@@ -27,40 +27,42 @@ class DiscordClientForCreatingThread(discord.Client):
         self.do = False
 
     async def on_ready(self):
-        Session = scoped_session(sessionmaker(bind=db.engine))
-        Session()
-        self.guild = await self.fetch_guild(int(self.course.discord_channel_id))
-        for resource in self.uploaded_resources:
-            channel = None
-            topic = "<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course.course_institute_english,
-                                                                             self.course.course_institute_id, resource.resource_id)
+        try:
 
-            if resource.comments:
-                channel = self.guild.get_channel(int(resource.comments.split('/')[5]))
-            if channel:
-                if resource.type == 'lecture':
-                    if channel.name != resource.display_name:
-                        await channel.edit(name=resource.display_name, topic=topic)
-                if resource.type.startswith('exercise') or resource.type.startswith('exam'):
-                    if channel.name != resource.display_name:
-                        await channel.edit(name=resource.semester + ' ' + resource.display_name, topic=topic)
-                if resource.type == 'other':
-                    await channel.edit(name="[אחר] " + resource.display_name, topic=topic)
-                    _update_resource_discord_link(resource.resource_id, None)
+            self.guild = await self.fetch_guild(int(self.course[0]))
+            for resource in self.uploaded_resources:
+                channel = None
+                topic = "<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course[1],
+                                                                                 self.course[2], resource[0])
 
-            else:
-                if resource.type == 'lecture':
-                    channel = await self.guild.create_text_channel(resource.display_name, topic=topic)
-                if resource.type.startswith('exercise'):
-                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, topic=topic)
-                if resource.type.startswith('exam'):
-                    channel = await self.guild.create_text_channel(resource.semester + ' ' + resource.display_name, topic=topic)
+                if resource[4]:
+                    channel = self.guild.get_channel(int(resource[4].split('/')[5]))
 
                 if channel:
-                    _update_resource_discord_link(resource.resource_id, channel.jump_url)
+                    if resource[2] == 'lecture':
+                        if channel.name != resource[1]:
+                            await channel.edit(name=resource[1], topic=topic)
+                    if resource[2].startswith('exercise') or resource[2].startswith('exam'):
+                        if channel.name != resource[1]:
+                            await channel.edit(name=resource[3] + ' ' + resource[1], topic=topic)
+                    if resource[2] == 'other':
+                        await channel.edit(name="[אחר] " + resource[1], topic=topic)
+                        _update_resource_discord_link(resource[0], None)
 
-        await self.close()
-        Session.remove()
+                else:
+                    if resource[2] == 'lecture':
+                        channel = await self.guild.create_text_channel(resource[1], topic=topic)
+                    if resource[2].startswith('exercise'):
+                        channel = await self.guild.create_text_channel(resource[3] + ' ' + resource[1], topic=topic)
+                    if resource[2].startswith('exam'):
+                        channel = await self.guild.create_text_channel(resource[3] + ' ' + resource[1], topic=topic)
+
+                    if channel:
+                        _update_resource_discord_link(resource[0], channel.jump_url)
+
+            await self.close()
+        except Exception as e:
+            print(e)
 
 
 async def async_update_discord_threads(course, uploaded_resources):
@@ -96,7 +98,8 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
         else:
             updated_resources = _insert_resource_according_to_form(form, course_id)
 
-        thread = Thread(target=update_discord_threads, args=(course, updated_resources))
+        thread = Thread(target=update_discord_threads, args=((course.discord_channel_id,
+                        course.course_institute_english, course.course_institute_id), updated_resources))
         thread.start()
 
         if form.type.data == 'lecture':
@@ -107,3 +110,4 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
             return redirect(url_for('exams', institute=institute, institute_course_id=institute_course_id))
         if form.type.data == 'other':
             return redirect(url_for('archive', institute=institute, institute_course_id=institute_course_id))
+        thread.join()
