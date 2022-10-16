@@ -4,6 +4,7 @@ from app.utils import _fetch_subject_list, _fetch_resource_df, _update_form_acco
 import discord
 import asyncio
 import os
+from threading import Thread
 
 
 class DiscordClientForCreatingThread(discord.Client):
@@ -34,7 +35,6 @@ class DiscordClientForCreatingThread(discord.Client):
             channel = None
 
             if resource.comments:
-                print(resource.comments)
                 channel = await self.guild.fetch_channel(int(resource.comments.split('/')[5]))
 
             if channel:
@@ -94,7 +94,8 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
         else:
             updated_resources = _insert_resource_according_to_form(form, course_id)
 
-        asyncio.create_task(update_discord_threads(course, updated_resources))
+        thread = Thread(target=asyncio.run, args=(update_discord_threads(course, updated_resources), ), )
+        thread.start()
 
         if form.type.data == 'lecture':
             return redirect(url_for('course', institute=institute, institute_course_id=institute_course_id))
