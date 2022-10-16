@@ -94,7 +94,7 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
         else:
             updated_resources = _insert_resource_according_to_form(form, course_id)
 
-        asyncio.run(update_discord_threads(course, updated_resources))
+        asyncio.create_task(update_discord_threads(course, updated_resources))
 
         if form.type.data == 'lecture':
             return redirect(url_for('course', institute=institute, institute_course_id=institute_course_id))
