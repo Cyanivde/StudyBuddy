@@ -31,7 +31,7 @@
             <th class="text-start">סמסטר</th>
             <th class="all text-start">שם</th>
             <th class="{% if tab in ("archive","semester") %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
-            <th class="{% if tab == "archive" %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
+            <th class="{% if tab in ("archive","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
             {% if tab != "archive" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">הערות</th>
