@@ -194,13 +194,15 @@ def _fetch_resources(course_id, tab):
     return resources_extended_df
 
 
-def _update_resource_discord_link(resource_id, discord_link):
+def _update_resource_discord_link(db, resource_id, discord_link):
+    print(db)
+    print(type(db))
     with db.app.app_context():
         Resource.query.filter_by(resource_id=resource_id).update({'comments': discord_link})
         db.session.commit()
 
 
-def _update_resource_num_comments_and_time(resource_id, num_comments, last_comment):
+def _update_resource_num_comments_and_time(db, resource_id, num_comments, last_comment):
     with db.app.app_context():
         Resource.query.filter_by(resource_id=resource_id).update({'num_comments': num_comments, 'last_comment': last_comment})
         db.session.commit()
