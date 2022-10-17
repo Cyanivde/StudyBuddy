@@ -3,6 +3,8 @@ from app import app
 from app.models import Course
 from app.register import _register
 from app.login import _login
+from app.forgotpassword import _forgotpassword
+from app.resetpassword import _resetpassword
 from app.logout import _logout
 from app.resource import _resource
 from app.update_resource import _update_resource
@@ -23,6 +25,16 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     return _login()
+
+
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+def forgotpassword():
+    return _forgotpassword()
+
+
+@app.route('/resetpassword/<token>', methods=['GET', 'POST'])
+def resetpassword(token):
+    return _resetpassword(token)
 
 
 @app.route('/logout')

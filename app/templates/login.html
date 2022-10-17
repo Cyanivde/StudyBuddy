@@ -5,11 +5,11 @@
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.username.label }}
+            {{ form.usernameemail.label }}
             <br/>
-            {{ form.username(size=30) }}
+            {{ form.usernameemail(size=30) }}
             <br/>
-            {% for error in form.username.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+            {% for error in form.usernameemail.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
         </p>
         <p>
             {{ form.password.label }}
@@ -23,6 +23,8 @@
                 {% endif %}
             {% endwith %}
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>
+            {{ form.submit() }} <a href="{{ url_for('forgotpassword')}}">&nbsp;&nbsp;שכחתי סיסמה</a>
+        </p>
     </form>
 {% endblock content %}

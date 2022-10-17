@@ -86,9 +86,15 @@ class UpdateResourceForm(FlaskForm):
     submit = SubmitField('שמירה')
 
 
+class ForgotPasswordForm(FlaskForm):
+    usernameemail = StringField('שם משתמש או כתובת מייל', filters=[strip_whitespace], validators=[
+        DataRequired(message=ERR_EMPTY)])
+    submit = SubmitField('שליחה')
+
+
 class LoginForm(FlaskForm):
-    username = StringField('שם משתמש', filters=[strip_whitespace], validators=[
-                           DataRequired(message=ERR_EMPTY)])
+    usernameemail = StringField('שם משתמש או כתובת מייל', filters=[strip_whitespace], validators=[
+        DataRequired(message=ERR_EMPTY)])
     password = PasswordField('סיסמה', validators=[
         DataRequired(message=ERR_EMPTY)])
     remember_me = BooleanField('זכור אותי')
@@ -115,3 +121,11 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data.lower()).first()
         if user is not None:
             raise ValidationError('כתובת המייל כבר נמצאת בשימוש.')
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('password', validators=[
+        DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
+    password2 = PasswordField(
+        'confirm password', validators=[DataRequired(ERR_EMPTY), EqualTo('password')])
+    submit = SubmitField('שמירה')
