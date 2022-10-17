@@ -29,14 +29,14 @@ class DiscordClientForMovingChannels(discord.Client):
 
             _update_resource_num_comments_and_time(resource_id, count, datetime.now())
         except Exception as e:
-            traceback.print_exc()
+            print(repr(e))
 
     async def on_guild_channel_create(self, channel):
         try:
             resource_id = channel.topic.split('/')[-1][:-1]
             _update_resource_discord_link(resource_id, channel.jump_url)
         except Exception as e:
-            traceback.print_exc()
+            print(repr(e))
 
 
 def create_discord_bot_for_moving_channels():
