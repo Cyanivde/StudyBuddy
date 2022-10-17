@@ -30,9 +30,8 @@ class DiscordClientForCreatingThread(discord.Client):
                 channel = None
                 topic = "<https://studybuddy.co.il/{0}/{1}/resource/{2}>".format(self.course[1],
                                                                                  self.course[2], resource[0])
-
                 if resource[4]:
-                    channel = self.guild.get_channel(int(resource[4].split('/')[5]))
+                    channel = await self.guild.fetch_channel(int(resource[4].split('/')[5]))
 
                 if channel:
                     if resource[2] == 'lecture':
