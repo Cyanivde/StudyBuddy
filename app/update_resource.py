@@ -43,7 +43,6 @@ class DiscordClientForCreatingThread(discord.Client):
                             await channel.edit(name=resource[3] + ' ' + resource[1], topic=topic)
                     if resource[2] == 'other':
                         await channel.edit(name="[אחר] " + resource[1], topic=topic)
-                        _update_resource_discord_link(resource[0], None)
 
                 else:
                     if resource[2] == 'lecture':
@@ -53,8 +52,6 @@ class DiscordClientForCreatingThread(discord.Client):
                     if resource[2].startswith('exam'):
                         channel = await self.guild.create_text_channel(resource[3] + ' ' + resource[1], topic=topic)
 
-                    if channel:
-                        _update_resource_discord_link(resource[0], channel.jump_url)
         except Exception as e:
             print(e)
         finally:
