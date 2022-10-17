@@ -15,21 +15,27 @@ class DiscordClientForMovingChannels(discord.Client):
         self.do = False
 
     async def on_message(self, message):
-        channel = message.channel
-        if channel.position != 0:
-            await channel.edit(position=0)
+        try:
+            channel = message.channel
+            if channel.position != 0:
+                await channel.edit(position=0)
 
-        resource_id = channel.topic.split('/')[-1][:-1]
+            resource_id = channel.topic.split('/')[-1][:-1]
 
-        count = 0
-        async for _ in channel.history(limit=None):
-            count += 1
+            count = 0
+            async for _ in channel.history(limit=None):
+                count += 1
 
-        _update_resource_num_comments_and_time(resource_id, count, datetime.now())
+            _update_resource_num_comments_and_time(resource_id, count, datetime.now())
+        except Exception as e:
+            print(repr(e))
 
     async def on_guild_channel_create(self, channel):
-        resource_id = channel.topic.split('/')[-1][:-1]
-        _update_resource_discord_link(resource_id, channel.jump_url)
+        try:
+            resource_id = channel.topic.split('/')[-1][:-1]
+            _update_resource_discord_link(resource_id, channel.jump_url)
+        except Exception as e:
+            print(repr(e))
 
 
 def create_discord_bot_for_moving_channels():
