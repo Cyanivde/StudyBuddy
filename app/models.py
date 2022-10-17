@@ -32,6 +32,8 @@ class Resource(db.Model):
     solution = db.Column(db.String(500))
     recording = db.Column(db.String(500))
     comments = db.Column(db.String(500))
+    num_comments = db.Column(db.Integer)
+    last_comment = db.Column(db.DateTime)
     subject = db.Column(db.Text)
     course_id = db.Column(db.Integer)
     display_name = db.Column(db.String(140))

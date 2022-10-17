@@ -103,6 +103,7 @@ def _insert_resource_according_to_form(form, course_id):
                             deadline_week=form.deadline_week.data,
                             semester=form.semester.data,
                             likes=0,
+                            num_comments=0,
                             subject=form.subject.data,
                             course_id=course_id)
         db.session.add(resource)

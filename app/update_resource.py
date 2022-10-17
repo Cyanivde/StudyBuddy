@@ -1,13 +1,10 @@
 from flask import redirect, render_template, url_for
 from app.forms import UpdateResourceForm
-from app import db
 from app.utils import _fetch_subject_list, _fetch_resource_df, _update_form_according_to_resource, _update_resource_according_to_form, _insert_resource_according_to_form, _fetch_course, _update_resource_discord_link
 import discord
 import asyncio
 import os
 from threading import Thread
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
 
 
 class DiscordClientForCreatingThread(discord.Client):
