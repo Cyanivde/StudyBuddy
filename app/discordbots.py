@@ -3,6 +3,7 @@ import asyncio
 from datetime import datetime
 import os
 from app.utils import _update_resource_num_comments_and_time, _update_resource_discord_link
+import traceback
 
 
 class DiscordClientForMovingChannels(discord.Client):
@@ -28,14 +29,14 @@ class DiscordClientForMovingChannels(discord.Client):
 
             _update_resource_num_comments_and_time(resource_id, count, datetime.now())
         except Exception as e:
-            print(repr(e))
+            traceback.print_exc()
 
     async def on_guild_channel_create(self, channel):
         try:
             resource_id = channel.topic.split('/')[-1][:-1]
             _update_resource_discord_link(resource_id, channel.jump_url)
         except Exception as e:
-            print(repr(e))
+            traceback.print_exc()
 
 
 def create_discord_bot_for_moving_channels():
