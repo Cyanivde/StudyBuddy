@@ -4,10 +4,7 @@ from app.utils import _fetch_subject_list, _fetch_resource_df, _update_form_acco
 import discord
 import asyncio
 import os
-from app import db
 from threading import Thread
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
 
 
 class DiscordClientForCreatingThread(discord.Client):
@@ -28,9 +25,6 @@ class DiscordClientForCreatingThread(discord.Client):
 
     async def on_ready(self):
         try:
-            Session = scoped_session(sessionmaker(bind=db.engine))
-            Session()
-
             self.guild = await self.fetch_guild(int(self.course[0]))
             for resource in self.uploaded_resources:
                 channel = None
@@ -65,7 +59,6 @@ class DiscordClientForCreatingThread(discord.Client):
             print(e)
         finally:
             await self.close()
-            Session.remove()
 
 
 async def async_update_discord_threads(course, uploaded_resources):
@@ -113,4 +106,3 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
             return redirect(url_for('exams', institute=institute, institute_course_id=institute_course_id))
         if form.type.data == 'other':
             return redirect(url_for('archive', institute=institute, institute_course_id=institute_course_id))
-        thread.join()
