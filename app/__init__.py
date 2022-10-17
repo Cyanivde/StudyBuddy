@@ -15,7 +15,7 @@ login.login_view = 'login'
 
 import app.discordbots as discordbots
 from threading import Thread
-thread = Thread(target=discordbots.create_discord_bot_for_moving_channels, args=(db,))
+thread = Thread(target=discordbots.create_discord_bot_for_moving_channels, args=(app,db))
 thread.start()
 
 

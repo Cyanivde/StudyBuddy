@@ -6,15 +6,17 @@ from app.utils import _update_resource_num_comments_and_time, _update_resource_d
 
 
 class DiscordClientForMovingChannels(discord.Client):
+    app = None
     db = None
 
-    def __init__(self, db):
+    def __init__(self, app, db):
         intents = discord.Intents.default()
         intents.guild_messages = True
         intents.guilds = True
         intents.message_content = True
         super().__init__(intents=intents)
         self.do = False
+        self.app = app
         self.db = db
 
     async def on_message(self, message):
@@ -29,18 +31,18 @@ class DiscordClientForMovingChannels(discord.Client):
             async for _ in channel.history(limit=None):
                 count += 1
 
-            _update_resource_num_comments_and_time(self.db, resource_id, count, datetime.now())
+            _update_resource_num_comments_and_time(self.app, self.db, resource_id, count, datetime.now())
         except Exception as e:
             print(repr(e))
 
     async def on_guild_channel_create(self, channel):
         try:
             resource_id = channel.topic.split('/')[-1][:-1]
-            _update_resource_discord_link(self.db, resource_id, channel.jump_url)
+            _update_resource_discord_link(self.app, self.db, resource_id, channel.jump_url)
         except Exception as e:
             print(repr(e))
 
 
-def create_discord_bot_for_moving_channels(db):
-    client = DiscordClientForMovingChannels(db)
+def create_discord_bot_for_moving_channels(app, db):
+    client = DiscordClientForMovingChannels(app, db)
     asyncio.run(client.start(os.environ.get("DISCORD_TOKEN_2")))
