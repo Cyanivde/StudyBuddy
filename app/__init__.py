@@ -11,7 +11,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
-app.app_context().push()
 
 # trunk-ignore(flake8/F401)
 # trunk-ignore(flake8/E402)
