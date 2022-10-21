@@ -265,11 +265,16 @@
               visible: false
           },
           {
-            targets: [6],
+            targets: [5],
             render: function ( data, type, row ) {
                var s = data.split('</span>').slice(0,3).join('</span>')
                if ((s != '') && (!s.endsWith('</span>'))) {
-                s = s + '</span> ⋯'
+                if ((s + '</span>') == data) {
+                  s = s + '</span>'
+                }
+                else {
+                  s = s + '</span> ⋯'
+                }
                }
                 return s + '<span style="display:none">'+data+"</span>";
             }
