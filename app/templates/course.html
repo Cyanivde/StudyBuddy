@@ -68,10 +68,12 @@
               </td>
               {% if tab != "archive" %}
                 <td class="text-start">
-                  <a class="text-decoration-none"
-                     href="{{ url_for('resource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">תגובות
-                    <span {% if resource.last_comment and resource.last_comment > new_comment_threshold %} style="font-weight:bold"{% endif %}>({{ resource.num_comments }})</span>
-                  </a>
+                  {% if resource.comments %}
+                    <a class="text-decoration-none"
+                       href="{{ url_for('resource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">תגובות
+                      <span {% if resource.last_comment and resource.last_comment > new_comment_threshold %} style="font-weight:bold"{% endif %}>({{ resource.num_comments }})</span>
+                    </a>
+                  {% endif %}
                 </td>
               {% endif %}
               <td class="text-center">
