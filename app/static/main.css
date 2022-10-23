@@ -105,3 +105,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
 body {
   font-size: 0.9rem;
 }
+
+div.dataTables_wrapper div.dataTables_filter input {
+  width: 120px !important;
+}
