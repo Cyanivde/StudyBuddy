@@ -67,7 +67,7 @@ def update_resource_to_user():
 @app.route('/<institute>/<institute_course_id>', methods=['GET', 'POST'])
 def course(institute, institute_course_id):
     course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "semester")
+    return _course(str(course_df.course_id), "lectures & tutorials")
 
 
 @app.route('/<institute>/<institute_course_id>/exercises', methods=['GET', 'POST'])

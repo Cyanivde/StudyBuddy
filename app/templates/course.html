@@ -10,7 +10,7 @@
       </ul>
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "semester" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
+          <span {% if tab == "lectures & tutorials" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
           <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('exercises', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">תרגילי בית</a></span>
@@ -30,7 +30,9 @@
           <tr class="align-middle course-tr">
             <th class="text-start">סמסטר</th>
             <th class="all text-start">שם</th>
-            <th class="{% if tab in ("archive","semester") %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
+            <th class="{% if tab in ("archive","lectures & tutorials") %}min-tablet {% else %}all {% endif %} text-start">
+              פתרון
+            </th>
             <th class="{% if tab in ("archive","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
             {% if tab != "archive" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
@@ -290,7 +292,7 @@
               infoEmpty: '0 עד 0 מתוך 0 רשומות',
               infoFiltered: '(מסונן מסך _MAX_ רשומות)',
               infoPostFix: '',
-              search: 'סינון: ',
+              search: 'חיפוש: ',
               url: '',
               paginate: {
                   first: 'ראשון',
@@ -407,10 +409,28 @@
           },
           stateSave: true,
       })
+      
 
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
       var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
-})
+
+
+  });
+
+  var element = document.createElement("button");
+  element.type="button";
+  element.classList.add('btn');
+  element.classList.add('btn-primary');
+  element.style="margin-top: -4px; padding: 0.35rem 0.5rem !important"
+  element.innerHTML = '<div style="margin-top:-5px"><span style="font-size:0.8rem">חיפוש מתקדם</span> <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-box-arrow-up-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M7.364 3.5a.5.5 0 0 1 .5-.5H14.5A1.5 1.5 0 0 1 16 4.5v10a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 3 14.5V7.864a.5.5 0 1 1 1 0V14.5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5v-10a.5.5 0 0 0-.5-.5H7.864a.5.5 0 0 1-.5-.5z"/><path fill-rule="evenodd" d="M0 .5A.5.5 0 0 1 .5 0h5a.5.5 0 0 1 0 1H1.707l8.147 8.146a.5.5 0 0 1-.708.708L1 1.707V5.5a.5.5 0 0 1-1 0v-5z"/></svg></div>'
+  element.onclick = function() { // Note this is a function
+    var url = "https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FStudyBuddy%2FShared%20Documents%2F{{course.course_institute_id}}%2F{{tab}}&view=7&q=" + document.getElementById('myTable_filter').children[0].children[0].value;
+    window.open(url, '_blank').focus();
+  };
+  document.getElementById('myTable_filter').appendChild(element);
+
+    
+
   </script>
 {% endblock content %}
