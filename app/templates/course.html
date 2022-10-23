@@ -10,7 +10,7 @@
       </ul>
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "lectures & tutorials" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
+          <span {% if tab == "lessons" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
           <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('exercises', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">תרגילי בית</a></span>
@@ -19,7 +19,7 @@
           <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">מבחנים</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "archive" %}class="fw-bold"{% endif %}><a href="{{ url_for('archive', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">חומרי עזר</a></span>
+          <span {% if tab == "others" %}class="fw-bold"{% endif %}><a href="{{ url_for('others', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">חומרי עזר</a></span>
         </li>
       </ul>
     </div>
@@ -30,15 +30,13 @@
           <tr class="align-middle course-tr">
             <th class="text-start">סמסטר</th>
             <th class="all text-start">שם</th>
-            <th class="{% if tab in ("archive","lectures & tutorials") %}min-tablet {% else %}all {% endif %} text-start">
-              פתרון
-            </th>
-            <th class="{% if tab in ("archive","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
-            {% if tab != "archive" %}<th class="all text-start">תגובות</th>{% endif %}
+            <th class="{% if tab in ("others","lessons") %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
+            <th class="{% if tab in ("others","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
+            {% if tab != "others" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">הערות</th>
             <th class="text-center min-tablet">מעקב</th>
-            {% if tab == "archive" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
+            {% if tab == "others" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
             <th class="text-center min-tablet">עריכה</th>
             <th class="max-tablet"></th>
           </tr>
@@ -68,7 +66,7 @@
                      href="{{ resource.recording }}">הקלטה</a>
                 {% endif %}
               </td>
-              {% if tab != "archive" %}
+              {% if tab != "others" %}
                 <td class="text-start">
                   {% if resource.comments %}
                     <a class="text-decoration-none"
@@ -156,7 +154,7 @@
                   </label>
                 </div>
               </td class="text-center">
-              {% if tab == "archive" %}
+              {% if tab == "others" %}
                 <td class="text-center">
                   <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
                        class="btn-group"
@@ -258,7 +256,7 @@
                 orderable: false,
                 targets:   -1
             } ],
-            {%if tab != "archive" %}
+            {%if tab != "others" %}
           rowGroup: {
               dataSrc: [0]
           },

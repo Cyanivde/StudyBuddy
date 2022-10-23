@@ -154,7 +154,7 @@ def _fetch_resources(course_id, tab):
     if len(resource_df) == 0:
         return pd.DataFrame()
 
-    if tab == 'semester':
+    if tab == 'lessons':
         resource_df = resource_df[(resource_df['type'] == 'lecture')]
         resource_df.sort_values(['deadline_week', 'display_name'], key=_alternative_sort, inplace=True)
         resource_df['deadline_week'] = resource_df['deadline_week'].fillna('המבחן')
@@ -170,7 +170,7 @@ def _fetch_resources(course_id, tab):
         resource_df.sort_values(['semester', 'display_name'], key=_alternative_sort,  ascending=[False, True], inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
-    if tab == 'archive':
+    if tab == 'others':
         resource_df = resource_df[resource_df['type'] == 'other']
         resource_df.insert(0, 'main', resource_df['semester'])
         resource_df.sort_values(['likes', 'display_name'], key=_alternative_sort, ascending=[False, True], inplace=True)

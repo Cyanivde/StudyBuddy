@@ -101,4 +101,4 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
         if form.type.data.startswith('exam'):
             return redirect(url_for('exams', institute=institute, institute_course_id=institute_course_id))
         if form.type.data == 'other':
-            return redirect(url_for('archive', institute=institute, institute_course_id=institute_course_id))
+            return redirect(url_for('others', institute=institute, institute_course_id=institute_course_id))

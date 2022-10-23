@@ -67,7 +67,7 @@ def update_resource_to_user():
 @app.route('/<institute>/<institute_course_id>', methods=['GET', 'POST'])
 def course(institute, institute_course_id):
     course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "lectures & tutorials")
+    return _course(str(course_df.course_id), "lessons")
 
 
 @app.route('/<institute>/<institute_course_id>/exercises', methods=['GET', 'POST'])
@@ -82,7 +82,7 @@ def exams(institute, institute_course_id):
     return _course(str(course_df.course_id), "exams")
 
 
-@app.route('/<institute>/<institute_course_id>/archive', methods=['GET', 'POST'])
-def archive(institute, institute_course_id):
+@app.route('/<institute>/<institute_course_id>/others', methods=['GET', 'POST'])
+def others(institute, institute_course_id):
     course_df = Course.query.filter_by(course_institute_english=institute, course_institute_id=institute_course_id).first_or_404()
-    return _course(str(course_df.course_id), "archive")
+    return _course(str(course_df.course_id), "others")

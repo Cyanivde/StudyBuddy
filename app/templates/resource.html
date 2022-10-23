@@ -20,7 +20,7 @@
       {% endif %}
       {% if resource.type == 'other' %}
         <li class="breadcrumb-item active">
-          <a href="{{ url_for('archive', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">חומרי עזר</a>
+          <a href="{{ url_for('others', institute=resource.course_institute_english, institute_course_id=resource.course_institute_id)}}">חומרי עזר</a>
         </li>
       {% endif %}
       <li class="breadcrumb-item active" aria-current="page">
