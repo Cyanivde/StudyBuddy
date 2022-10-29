@@ -25,6 +25,9 @@ def _fetch_subject_list(course_id):
     resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
         course_id=course_id).all(), dtype=object)])
 
+    if len(resource_df) == 0:
+        return []
+
     resource_df['subject'] = resource_df['subject'].str.split(',')
     resource_df = resource_df.explode('subject')
 
