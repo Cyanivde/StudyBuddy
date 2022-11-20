@@ -26,14 +26,13 @@ class UpdateResourceForm(FlaskForm):
     type = SelectField('סוג',
                        choices=[
                            ('lecture', 'שיעור (הרצאה/תרגול/סדנה)'),
-                           ('exercise_full', 'תרגיל בית'),
+                           ('exercise', 'תרגיל בית'),
                            ('exam_full', 'מבחן'),
-                           ('exercise', 'שאלה מתרגיל בית'),
                            ('exam', 'שאלה ממבחן'),
                            ('other', 'אחר (למשל סיכום אישי)')])
     display_name = StringField('שם תצוגה', validators=[
         DataRequired(message=ERR_EMPTY)])
-    questions_count = SelectField('כמה שאלות יש בגיליון?', choices=range(1, 26))
+    questions_count = SelectField('כמה שאלות יש במבחן?', choices=range(1, 26))
     deadline_week = SelectField('שבוע בקורס', choices=[
         ('שבוע 1', 'שבוע 1'),
         ('שבוע 2', 'שבוע 2'),

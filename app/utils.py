@@ -88,7 +88,7 @@ def _insert_resource_according_to_form(form, course_id):
 
     num = 1
 
-    if form.type.data in ['exercise_full', 'exam_full']:
+    if form.type.data == 'exam_full':
         form.type.data = form.type.data[:-5]
         num = int(form.questions_count.data)
 

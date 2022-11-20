@@ -14,7 +14,7 @@ from app.course import _course
 
 @app.route('/')
 def index():
-    return render_template("index.html", courses=Course.query.all())
+    return render_template("index.html", courses=Course.query.order_by(Course.course_institute_id).all())
 
 
 @app.route('/register', methods=['GET', 'POST'])
