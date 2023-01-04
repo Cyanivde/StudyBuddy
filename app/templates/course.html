@@ -77,7 +77,11 @@
                 </td>
               {% endif %}
               <td class="text-center">
-                {% for subj in resource.subject %}<span class="badge bg-secondary me-1">{{ subj }}</span>{% endfor %}
+                {% for subj in resource.subject %}
+                  <button class="badge bg-secondary"
+                          onclick="querySubj(&quot;{{ subj }}&quot;)"
+                          style="border: 0">{{ subj }}</button>
+                {% endfor %}
               </td>
               <td class="text-center">
                 {% if resource.is_out_of_date %}<span class="badge bg-danger me-1">לא למבחן</span>{% endif %}
@@ -208,6 +212,21 @@
     </div>
   </div>
   <script type="text/javascript">
+    function querySubj(subj) {
+      var oTable = $('#myTable').dataTable();
+      if (document.getElementById("myTable_filter").firstChild.children[0].value != "") {
+        if (document.getElementById("myTable_filter").firstChild.children[0].value != subj) {
+          oTable.fnFilter(subj);
+        }
+        else {
+        oTable.fnFilter("");
+      }
+      }
+      else {
+        oTable.fnFilter(subj);
+      }
+    }
+
       function updateRadio(resource_id, val) {
           var xhr = new XMLHttpRequest();
           xhr.open("POST", "{{ url_for('update_resource_to_user')}}", true);
@@ -267,13 +286,13 @@
           {
             targets: [5],
             render: function ( data, type, row ) {
-               var s = data.split('</span>').slice(0,4).join('</span>')
-               if ((s != '') && (!s.endsWith('</span>'))) {
-                if ((s + '</span>') == data) {
-                  s = s + '</span>'
+               var s = data.split('</button>').slice(0,4).join('</button>')
+               if ((s != '') && (!s.endsWith('</button>'))) {
+                if ((s + '</button>') == data) {
+                  s = s + '</button>'
                 }
                 else {
-                  s = s + '</span> ⋯'
+                  s = s + '</button> ⋯'
                 }
                }
                 return s + '<span style="display:none">'+data+"</span>";

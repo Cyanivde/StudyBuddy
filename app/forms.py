@@ -50,7 +50,7 @@ class UpdateResourceForm(FlaskForm):
         ('לפני הסמסטר', 'לפני הסמסטר'),
         ('לקראת המבחן', 'לקראת המבחן')])
 
-    link = StringField('קישור')
+    link = StringField('קישור', validators=[Regexp(r"^.*sharepoint\.com.*|\w{0}$", message="הקישור אינו תקין")])
     semester = SelectField(
         'סמסטר', choices=[
             ('חורף 2022-2023', 'חורף 2022-2023'),
@@ -77,7 +77,7 @@ class UpdateResourceForm(FlaskForm):
             ('חורף 2015-2016', 'חורף 2015-2016'),
         ],
         validate_choice=False)
-    solution = StringField('קישור לפתרון')
+    solution = StringField('קישור לפתרון', validators=[Regexp(r"^.*sharepoint\.com.*|\w{0}$", message="הקישור אינו תקין")])
     recording = StringField('קישור להקלטה')
     subject = StringField('נושאים (מופרדים בפסיק)')
     is_out_of_date = BooleanField('כבר לא בחומר')
