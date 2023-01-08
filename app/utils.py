@@ -195,8 +195,8 @@ def _fetch_resources(course_id, tab):
 
     course = _fetch_course(course_id)
     if tab == 'exams' and course.show_scans:
-        resources_extended_df['solution'] = "https://tscans.cf/?course=" + course.course_institute_id + "&search=" + resources_extended_df['semester'] + " " + \
-            resources_extended_df['display_name'].apply(lambda x: ' '.join(x.split(' ')[:2]))
+        resources_extended_df['solution'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course.course_institute_id + "&search=" +
+                                                                        x.semester + " " + ' '.join(x.display_name.split(' ')[:2]) if not x['solution'] else x['solution'], axis=1)
 
     resources_extended_df = resources_extended_df.fillna(0)
     return resources_extended_df
