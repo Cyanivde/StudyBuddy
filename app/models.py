@@ -72,6 +72,7 @@ class Course(db.Model):
     maintainer_email = db.Column(db.String(140))
     discord_channel_id = db.Column(db.String(50))
     discord_invite = db.Column(db.String(200))
+    show_scans = db.Column(db.Boolean)
 
 
 class ResourceToUser(db.Model):
