@@ -31,6 +31,9 @@
             <th class="text-start">סמסטר</th>
             <th class="all text-start">שם</th>
             <th class="{% if tab in ("others","lessons") %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
+            {% if tab == "exams" %}
+              <th class="min-tablet text-start">סריקות</th>
+            {% endif %}
             <th class="{% if tab in ("others","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
             {% if tab != "others" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
@@ -56,15 +59,16 @@
                 {% if resource.solution %}
                   <a target="_blank"
                      class="text-decoration-none"
-                     href="{{ resource.solution }}">
-                    {% if 'tscans' in resource.solution %}
-                      סריקות
-                    {% else %}
-                      פתרון
-                    {% endif %}
-                  </a>
+                     href="{{ resource.solution }}">פתרון</a>
                 {% endif %}
               </td>
+              {% if tab == "exams" %}
+                <td class="text-start">
+                  <a target="_blank"
+                     class="text-decoration-none"
+                     href="{{ resource.scans }}">סריקות</a>
+                </td>
+              {% endif %}
               <td class="text-start">
                 {% if resource.recording %}
                   <a target="_blank"
@@ -290,7 +294,7 @@
               visible: false
           },
           {
-            targets: [5],
+            {% if tab == 'exams' %}targets: [6],{%else%}targets: [5],{%endif%}
             render: function ( data, type, row ) {
                var s = data.split('</button>').slice(0,4).join('</button>')
                if ((s != '') && (!s.endsWith('</button>'))) {
