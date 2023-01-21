@@ -109,3 +109,13 @@ body {
 div.dataTables_wrapper div.dataTables_filter input {
   width: 120px !important;
 }
+
+.uploadbtn {
+  font-size: 0.8rem;
+}
+
+@media screen and (max-width: 768px) {
+  .uploadbtn {
+    display: none;
+  }
+}
