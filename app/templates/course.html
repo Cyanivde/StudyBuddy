@@ -30,12 +30,11 @@
           <tr class="align-middle course-tr">
             <th class="text-start">סמסטר</th>
             <th class="all text-start">שם</th>
-            <th class="{% if tab in ("others","lessons") %}min-tablet {% else %}all {% endif %} text-start">פתרון</th>
-            {% if tab == "exams" %}
-              <th class="min-tablet text-start">סריקות</th>
+            {% if tab in ("exams", "exercises") %}
+              <th class="all text-start">פתרון</th>
             {% endif %}
+            {% if tab == "exams" %}<th class="min-tablet text-start">סריקות</th>{% endif %}
             <th class="{% if tab in ("others","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
-            {% if tab != "others" %}<th class="all text-start">תגובות</th>{% endif %}
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">הערות</th>
             <th class="text-center min-tablet">מעקב</th>
@@ -55,13 +54,15 @@
                 {{ resource.display_name }}
                 {% if resource.link %}</a>{% endif %}
               </td>
-              <td class="text-start">
-                {% if resource.solution %}
-                  <a target="_blank"
-                     class="text-decoration-none"
-                     href="{{ resource.solution }}">פתרון</a>
-                {% endif %}
-              </td>
+              {% if tab in ("exams", "exercises") %}
+                <td class="text-start">
+                  {% if resource.solution %}
+                    <a target="_blank"
+                       class="text-decoration-none"
+                       href="{{ resource.solution }}">פתרון</a>
+                  {% endif %}
+                </td>
+              {% endif %}
               {% if tab == "exams" %}
                 <td class="text-start">
                   <a target="_blank"
@@ -72,20 +73,36 @@
               <td class="text-start">
                 {% if resource.recording %}
                   <a target="_blank"
-                     class="text-decoration-none"
-                     href="{{ resource.recording }}">הקלטה</a>
+                     class="text-decoration-none"href="{{ resource.recording }}">הקלטה
+                    {% if resource.recording2 %}חלק 1{% endif %}
+                  </a>
                 {% endif %}
+                {% if resource.recording_comment %}({{ resource.recording_comment }}){% endif %}
+                {% if resource.recording2 %}
+                  <br/>
+                  <a target="_blank"
+                     class="text-decoration-none"href="{{ resource.recording2 }}">הקלטה חלק 2</a>
+                {% endif %}
+                {% if resource.recording2_comment %}({{ resource.recording2_comment }}){% endif %}
+                {% if resource.recording3 %}
+                  <br/>
+                  <a target="_blank"
+                     class="text-decoration-none"href="{{ resource.recording3 }}">הקלטה חלק 3</a>
+                {% endif %}
+                {% if resource.recording3_comment %}({{ resource.recording3_comment }}){% endif %}
+                {% if resource.recording4 %}
+                  <br/>
+                  <a target="_blank"
+                     class="text-decoration-none"href="{{ resource.recording4 }}">הקלטה חלק 4</a>
+                {% endif %}
+                {% if resource.recording4_comment %}({{ resource.recording4_comment }}){% endif %}
+                {% if resource.recording5 %}
+                  <br/>
+                  <a target="_blank"
+                     class="text-decoration-none"href="{{ resource.recording5 }}">הקלטה חלק 5</a>
+                {% endif %}
+                {% if resource.recording5_comment %}({{ resource.recording5_comment }}){% endif %}
               </td>
-              {% if tab != "others" %}
-                <td class="text-start">
-                  {% if resource.comments %}
-                    <a class="text-decoration-none"
-                       href="{{ url_for('resource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">תגובות
-                      <span {% if resource.last_comment and resource.last_comment > new_comment_threshold %} style="font-weight:bold"{% endif %}>({{ resource.num_comments }})</span>
-                    </a>
-                  {% endif %}
-                </td>
-              {% endif %}
               <td class="text-center">
                 {% for subj in resource.subject %}
                   <button class="badge bg-secondary"
@@ -294,7 +311,9 @@
               visible: false
           },
           {
-            {% if tab == 'exams' %}targets: [6],{%else%}targets: [5],{%endif%}
+            {% if tab == 'exams' %}targets: [5],{%endif%}
+            {% if tab == 'exercises' %}targets: [4],{%endif%}
+            {% if tab in ('lessons', 'others') %}targets: [3],{%endif%}
             render: function ( data, type, row ) {
                var s = data.split('</button>').slice(0,4).join('</button>')
                if ((s != '') && (!s.endsWith('</button>'))) {

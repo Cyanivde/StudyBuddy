@@ -65,6 +65,23 @@
             {{ form.recording.label }}
             <br/>
             {{ form.recording(size=32) }}
+            {{ form.recording_comment(size=16) }}
+            <br/>
+            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {{ form.recording2(size=32) }}
+            {{ form.recording2_comment(size=16) }}
+            <br/>
+            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {{ form.recording3(size=32) }}
+            {{ form.recording3_comment(size=16) }}
+            <br/>
+            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {{ form.recording4(size=32) }}
+            {{ form.recording4_comment(size=16) }}
+            <br/>
+            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+            {{ form.recording5(size=32) }}
+            {{ form.recording5_comment(size=16) }}
             <br/>
             {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
@@ -130,5 +147,16 @@
                     document.getElementById('dweek').style.display = "none";
                 }
             }
+
+    document.getElementById('recording').placeholder = "קישור";
+    document.getElementById('recording2').placeholder = "קישור לחלק 2 (אם יש)";
+    document.getElementById('recording3').placeholder = "קישור לחלק 3 (אם יש)";
+    document.getElementById('recording4').placeholder = "קישור לחלק 4 (אם יש)";
+    document.getElementById('recording5').placeholder = "קישור לחלק 5 (אם יש)";
+    document.getElementById('recording_comment').placeholder = "הערות";
+    document.getElementById('recording2_comment').placeholder = "הערות";
+    document.getElementById('recording3_comment').placeholder = "הערות";
+    document.getElementById('recording4_comment').placeholder = "הערות";
+    document.getElementById('recording5_comment').placeholder = "הערות";
     </script>
 {% endblock content %}
