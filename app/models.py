@@ -64,6 +64,8 @@ class Resource(db.Model):
     course_id = db.Column(db.Integer)
     display_name = db.Column(db.String(140))
     semester = db.Column(db.String(30))
+    grouping = db.Column(db.String(50))
+    instructor = db.Column(db.String(50))
     deadline_week = db.Column(db.String(140))
     is_out_of_date = db.Column(db.Boolean)
     is_solution_partial = db.Column(db.Boolean)

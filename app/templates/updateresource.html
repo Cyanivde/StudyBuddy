@@ -23,11 +23,10 @@
             <br/>
             {{ form.type() }}
         </p>
-        <p id="dweek">
-            <span style="color:red">*</span>
-            שבוע בסמסטר
+        <p id="folder-p">
+            תיקייה
             <br/>
-            {{ form.deadline_week() }}
+            {{ form.grouping() }}
         </p>
         <p id="qcount">
             <span style="color:red">*</span>
@@ -37,8 +36,7 @@
             <br/>
             {% for error in form.questions_count.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
-        <p>
-            <span style="color:red">*</span>
+        <p id="dname">
             {{ form.display_name.label }}
             <br/>
             {{ form.display_name(size=32) }}
@@ -115,11 +113,14 @@
 
         {% if is_existing_resource %}
         $("#type option[value='exam_full']").remove();
+        $("#type option[value='exercise_full']").remove();
         {% else %}
         $("#type option[value='exam']").remove();
+        $("#type option[value='exercise']").remove();
         {% endif %}
 
         document.getElementById('display_name').placeholder = "הרצאה 1";
+        document.getElementById('grouping').placeholder = "שבוע 1";
         document.getElementById('qcount').style.display = "none";
         document.getElementById("type").onchange =
             function displayNamePlaceholder() {
@@ -127,24 +128,39 @@
                 var val = typeSelect.options[typeSelect.selectedIndex].value;
                 if (val == "lecture") {
                     document.getElementById('display_name').placeholder = "הרצאה 1";
+                    document.getElementById('grouping').placeholder = "שבוע 1";
                     document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dweek').style.display = "block";
+                    document.getElementById('dname').style.display = "block";
+                    document.getElementById('folder-p').style.display = "block";
                 } else if (val == "exercise") {
-                    document.getElementById('display_name').placeholder = "תרגיל בית 1";
+                    document.getElementById('display_name').placeholder = "שאלה 1";
+                    document.getElementById('grouping').placeholder = "תרגיל בית 1";
                     document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dweek').style.display = "none";
-                } else if (val == "exam") {
-                    document.getElementById('display_name').placeholder = "מועד א' שאלה 1";
-                    document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dweek').style.display = "none";
-                } else if (val == "exam_full") { 
+                    document.getElementById('dname').style.display = "block";
+                    document.getElementById('folder-p').style.display = "block";
+                } else if (val == "exercise_full") {
+                    document.getElementById('display_name').placeholder = "";
+                    document.getElementById('grouping').placeholder = "תרגיל בית 1";
                     document.getElementById('qcount').style.display = "block";
-                    document.getElementById('display_name').placeholder = "מועד א'";
-                    document.getElementById('dweek').style.display = "none";
+                    document.getElementById('dname').style.display = "none";
+                    document.getElementById('folder-p').style.display = "block";
+                } else if (val == "exam") {
+                    document.getElementById('display_name').placeholder = "שאלה 1";
+                    document.getElementById('grouping').placeholder = "מועד א'";
+                    document.getElementById('qcount').style.display = "none";
+                    document.getElementById('dname').style.display = "block";
+                    document.getElementById('folder-p').style.display = "block";
+                } else if (val == "exam_full") { 
+                    document.getElementById('grouping').placeholder = "מועד א'";
+                    document.getElementById('qcount').style.display = "block";
+                    document.getElementById('dname').style.display = "none";
+                    document.getElementById('folder-p').style.display = "block";
                 } else {
+                    document.getElementById('grouping').placeholder = "";
                     document.getElementById('display_name').placeholder = "";
                     document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dweek').style.display = "none";
+                    document.getElementById('dname').style.display = "block";
+                    document.getElementById('folder-p').style.display = "none";
                 }
             }
 

@@ -26,29 +26,14 @@ class UpdateResourceForm(FlaskForm):
     type = SelectField('סוג',
                        choices=[
                            ('lecture', 'שיעור (הרצאה/תרגול/סדנה)'),
-                           ('exercise', 'תרגיל בית'),
+                           ('exercise_full', 'תרגיל בית'),
+                           ('exercise', 'שאלה מתרגיל בית'),
                            ('exam_full', 'מבחן'),
                            ('exam', 'שאלה ממבחן'),
                            ('other', 'אחר (למשל סיכום אישי)')])
-    display_name = StringField('שם תצוגה', validators=[
-        DataRequired(message=ERR_EMPTY)])
-    questions_count = SelectField('כמה שאלות יש במבחן?', choices=range(1, 26))
-    deadline_week = SelectField('שבוע בקורס', choices=[
-        ('שבוע 1', 'שבוע 1'),
-        ('שבוע 2', 'שבוע 2'),
-        ('שבוע 3', 'שבוע 3'),
-        ('שבוע 4', 'שבוע 4'),
-        ('שבוע 5', 'שבוע 5'),
-        ('שבוע 6', 'שבוע 6'),
-        ('שבוע 7', 'שבוע 7'),
-        ('שבוע 8', 'שבוע 8'),
-        ('שבוע 9', 'שבוע 9'),
-        ('שבוע 10', 'שבוע 10'),
-        ('שבוע 11', 'שבוע 11'),
-        ('שבוע 12', 'שבוע 12'),
-        ('שבוע 13', 'שבוע 13'),
-        ('לפני הסמסטר', 'לפני הסמסטר'),
-        ('לקראת המבחן', 'לקראת המבחן')])
+    display_name = StringField('שם תצוגה')
+    questions_count = SelectField('כמה שאלות יש?', choices=range(1, 26))
+    grouping = StringField('תיקייה')
 
     link = StringField('קישור', validators=[Regexp(r"^.*sharepoint\.com.*|\w{0}$", message="הקישור אינו תקין")])
     semester = SelectField(

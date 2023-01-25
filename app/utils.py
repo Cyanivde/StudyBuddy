@@ -43,6 +43,7 @@ def _fetch_course(course_id):
 
 def _update_form_according_to_resource(form, resource):
     form.display_name.data = resource.display_name
+    form.grouping.data = resource.grouping
     form.link.data = resource.link
     form.type.data = resource.type
     form.solution.data = resource.solution
@@ -59,15 +60,23 @@ def _update_form_according_to_resource(form, resource):
     form.is_out_of_date.data = resource.is_out_of_date
     form.is_solution_partial.data = resource.is_solution_partial
     form.semester.data = resource.semester
-    form.deadline_week.data = resource.deadline_week
+    #form.deadline_week.data = resource.deadline_week
     form.subject.data = resource.subject
     return form
 
 
 def _update_resource_according_to_form(resource, form):
+
+    if form.grouping.data == '':
+        form.grouping.data = 'ללא תיקייה'
+
+    if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
+        form.display_name.data = 'ללא שם'
+
     actual_resource = db.session.query(Resource).filter_by(resource_id=int(resource.resource_id)).first()
 
     actual_resource.display_name = form.display_name.data
+    actual_resource.grouping = form.grouping.data
     actual_resource.type = form.type.data
     actual_resource.link = _strip_after_file_extension(form.link.data)
     actual_resource.solution = _strip_after_file_extension(form.solution.data)
@@ -83,7 +92,7 @@ def _update_resource_according_to_form(resource, form):
     actual_resource.recording5_comment = form.recording5_comment.data
     actual_resource.is_out_of_date = form.is_out_of_date.data
     actual_resource.is_solution_partial = form.is_solution_partial.data
-    actual_resource.deadline_week = form.deadline_week.data
+    #actual_resource.deadline_week = form.deadline_week.data
     actual_resource.semester = form.semester.data
     actual_resource.subject = form.subject.data
 
@@ -106,7 +115,13 @@ def _insert_resource_according_to_form(form, course_id):
 
     num = 1
 
-    if form.type.data == 'exam_full':
+    if form.grouping.data == '':
+        form.grouping.data = 'ללא תיקייה'
+
+    if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
+        form.display_name.data = 'ללא שם'
+
+    if form.type.data in ('exam_full', 'exercise_full'):
         form.type.data = form.type.data[:-5]
         num = int(form.questions_count.data)
 
@@ -115,6 +130,7 @@ def _insert_resource_according_to_form(form, course_id):
         if num > 1:
             name += ' שאלה ' + str((i+1))
         resource = Resource(display_name=name,
+                            grouping=form.grouping.data,
                             type=form.type.data,
                             link=_strip_after_file_extension(form.link.data),
                             solution=_strip_after_file_extension(form.solution.data),
@@ -130,7 +146,7 @@ def _insert_resource_according_to_form(form, course_id):
                             recording5_comment=form.recording5_comment.data,
                             is_out_of_date=form.is_out_of_date.data,
                             is_solution_partial=form.is_solution_partial.data,
-                            deadline_week=form.deadline_week.data,
+                            # deadline_week=form.deadline_week.data,
                             semester=form.semester.data,
                             likes=0,
                             num_comments=0,
@@ -152,7 +168,10 @@ def _get_subjects(resources_df):
 
 
 def _alternative_sort(series):
+    series = series.fillna('')
+
     if series.dtype == object:
+        print(series)
         series[series.str.startswith('אביב 20')] = series[series.str.startswith('אביב 20')] + 'א'
         series[series.str.startswith('קיץ 20')] = series[series.str.startswith('קיץ 20')] + 'ב'
 
@@ -186,18 +205,18 @@ def _fetch_resources(course_id, tab):
 
     if tab == 'lessons':
         resource_df = resource_df[(resource_df['type'] == 'lecture')]
-        resource_df.sort_values(['deadline_week', 'display_name'], key=_alternative_sort, inplace=True)
-        resource_df['deadline_week'] = resource_df['deadline_week'].fillna('המבחן')
-        resource_df.insert(0, 'main', resource_df['deadline_week'])
+        resource_df.sort_values(['grouping', 'display_name'], key=_alternative_sort, inplace=True)
+        resource_df['grouping'] = resource_df['grouping'].fillna('המבחן')
+        resource_df.insert(0, 'main', resource_df['grouping'])
 
     if tab == 'exercises':
         resource_df = resource_df[resource_df['type'] == 'exercise']
-        resource_df.sort_values(['semester', 'display_name'], key=_alternative_sort,  ascending=[False, True], inplace=True)
+        resource_df.sort_values(['semester', 'grouping', 'display_name'], key=_alternative_sort,  ascending=[False, True, True], inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'exams':
         resource_df = resource_df[resource_df['type'] == 'exam']
-        resource_df.sort_values(['semester', 'display_name'], key=_alternative_sort,  ascending=[False, True], inplace=True)
+        resource_df.sort_values(['semester', 'grouping', 'display_name'], key=_alternative_sort,  ascending=[False, True, True], inplace=True)
         resource_df.insert(0, 'main', resource_df['semester'])
 
     if tab == 'others':
@@ -224,7 +243,7 @@ def _fetch_resources(course_id, tab):
     if tab == 'exams':
         if (len(resources_extended_df) > 0):
             resources_extended_df['scans'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course.course_institute_id + "&search=\"" +
-                                                                         x.semester + "\" " + ' '.join(x.display_name.split(' ')[:2]), axis=1)
+                                                                         x.semester + "\" " + x.grouping, axis=1)
 
     resources_extended_df = resources_extended_df.fillna(0)
     return resources_extended_df

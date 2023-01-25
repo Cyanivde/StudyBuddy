@@ -25,10 +25,12 @@
     </div>
     <hr/>
     <div class="col-md-12 table-responsive">
-      <table id="myTable" class="responsive table hover">
+      <table id="myTable" class="responsive table hover" style="display:none">
         <thead>
           <tr class="align-middle course-tr">
-            <th class="text-start">סמסטר</th>
+            {% if tab != "others" %}
+              <th class="text-start">תיקייה</th>
+            {% endif %}
             <th class="all text-start">שם</th>
             {% if tab in ("exams", "exercises") %}
               <th class="all text-start">פתרון</th>
@@ -46,7 +48,12 @@
         <tbody>
           {% for index, resource in resources.iterrows() %}
             <tr class="align-middle course-tr">
-              <td>{{ resource.main }}</td>
+              {% if tab != 'others' %}
+                <td>
+                  {% if tab != "lessons" %}{{ resource.semester }}{% endif %}
+                  {{ resource.grouping }}
+                </td>
+              {% endif %}
               <td>
                 {% if resource.link %}<a class="text-decoration-none"
    target="_blank"
@@ -283,11 +290,11 @@
               ilike: ilike
           }));
       }
-
+      var collapsedGroups = {};
       var myTable = $('#myTable').DataTable({
           "ordering": false,
           "info": false,
-          "pageLength": 100,
+          "pageLength": 9999,
           "processing": true,
           "bAutoWidth": false,
 
@@ -304,12 +311,25 @@
             } ],
             {%if tab != "others" %}
           rowGroup: {
-              dataSrc: [0]
+              dataSrc: [0],
+              startRender: function (rows, group, level) {
+                var collapsed = !!collapsedGroups[group];
+                rows.nodes().each(function (r) {
+                  r.style.display = 'none';
+                  if (collapsed) {
+                    r.style.display = '';
+                  }});
+                return $('<tr/>')
+                    .append('<td> ' + group + '</td><td colspan="7"></td>')
+                    .attr('data-name', group)
+                    .toggleClass('collapsed', collapsed);
+            },
           },
           columnDefs: [{
               targets: [0],
               visible: false
           },
+          
           {
             {% if tab == 'exams' %}targets: [5],{%endif%}
             {% if tab == 'exercises' %}targets: [4],{%endif%}
@@ -328,7 +348,7 @@
             }
           },
           ],
-          {%endif %}
+          {%endif%}
           language: {
               processing: 'מעבד...',
               lengthMenu: 'הצג _MENU_ פריטים',
@@ -448,6 +468,19 @@
           pageLength: 10,
           pagingType: 'full', // https://datatables.net/reference/option/pagingType
           responsive: true,
+
+          initComplete: function () {
+            // Start with closed groups
+            {%if tab != "others" %}
+              $('#myTable tbody tr.dtrg-start').each(function () {
+                var name = $(this).data('name');
+                collapsedGroups[name] = !collapsedGroups[name];
+                myTable.draw(false);
+            });
+            {%endif%}
+
+  
+          },
           searching: true,
           select: {
               style: 'multi+shift', // https://datatables.net/reference/option/select.style
@@ -457,12 +490,25 @@
       })
       
 
+
       var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
       var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl)
 
 
   });
+
+  $(document).ready(function() {
+    $('#myTable').show();
+} );
+{% if tab != "others" %}
+    // Collapse Groups
+    $('#myTable tbody').on('click', 'tr.dtrg-start', function () {
+      var name = $(this).data('name');
+      collapsedGroups[name] = !collapsedGroups[name];
+      myTable.draw(false);
+  });
+  {%endif%}
 
   var element = document.createElement("button");
   element.type="button";
