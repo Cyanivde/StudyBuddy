@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+  <div class="alert alert-success" role="alert">
+    למה יצרנו את StudyBuddy? כדי שיהיה לכולנו מקום מסודר עם כל חומרי הלימוד.
+    <br/>
+    האתר הוא שיתופי, מבוסס קוד פתוח, וכולם יכולים לערוך את התכנים. נסו זאת!
+    <hr/>
+    כדי להפוך את החזון הזה למציאות, אנחנו זקוקים למתנדבים. מעוניינים לקחת חלק? הצטרפו אל <a style="text-decoration: underline"
+    class="alert-link"
+    href="https://chat.whatsapp.com/LwsSaYejPtBJIIvH3RqgEP">קבוצת ה-Whatsapp</a>!
+  </div>
   <div class="overflow-auto">
     <div class="header-paragraph">
       <ul class="list-group list-group-horizontal">
@@ -28,9 +37,7 @@
       <table id="myTable" class="responsive table hover" style="display:none">
         <thead>
           <tr class="align-middle course-tr">
-            {% if tab != "others" %}
-              <th class="text-start">תיקייה</th>
-            {% endif %}
+            {% if tab != "others" %}<th class="text-start">תיקייה</th>{% endif %}
             <th class="all text-start">שם</th>
             {% if tab in ("exams", "exercises") %}
               <th class="all text-start">פתרון</th>
