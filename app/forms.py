@@ -121,6 +121,7 @@ class UpdateResourceForm(FlaskForm):
     recording4_comment = StringField('הערה להקלטה')
     recording5_comment = StringField('הערה להקלטה')
     subject = StringField('נושאים (מופרדים בפסיק)')
+    instructor = StringField('יוצרים (מופרדים בפסיק)')
     is_out_of_date = BooleanField('כבר לא בחומר')
     is_solution_partial = BooleanField('הפתרון חלקי')
     submit = SubmitField('שמירה')

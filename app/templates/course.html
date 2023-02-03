@@ -45,6 +45,7 @@
             {% if tab == "exams" %}<th class="min-tablet text-start">סריקות</th>{% endif %}
             <th class="{% if tab in ("others","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
             <th class="text-center min-tablet">נושאים</th>
+            <th class="text-center min-tablet">יוצרים</th>
             <th class="text-center min-tablet">הערות</th>
             <th class="text-center min-tablet">מעקב</th>
             {% if tab == "others" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
@@ -119,9 +120,20 @@
               </td>
               <td class="text-center">
                 {% for subj in resource.subject %}
-                  <button class="badge bg-secondary"
+                  <button class="badge btn-outline-secondary"
                           onclick="querySubj(&quot;{{ subj }}&quot;)"
-                          style="border: 0">{{ subj }}</button>
+                          style="border: 0">
+                    {{ subj }}
+                  </button>
+                {% endfor %}
+              </td>
+              <td class="text-center">
+                {% for instr in resource.instructor %}
+                  <button class="badge btn-outline-secondary"
+                          onclick="querySubj(&quot;{{ instr }}&quot;)"
+                          style="border: 0">
+                    {{ instr }}
+                  </button>
                 {% endfor %}
               </td>
               <td class="text-center">
@@ -143,7 +155,7 @@
                          {% if (resource.done != 1) and (resource.done != 2) %}checked{% endif %}
                          {% if not current_user.is_authenticated %}disabled{% endif %}/>
                   <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="איפוס"{% endif %}
-                         class="btn btn-outline-secondary"
+                         class="btn btn-outline-secondary tracking"
                          for="btnradio1-{{ resource.resource_id }}">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          width="16"
@@ -164,7 +176,7 @@
                          {% if resource.done == 1 %}checked{% endif %}
                          {% if not current_user.is_authenticated %}disabled{% endif %}/>
                   <label {% if current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="נדרשת חזרה"{% endif %}
-                         class="btn btn-outline-secondary"
+                         class="btn btn-outline-secondary tracking"
                          for="btnradio2-{{ resource.resource_id }}">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          width="16"
@@ -327,7 +339,7 @@
                     r.style.display = '';
                   }});
                 return $('<tr/>')
-                    .append('<td> ' + group + '</td><td colspan="7"></td>')
+                    .append('<td> ' + group + '</td><td colspan="8"></td>')
                     .attr('data-name', group)
                     .toggleClass('collapsed', collapsed);
             },
@@ -338,9 +350,9 @@
           },
           
           {
-            {% if tab == 'exams' %}targets: [5],{%endif%}
-            {% if tab == 'exercises' %}targets: [4],{%endif%}
-            {% if tab in ('lessons', 'others') %}targets: [3],{%endif%}
+            {% if tab == 'exams' %}targets: [6],{%endif%}
+            {% if tab == 'exercises' %}targets: [5],{%endif%}
+            {% if tab in ('lessons', 'others') %}targets: [4],{%endif%}
             render: function ( data, type, row ) {
                var s = data.split('</button>').slice(0,4).join('</button>')
                if ((s != '') && (!s.endsWith('</button>'))) {

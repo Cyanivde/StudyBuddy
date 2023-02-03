@@ -1,6 +1,6 @@
 from flask import redirect, render_template, url_for
 from app.forms import UpdateResourceForm
-from app.utils import _fetch_subject_list, _fetch_resource_df, _update_form_according_to_resource, _update_resource_according_to_form, _insert_resource_according_to_form, _fetch_course, _update_resource_discord_link
+from app.utils import _fetch_subject_list, _fetch_instructor_list, _fetch_resource_df, _update_form_according_to_resource, _update_resource_according_to_form, _insert_resource_according_to_form, _fetch_course, _update_resource_discord_link
 import discord
 import asyncio
 import os
@@ -77,7 +77,7 @@ def _update_resource(course_id, institute, institute_course_id, is_existing_reso
             resource = resource_df.iloc[0]
             form = _update_form_according_to_resource(form, resource)
 
-        return render_template('updateresource.html', form=form, is_existing_resource=is_existing_resource, course_subjects=_fetch_subject_list(course_id))
+        return render_template('updateresource.html', form=form, is_existing_resource=is_existing_resource, course_subjects=_fetch_subject_list(course_id), course_instructors=_fetch_instructor_list(course_id))
 
     # Form was submitted with valid input
     if form.validate_on_submit():

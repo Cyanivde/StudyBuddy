@@ -37,6 +37,22 @@ def _fetch_subject_list(course_id):
     return list(subject_hist[subject_hist >= 2].keys())
 
 
+def _fetch_instructor_list(course_id):
+    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
+        course_id=course_id).all(), dtype=object)])
+
+    if len(resource_df) == 0:
+        return []
+
+    resource_df['instructor'] = resource_df['instructor'].str.split(',')
+    resource_df = resource_df.explode('instructor')
+
+    resource_df = resource_df[resource_df['instructor'] != '']
+    instructor_hist = resource_df['instructor'].value_counts()
+
+    return list(instructor_hist[instructor_hist >= 2].keys())
+
+
 def _fetch_course(course_id):
     return Course.query.filter_by(course_id=course_id)[0]
 
@@ -61,6 +77,7 @@ def _update_form_according_to_resource(form, resource):
     form.is_solution_partial.data = resource.is_solution_partial
     form.semester.data = resource.semester
     #form.deadline_week.data = resource.deadline_week
+    form.instructor.data = resource.instructor
     form.subject.data = resource.subject
     return form
 
@@ -95,6 +112,7 @@ def _update_resource_according_to_form(resource, form):
     #actual_resource.deadline_week = form.deadline_week.data
     actual_resource.semester = form.semester.data
     actual_resource.subject = form.subject.data
+    actual_resource.instructor = form.instructor.data
 
     db.session.commit()
     db.session.refresh(actual_resource)
@@ -151,6 +169,7 @@ def _insert_resource_according_to_form(form, course_id):
                             likes=0,
                             num_comments=0,
                             subject=form.subject.data,
+                            instructor=form.instructor.data,
                             course_id=course_id)
         db.session.add(resource)
         db.session.commit()
@@ -167,11 +186,16 @@ def _get_subjects(resources_df):
     return set([x for xs in list_of_lists for x in xs])
 
 
+def _get_instuctors(resources_df):
+    list_of_lists = [
+        resource[1].instructor for resource in resources_df.iterrows()]
+    return set([x for xs in list_of_lists for x in xs])
+
+
 def _alternative_sort(series):
     series = series.fillna('')
 
     if series.dtype == object:
-        print(series)
         series[series.str.startswith('אביב 20')] = series[series.str.startswith('אביב 20')] + 'א'
         series[series.str.startswith('קיץ 20')] = series[series.str.startswith('קיץ 20')] + 'ב'
 
@@ -237,6 +261,10 @@ def _fetch_resources(course_id, tab):
 
     if 'subject' in resources_extended_df.keys():
         resources_extended_df['subject'] = resources_extended_df['subject'].apply(
+            lambda x: x.split(',') if x else "")
+
+    if 'instructor' in resources_extended_df.keys():
+        resources_extended_df['instructor'] = resources_extended_df['instructor'].apply(
             lambda x: x.split(',') if x else "")
 
     course = _fetch_course(course_id)

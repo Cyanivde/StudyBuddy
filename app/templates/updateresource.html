@@ -95,6 +95,18 @@
             <br/>
             {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
         </p>
+        <p>
+            {{ form.instructor.label }}
+            <br/>
+            {{ form.instructor(size=32) }}
+            {% for inst in course_instructors %}
+                <button type="button"
+                        onClick="addInst('{{ inst }}')"
+                        class="btn btn-outline-primary btn-sm">{{ inst }}</button>
+            {% endfor %}
+            <br/>
+            {% for error in form.instructor.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
+        </p>
         <p>{{ form.is_out_of_date() }} {{ form.is_out_of_date.label }}</p>
         <p>{{ form.is_solution_partial() }} {{ form.is_solution_partial.label }}</p>
         <p>{{ form.submit() }}</p>
@@ -102,6 +114,16 @@
     <script>
         function addSubj(subj) {
             var subjectInput = document.getElementById("subject");
+
+            if (!subjectInput.value.split(',').includes(subj)) {
+                if (subjectInput.value != '') {
+                    subjectInput.value = subjectInput.value + ','
+                }
+            subjectInput.value = subjectInput.value + subj;
+            }
+        }
+        function addInst(subj) {
+            var subjectInput = document.getElementById("instructor");
 
             if (!subjectInput.value.split(',').includes(subj)) {
                 if (subjectInput.value != '') {
