@@ -271,7 +271,7 @@ def _fetch_resources(course_id, tab):
     if tab == 'exams':
         if (len(resources_extended_df) > 0):
             resources_extended_df['scans'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course.course_institute_id + "&search=\"" +
-                                                                         x.semester + "\" " + x.grouping, axis=1)
+                                                                         x.semester + "\" " + x.grouping.replace("'", "%27"), axis=1)
 
     resources_extended_df = resources_extended_df.fillna(0)
     return resources_extended_df
