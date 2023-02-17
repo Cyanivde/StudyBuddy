@@ -62,6 +62,8 @@ class Resource(db.Model):
     last_comment = db.Column(db.DateTime)
     subject = db.Column(db.Text)
     course_id = db.Column(db.Integer)
+    course_institute = db.Column(db.String(140))
+    course_institute_id = db.Column(db.String(140))
     display_name = db.Column(db.String(140))
     semester = db.Column(db.String(30))
     grouping = db.Column(db.String(50))

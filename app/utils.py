@@ -1,29 +1,12 @@
-from re import sub
-from flask import abort
+
 from flask_login import current_user
 from app import db
-from app.models import Subject, Resource, Course, ResourceToUser
+from app.models import Resource, ResourceToUser
 import pandas as pd
 
 
-def _fetch_resource_df(resource_id):
-    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
-        resource_id=resource_id).all(), dtype=object)])
-
-    if len(resource_df) == 0:
-        abort(404)
-
-    course_df = pd.DataFrame([vars(s) for s in pd.Series(Course.query.filter(
-        Course.course_id.in_(resource_df['course_id'])).all(), dtype=object)])
-
-    merged_resource_df = pd.merge(left=resource_df, right=course_df, on='course_id')
-
-    return merged_resource_df
-
-
-def _fetch_subject_list(course_id):
-    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
-        course_id=course_id).all(), dtype=object)])
+def _fetch_subject_list(course_institute, course_institute_id):
+    resource_df = _fetch_resources(course_institute=course_institute, course_institute_id=course_institute_id, should_enrich=False)
 
     if len(resource_df) == 0:
         return []
@@ -37,9 +20,8 @@ def _fetch_subject_list(course_id):
     return list(subject_hist[subject_hist >= 2].keys())
 
 
-def _fetch_instructor_list(course_id):
-    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(
-        course_id=course_id).all(), dtype=object)])
+def _fetch_instructor_list(course_institute, course_institute_id):
+    resource_df = _fetch_resources(course_institute=course_institute, course_institute_id=course_institute_id, should_enrich=False)
 
     if len(resource_df) == 0:
         return []
@@ -53,8 +35,16 @@ def _fetch_instructor_list(course_id):
     return list(instructor_hist[instructor_hist >= 2].keys())
 
 
-def _fetch_course(course_id):
-    return Course.query.filter_by(course_id=course_id)[0]
+def _fetch_courses(course_institute=None, course_institute_id=None):
+    courses_df = pd.read_csv('courses.csv', dtype={'course_institute_id': object})
+
+    if course_institute:
+        courses_df = courses_df[courses_df.course_institute == course_institute]
+
+    if course_institute_id:
+        courses_df = courses_df[courses_df.course_institute_id == course_institute_id]
+
+    return courses_df
 
 
 def _update_form_according_to_resource(form, resource):
@@ -128,7 +118,7 @@ def _strip_after_file_extension(s):
         return s
 
 
-def _insert_resource_according_to_form(form, course_id):
+def _insert_resource_according_to_form(form, course_institute, course_institute_id):
     updated_resources = []
 
     num = 1
@@ -170,7 +160,8 @@ def _insert_resource_according_to_form(form, course_id):
                             num_comments=0,
                             subject=form.subject.data,
                             instructor=form.instructor.data,
-                            course_id=course_id)
+                            course_institute=course_institute,
+                            course_institute_id=course_institute_id)
         db.session.add(resource)
         db.session.commit()
         db.session.refresh(resource)
@@ -221,32 +212,29 @@ def _alternative_sort(series):
     return series
 
 
-def _fetch_resources(course_id, tab):
-    resource_df = pd.DataFrame([vars(s) for s in pd.Series(Resource.query.filter_by(course_id=course_id).all(), dtype=object)])
+def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, resource_id=None, should_enrich=True):
+    # query resources from database
+    query = Resource.query
+    if course_institute:
+        query = query.filter_by(course_institute=course_institute)
+    if course_institute_id:
+        query = query.filter_by(course_institute_id=course_institute_id)
+    if tab:
+        if tab == 'lessons':
+            query = query.filter_by(type='lecture')
+        else:
+            query = query.filter_by(type=tab[:-1])
+    if resource_id:
+        query = query.filter_by(resource_id=resource_id)
+    resource_df = _query_to_dataframe(query.all())
 
-    if len(resource_df) == 0:
-        return pd.DataFrame()
+    if resource_df.empty:
+        return resource_df
 
-    if tab == 'lessons':
-        resource_df = resource_df[(resource_df['type'] == 'lecture')]
-        resource_df.sort_values(['grouping', 'display_name'], key=_alternative_sort, inplace=True)
-        resource_df['grouping'] = resource_df['grouping'].fillna('המבחן')
-        resource_df.insert(0, 'main', resource_df['grouping'])
+    if not should_enrich:
+        return resource_df
 
-    if tab == 'exercises':
-        resource_df = resource_df[resource_df['type'] == 'exercise']
-        resource_df.sort_values(['semester', 'grouping', 'display_name'], key=_alternative_sort,  ascending=[False, True, True], inplace=True)
-        resource_df.insert(0, 'main', resource_df['semester'])
-
-    if tab == 'exams':
-        resource_df = resource_df[resource_df['type'] == 'exam']
-        resource_df.sort_values(['semester', 'grouping', 'display_name'], key=_alternative_sort,  ascending=[False, True, True], inplace=True)
-        resource_df.insert(0, 'main', resource_df['semester'])
-
-    if tab == 'others':
-        resource_df = resource_df[resource_df['type'] == 'other']
-        resource_df.insert(0, 'main', resource_df['semester'])
-        resource_df.sort_values(['likes', 'display_name'], key=_alternative_sort, ascending=[False, True], inplace=True)
+    resource_df.sort_values(['semester', 'grouping', 'display_name'], key=_alternative_sort,  ascending=[False, True, True], inplace=True)
 
     resources_extended_df = resource_df
     if current_user.is_authenticated:
@@ -267,23 +255,15 @@ def _fetch_resources(course_id, tab):
         resources_extended_df['instructor'] = resources_extended_df['instructor'].apply(
             lambda x: x.split(',') if x else "")
 
-    course = _fetch_course(course_id)
     if tab == 'exams':
         if (len(resources_extended_df) > 0):
-            resources_extended_df['scans'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course.course_institute_id + "&search=\"" +
+            resources_extended_df['scans'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course_institute_id + "&search=\"" +
                                                                          x.semester + "\" " + x.grouping.replace("'", "%27"), axis=1)
 
     resources_extended_df = resources_extended_df.fillna(0)
+
     return resources_extended_df
 
 
-def _update_resource_discord_link(app, db, resource_id, discord_link):
-    with app.app_context():
-        Resource.query.filter_by(resource_id=resource_id).update({'comments': discord_link})
-        db.session.commit()
-
-
-def _update_resource_num_comments_and_time(app, db, resource_id, num_comments, last_comment):
-    with app.app_context():
-        Resource.query.filter_by(resource_id=resource_id).update({'num_comments': num_comments, 'last_comment': last_comment})
-        db.session.commit()
+def _query_to_dataframe(query):
+    return pd.DataFrame([vars(s) for s in pd.Series(query, dtype=object)])

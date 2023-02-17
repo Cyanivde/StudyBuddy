@@ -1,25 +1,18 @@
-from flask import render_template, request
-from flask_login import current_user
-from app.models import Course
-from app.utils import _get_subjects, _fetch_resources
-import pandas as pd
-from datetime import datetime, timedelta
+from flask import render_template, abort
+from app.utils import _fetch_courses, _fetch_resources
 
 
-def _course(course_id, tab):
-    course = Course.query.filter_by(course_id=course_id).first_or_404()
+def _course(course_institute, course_institute_id, tab):
+    if tab not in ["lessons", "exercises", "exams", "others"]:
+        abort(404)
 
-    resources_df = _fetch_resources(course_id, tab)
-    if len(resources_df) == 0:
-        return render_template('course.html', subjects=[], filtered_subject=[], course=course, resources=pd.DataFrame(), new_comment_threshold=datetime.now() - timedelta(hours=3))
+    course = _fetch_courses(course_institute, course_institute_id)
 
-    # resources_df = _add_fake_rows(resources_df)
-    all_subjects = _get_subjects(resources_df)
+    if course.empty:
+        abort(404)
 
-    if request.method == "POST":
-        if current_user.is_authenticated:
-            resources_df = _fetch_resources(course_id, tab)
-            # resources_df = _add_fake_rows(resources_df)
-            all_subjects = _get_subjects(resources_df)
+    course = course.iloc[0]
 
-    return render_template('course.html', subjects=all_subjects, filtered_subjects=request.form.getlist('subject'), course=course, resources=resources_df, tab=tab, new_comment_threshold=datetime.now() - timedelta(hours=3))
+    resources_df = _fetch_resources(course_institute, course_institute_id, tab)
+
+    return render_template('course.html', course=course, resources=resources_df, tab=tab)

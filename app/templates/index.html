@@ -9,9 +9,9 @@
         <br/>
         <strong>רשימת הקורסים הזמינים במערכת:</strong>
         <ul>
-            {% for course in courses %}
+            {% for index, course in courses.iterrows() %}
                 <li>
-                    <a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">[{{ course.course_institute_id }}] {{ course.course_name }}</a>
+                    <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='lessons') }}">[{{ course.course_institute_id }}] {{ course.course_name }}</a>
                 </li>
             {% endfor %}
         </ul>

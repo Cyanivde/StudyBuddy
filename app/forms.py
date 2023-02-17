@@ -35,7 +35,7 @@ class UpdateResourceForm(FlaskForm):
     questions_count = SelectField('כמה שאלות יש?', choices=range(1, 26))
     grouping = StringField('תיקייה')
 
-    link = StringField('קישור', validators=[Regexp(r"^.*sharepoint\.com.*|\w{0}$", message="הקישור אינו תקין")])
+    link = StringField('קישור', validators=[Regexp(r"^.*(sharepoint|github)\.com.*|\w{0}$", message="הקישור אינו תקין")])
     semester = SelectField(
         'סמסטר', choices=[
             ('חורף 2022-2023', 'חורף 2022-2023'),
@@ -109,7 +109,7 @@ class UpdateResourceForm(FlaskForm):
             ('אביב 2000', 'אביב 2000'),
         ],
         validate_choice=False)
-    solution = StringField('קישור לפתרון', validators=[Regexp(r"^.*sharepoint\.com.*|\w{0}$", message="הקישור אינו תקין")])
+    solution = StringField('קישור לפתרון', validators=[Regexp(r"^.*(sharepoint|github)\.com.*|\w{0}$", message="הקישור אינו תקין")])
     recording = StringField('קישורים להקלטות')
     recording2 = StringField('קישורים להקלטות')
     recording3 = StringField('קישורים להקלטות')

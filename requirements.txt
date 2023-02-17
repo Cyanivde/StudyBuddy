@@ -10,4 +10,3 @@ SQLAlchemy
 flask-login
 email-validator
 pandas
-discord

@@ -1,34 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="alert alert-success" role="alert">
-    למה יצרנו את StudyBuddy? כדי שיהיה לכולנו מקום מסודר עם כל חומרי הלימוד.
-    <br/>
-    האתר הוא שיתופי, מבוסס קוד פתוח, וכולם יכולים לערוך את התכנים. נסו זאת!
-    <hr/>
-    כדי להפוך את החזון הזה למציאות, אנחנו זקוקים למתנדבים. מעוניינים לקחת חלק? הצטרפו אל <a style="text-decoration: underline"
-    class="alert-link"
-    href="https://chat.whatsapp.com/LwsSaYejPtBJIIvH3RqgEP">קבוצת ה-Whatsapp</a>!
-  </div>
   <div class="overflow-auto">
     <div class="header-paragraph">
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
           <h4>{{ course.course_name }}</h4>
-          <span class="xs">{{ course.course_institute }} {{ course.course_institute_id }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ course.updating_status }}</span>
         </li>
       </ul>
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "lessons" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">שיעורים</a></span>
+          <span {% if tab == "lessons" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='lessons') }}">שיעורים</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('exercises', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">תרגילי בית</a></span>
+          <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exercises') }}">תרגילי בית</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('exams', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">מבחנים</a></span>
+          <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exams') }}">מבחנים</a></span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "others" %}class="fw-bold"{% endif %}><a href="{{ url_for('others', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}">חומרי עזר</a></span>
+          <span {% if tab == "others" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='others') }}">חומרי עזר</a></span>
         </li>
       </ul>
     </div>
@@ -244,7 +234,7 @@
               {% endif %}
               <td class="text-center">
                 <a class="text-decoration-none"
-                   href="{{ url_for('editresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id, resource_id=resource.resource_id) }}">עריכה</a>
+                   href="{{ url_for('edit_resource', course_institute=course.course_institute, course_institute_id=course.course_institute_id, resource_id=resource.resource_id) }}">עריכה</a>
               </td>
               <td>
                 <a href="#" onclick="return false;">
@@ -548,7 +538,7 @@
   element2.style="padding: 0.35rem 0.5rem !important";
   element2.innerHTML = '<div style="margin-top:-5px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg> <span class="uploadbtn">העלאת חומרים</span></div>';
   element2.onclick = function() { // Note this is a function
-    var url = "{{ url_for('createresource', institute=course.course_institute_english, institute_course_id=course.course_institute_id) }}";
+    var url = "{{ url_for('create_resource', course_institute=course.course_institute, course_institute_id=course.course_institute_id) }}";
     window.open(url, '_blank').focus();
   };
   document.getElementById('myTable_wrapper').prepend(element2);
