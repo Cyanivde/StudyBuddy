@@ -1,24 +1,23 @@
 from flask import redirect, render_template, url_for
 from flask_login import current_user, login_user
 
-
 from app import db
-from app.forms import ResetPasswordForm
+from app.forms import reset_passwordForm
 from app.models import User
 
 
-def _resetpassword(token):
+def _reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     user = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('index'))
 
-    form = ResetPasswordForm()
+    form = reset_passwordForm()
 
     # Form was not yet submitted, or form was submitted with invalid input
     if not form.validate_on_submit():
-        return render_template('resetpassword.html', form=form)
+        return render_template('reset_password.html', form=form)
 
     # Form was submitted with valid input
     else:

@@ -1,4 +1,5 @@
-from flask import render_template, abort
+from flask import abort, render_template
+
 from app.utils import _fetch_courses, _fetch_resources
 
 
@@ -15,4 +16,7 @@ def _course(course_institute, course_institute_id, tab):
 
     resources_df = _fetch_resources(course_institute, course_institute_id, tab)
 
-    return render_template('course.html', course=course, resources=resources_df, tab=tab)
+    return render_template('course.html',
+                           course=course,
+                           resources=resources_df,
+                           tab=tab)

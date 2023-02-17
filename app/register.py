@@ -1,7 +1,6 @@
 from flask import redirect, render_template, url_for
 from flask_login import current_user, login_user
 
-
 from app import db
 from app.forms import RegistrationForm
 from app.models import User
@@ -19,7 +18,8 @@ def _register():
 
     # Form was submitted with valid input
     else:
-        user = User(username=form.username.data.lower(), email=form.email.data.lower(), is_admin=False)
+        user = User(username=form.username.data.lower(),
+                    email=form.email.data.lower())
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

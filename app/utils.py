@@ -1,12 +1,14 @@
 
+import pandas as pd
 from flask_login import current_user
+
 from app import db
 from app.models import Resource, ResourceToUser
-import pandas as pd
 
 
 def _fetch_subject_list(course_institute, course_institute_id):
-    resource_df = _fetch_resources(course_institute=course_institute, course_institute_id=course_institute_id, should_enrich=False)
+    resource_df = _fetch_resources(course_institute=course_institute,
+                                   course_institute_id=course_institute_id, should_enrich=False)
 
     if len(resource_df) == 0:
         return []
@@ -21,7 +23,8 @@ def _fetch_subject_list(course_institute, course_institute_id):
 
 
 def _fetch_instructor_list(course_institute, course_institute_id):
-    resource_df = _fetch_resources(course_institute=course_institute, course_institute_id=course_institute_id, should_enrich=False)
+    resource_df = _fetch_resources(course_institute=course_institute,
+                                   course_institute_id=course_institute_id, should_enrich=False)
 
     if len(resource_df) == 0:
         return []
@@ -36,13 +39,16 @@ def _fetch_instructor_list(course_institute, course_institute_id):
 
 
 def _fetch_courses(course_institute=None, course_institute_id=None):
-    courses_df = pd.read_csv('courses.csv', dtype={'course_institute_id': object})
+    courses_df = pd.read_csv('courses.csv', dtype={
+                             'course_institute_id': object})
 
     if course_institute:
-        courses_df = courses_df[courses_df.course_institute == course_institute]
+        courses_df = courses_df[courses_df.course_institute ==
+                                course_institute]
 
     if course_institute_id:
-        courses_df = courses_df[courses_df.course_institute_id == course_institute_id]
+        courses_df = courses_df[courses_df.course_institute_id ==
+                                course_institute_id]
 
     return courses_df
 
@@ -80,7 +86,8 @@ def _update_resource_according_to_form(resource, form):
     if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
         form.display_name.data = 'ללא שם'
 
-    actual_resource = db.session.query(Resource).filter_by(resource_id=int(resource.resource_id)).first()
+    actual_resource = db.session.query(Resource).filter_by(
+        resource_id=int(resource.resource_id)).first()
 
     actual_resource.display_name = form.display_name.data
     actual_resource.grouping = form.grouping.data
@@ -141,7 +148,8 @@ def _insert_resource_according_to_form(form, course_institute, course_institute_
                             grouping=form.grouping.data,
                             type=form.type.data,
                             link=_strip_after_file_extension(form.link.data),
-                            solution=_strip_after_file_extension(form.solution.data),
+                            solution=_strip_after_file_extension(
+                                form.solution.data),
                             recording=form.recording.data,
                             recording2=form.recording2.data,
                             recording3=form.recording3.data,
@@ -166,7 +174,8 @@ def _insert_resource_according_to_form(form, course_institute, course_institute_
         db.session.commit()
         db.session.refresh(resource)
 
-        updated_resources += [(resource.resource_id, resource.display_name, resource.type, resource.semester, resource.comments)]
+        updated_resources += [(resource.resource_id, resource.display_name,
+                               resource.type, resource.semester, resource.comments)]
 
     return updated_resources
 
@@ -187,27 +196,41 @@ def _alternative_sort(series):
     series = series.fillna('')
 
     if series.dtype == object:
-        series[series.str.startswith('אביב 20')] = series[series.str.startswith('אביב 20')] + 'א'
-        series[series.str.startswith('קיץ 20')] = series[series.str.startswith('קיץ 20')] + 'ב'
+        series[series.str.startswith(
+            'אביב 20')] = series[series.str.startswith('אביב 20')] + 'א'
+        series[series.str.startswith(
+            'קיץ 20')] = series[series.str.startswith('קיץ 20')] + 'ב'
 
-        series[series.str.startswith('אביב 20')] = series[series.str.startswith('אביב 20')].str.replace('אביב', '')
-        series[series.str.startswith('קיץ 20')] = series[series.str.startswith('קיץ 20')].str.replace('קיץ', '')
-        series[series.str.startswith('חורף 20')] = series[series.str.startswith('חורף 20')].str.replace('חורף', '').str.replace('-', 'ג')
+        series[series.str.startswith('אביב 20')] = series[series.str.startswith(
+            'אביב 20')].str.replace('אביב', '')
+        series[series.str.startswith('קיץ 20')] = series[series.str.startswith(
+            'קיץ 20')].str.replace('קיץ', '')
+        series[series.str.startswith('חורף 20')] = series[series.str.startswith(
+            'חורף 20')].str.replace('חורף', '').str.replace('-', 'ג')
 
-        series[series.str.startswith('לקראת המבחן')] = 'תתת' + series[series.str.startswith('לקראת המבחן')]
+        series[series.str.startswith(
+            'לקראת המבחן')] = 'תתת' + series[series.str.startswith('לקראת המבחן')]
 
-        series[series.str.startswith('מבוא להרצאה')] = 'אאאא' + series[series.str.startswith('מבוא להרצאה')]
-        series[series.str.startswith('הרצאה')] = 'אאא' + series[series.str.startswith('הרצאה')]
-        series[series.str.startswith('מבוא לתרגול')] = 'אא' + series[series.str.startswith('מבוא לתרגול')]
-        series[series.str.startswith('תרגול')] = 'א' + series[series.str.startswith('תרגול')]
+        series[series.str.startswith(
+            'מבוא להרצאה')] = 'אאאא' + series[series.str.startswith('מבוא להרצאה')]
+        series[series.str.startswith('הרצאה')] = 'אאא' + \
+            series[series.str.startswith('הרצאה')]
+        series[series.str.startswith(
+            'מבוא לתרגול')] = 'אא' + series[series.str.startswith('מבוא לתרגול')]
+        series[series.str.startswith('תרגול')] = 'א' + \
+            series[series.str.startswith('תרגול')]
         for digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            series[series.str.endswith(' '+digit)] = series[series.str.endswith(' '+digit)].apply(lambda x: x[:-1] + '0'+digit)
+            series[series.str.endswith(
+                ' '+digit)] = series[series.str.endswith(' '+digit)].apply(lambda x: x[:-1] + '0'+digit)
             for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
-                series[series.str.endswith(' '+digit+addend)] = series[series.str.endswith(' '+digit+addend)].apply(lambda x: x[:-2] + '0'+digit+addend)
+                series[series.str.endswith(' '+digit+addend)] = series[series.str.endswith(
+                    ' '+digit+addend)].apply(lambda x: x[:-2] + '0'+digit+addend)
             for t in ['הרצאה', 'תרגול', 'תרגיל בית', 'גיליון', 'שאלה', 'שבוע', 'חלק']:
-                series = series.str.replace(t + ' ' + digit + ' ', t+' 0' + digit+' ')
+                series = series.str.replace(
+                    t + ' ' + digit + ' ', t+' 0' + digit+' ')
                 for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
-                    series = series.str.replace(t + ' ' + digit + addend, t+' 0' + digit+addend)
+                    series = series.str.replace(
+                        t + ' ' + digit + addend, t+' 0' + digit+addend)
 
     return series
 
@@ -234,7 +257,8 @@ def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, 
     if not should_enrich:
         return resource_df
 
-    resource_df.sort_values(['semester', 'grouping', 'display_name'], key=_alternative_sort,  ascending=[False, True, True], inplace=True)
+    resource_df.sort_values(['semester', 'grouping', 'display_name'],
+                            key=_alternative_sort,  ascending=[False, True, True], inplace=True)
 
     resources_extended_df = resource_df
     if current_user.is_authenticated:
@@ -263,6 +287,12 @@ def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, 
     resources_extended_df = resources_extended_df.fillna(0)
 
     return resources_extended_df
+
+
+def strip_whitespace(s):
+    if isinstance(s, str):
+        s = s.strip()
+    return s
 
 
 def _query_to_dataframe(query):

@@ -1,15 +1,15 @@
+import os
+from time import time
+
+import jwt
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
-import os
-import jwt
-from time import time
 
 
 class User(UserMixin, db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
-    is_admin = db.Column(db.Boolean)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
@@ -33,7 +33,7 @@ class User(UserMixin, db.Model):
         try:
             id = jwt.decode(token, os.environ.get('SECRET_KEY'),
                             algorithms=['HS256'])['reset_password']
-        except:
+        except (jwt.InvalidTokenError, jwt.ExpiredSignature, jwt.DecodeError):
             return
         return User.query.get(id)
 

@@ -1,14 +1,15 @@
 from flask import redirect, url_for
+
 from app import app
+from app.course import _course
+from app.forgot_password import _forgot_password
 from app.index import _index
-from app.register import _register
 from app.login import _login
-from app.forgotpassword import _forgotpassword
-from app.resetpassword import _resetpassword
 from app.logout import _logout
+from app.register import _register
+from app.reset_password import _reset_password
 from app.update_resource import _update_resource
 from app.update_resource_to_user import _update_resource_to_user
-from app.course import _course
 
 
 @app.route('/')
@@ -26,14 +27,14 @@ def login():
     return _login()
 
 
-@app.route('/forgotpassword', methods=['GET', 'POST'])
-def forgotpassword():
-    return _forgotpassword()
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    return _forgot_password()
 
 
-@app.route('/resetpassword/<token>', methods=['GET', 'POST'])
-def resetpassword(token):
-    return _resetpassword(token)
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    return _reset_password(token)
 
 
 @app.route('/logout')
@@ -61,6 +62,7 @@ def course(course_institute, course_institute_id, tab):
     return _course(course_institute, course_institute_id, tab)
 
 
+# TODO: remove this in ~30 days
 @app.route('/<course_institute>/<course_institute_id>', methods=['GET', 'POST'])
 def course_backwards_compatibility(course_institute, course_institute_id):
     return redirect(url_for("course", course_institute=course_institute, course_institute_id=course_institute_id, tab="lessons"))

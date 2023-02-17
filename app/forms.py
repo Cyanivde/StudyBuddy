@@ -1,25 +1,55 @@
 
-from sqlite3 import Date
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, PasswordField, StringField, SubmitField, TextAreaField, SelectField, DateField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Regexp, Optional
+from wtforms import (BooleanField, PasswordField, SelectField, StringField,
+                     SubmitField)
+from wtforms.validators import (DataRequired, Email, EqualTo, Regexp,
+                                ValidationError)
 
 from app.models import User
+from app.utils import strip_whitespace
 
 ERR_EMPTY = "לא ניתן להשאיר ריק"
+ERR_INVALID_USERNAME = "שם המשתמש חייב להכיל 5-20 תווים"
+ERR_INVALID_EMAIL = "כתובת המייל אינה תקינה"
+ERR_INVALID_PASSWORD = "הסיסמה חייבת להכיל 8 תווים לפחות, עם אות אחת וספרה אחת"
+ERR_USERNAME_TAKEN = "שם המשתמש כבר נמצא בשימוש"
+ERR_EMAIL_TAKEN = "כתובת המייל כבר נמצאת בשימוש"
+USERNAME_REGEX = r"^\w{5,20}$"
+PASSWORD_REGEX = "^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$"
 
 
-def strip_whitespace(s):
-    if isinstance(s, str):
-        s = s.strip()
-    return s
+class RegistrationForm(FlaskForm):
+    username = StringField('username',
+                           filters=[strip_whitespace],
+                           validators=[DataRequired(message=ERR_EMPTY),
+                                       Regexp(USERNAME_REGEX,
+                                              message=ERR_INVALID_USERNAME)])
 
+    email = StringField('email',
+                        filters=[strip_whitespace],
+                        validators=[DataRequired(message=ERR_EMPTY),
+                                    Email(message=ERR_INVALID_EMAIL)])
 
-class CourseResourcesForm(FlaskForm):
-    resources = TextAreaField('חומרי הקורס')
-    archive = TextAreaField('ארכיון חומרים')
-    exams = TextAreaField('מבחנים')
-    submit = SubmitField('שמירה')
+    password = PasswordField('password',
+                             validators=[DataRequired(message=ERR_EMPTY),
+                                         Regexp(PASSWORD_REGEX,
+                                                message=ERR_INVALID_PASSWORD)])
+
+    password2 = PasswordField('confirm password',
+                              validators=[DataRequired(ERR_EMPTY),
+                                          EqualTo('password')])
+
+    submit = SubmitField('הרשמה')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data.lower()).first()
+        if user is not None:
+            raise ValidationError()
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data.lower()).first()
+        if user is not None:
+            raise ValidationError()
 
 
 class UpdateResourceForm(FlaskForm):
@@ -35,7 +65,8 @@ class UpdateResourceForm(FlaskForm):
     questions_count = SelectField('כמה שאלות יש?', choices=range(1, 26))
     grouping = StringField('תיקייה')
 
-    link = StringField('קישור', validators=[Regexp(r"^.*(sharepoint|github)\.com.*|\w{0}$", message="הקישור אינו תקין")])
+    link = StringField('קישור', validators=[Regexp(
+        r"^.*(sharepoint|github)\.com.*|\w{0}$", message="הקישור אינו תקין")])
     semester = SelectField(
         'סמסטר', choices=[
             ('חורף 2022-2023', 'חורף 2022-2023'),
@@ -109,7 +140,8 @@ class UpdateResourceForm(FlaskForm):
             ('אביב 2000', 'אביב 2000'),
         ],
         validate_choice=False)
-    solution = StringField('קישור לפתרון', validators=[Regexp(r"^.*(sharepoint|github)\.com.*|\w{0}$", message="הקישור אינו תקין")])
+    solution = StringField('קישור לפתרון', validators=[Regexp(
+        r"^.*(sharepoint|github)\.com.*|\w{0}$", message="הקישור אינו תקין")])
     recording = StringField('קישורים להקלטות')
     recording2 = StringField('קישורים להקלטות')
     recording3 = StringField('קישורים להקלטות')
@@ -127,7 +159,7 @@ class UpdateResourceForm(FlaskForm):
     submit = SubmitField('שמירה')
 
 
-class ForgotPasswordForm(FlaskForm):
+class forgot_passwordForm(FlaskForm):
     usernameemail = StringField('שם משתמש או כתובת מייל', filters=[strip_whitespace], validators=[
         DataRequired(message=ERR_EMPTY)])
     submit = SubmitField('שליחה')
@@ -142,29 +174,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('התחברות')
 
 
-class RegistrationForm(FlaskForm):
-    username = StringField('username', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_EMPTY), Regexp(r"^\w{5,20}$", message=".שם המשתמש חייב להכיל 5-20 תווים: אותיות, ספרות או קו תחתון")])
-    email = StringField('email', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_EMPTY),  Email(message="כתובת המייל אינה תקינה.")])
-    password = PasswordField('password', validators=[
-        DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
-    password2 = PasswordField(
-        'confirm password', validators=[DataRequired(ERR_EMPTY), EqualTo('password')])
-    submit = SubmitField('הרשמה')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data.lower()).first()
-        if user is not None:
-            raise ValidationError('שם המשתמש כבר נמצא בשימוש.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data.lower()).first()
-        if user is not None:
-            raise ValidationError('כתובת המייל כבר נמצאת בשימוש.')
-
-
-class ResetPasswordForm(FlaskForm):
+class reset_passwordForm(FlaskForm):
     password = PasswordField('password', validators=[
         DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
     password2 = PasswordField(
