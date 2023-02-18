@@ -5,6 +5,76 @@ from flask_login import current_user
 from app import db
 from app.models import Resource, ResourceToUser
 
+SEMESTERS_LIST = ['חורף 2022-2023',
+                  'קיץ 2022',
+                  'אביב 2022',
+                  'חורף 2021-2022',
+                  'קיץ 2021',
+                  'אביב 2021',
+                  'חורף 2020-2021',
+                  'קיץ 2020',
+                  'אביב 2020',
+                  'חורף 2019-2020',
+                  'קיץ 2019',
+                  'אביב 2019',
+                  'חורף 2018-2019',
+                  'קיץ 2018',
+                  'אביב 2018',
+                  'חורף 2017-2018',
+                  'קיץ 2017',
+                  'אביב 2017',
+                  'חורף 2016-2017',
+                  'קיץ 2016',
+                  'אביב 2016',
+                  'חורף 2015-2016',
+                  'קיץ 2015',
+                  'אביב 2015',
+                  'חורף 2014-2015',
+                  'קיץ 2014',
+                  'אביב 2014',
+                  'חורף 2013-2014',
+                  'קיץ 2013',
+                  'אביב 2013',
+                  'חורף 2012-2013',
+                  'קיץ 2012',
+                  'אביב 2012',
+                  'חורף 2011-2012',
+                  'קיץ 2011',
+                  'אביב 2011',
+                  'חורף 2010-2011',
+                  'קיץ 2010',
+                  'אביב 2010',
+                  'חורף 2009-2010',
+                  'קיץ 2009',
+                  'אביב 2009',
+                  'חורף 2008-2009',
+                  'קיץ 2008',
+                  'אביב 2008',
+                  'חורף 2007-2008',
+                  'קיץ 2007',
+                  'אביב 2007',
+                  'חורף 2006-2007',
+                  'קיץ 2006',
+                  'אביב 2006',
+                  'חורף 2005-2006',
+                  'קיץ 2005',
+                  'אביב 2005',
+                  'חורף 2004-2005',
+                  'קיץ 2004',
+                  'אביב 2004',
+                  'חורף 2003-2004',
+                  'קיץ 2003',
+                  'אביב 2003',
+                  'חורף 2002-2003',
+                  'קיץ 2002',
+                  'אביב 2002',
+                  'חורף 2001-2002',
+                  'קיץ 2001',
+                  'אביב 2001',
+                  'חורף 2000-2001',
+                  'קיץ 2000',
+                  'אביב 2000']
+
 
 def _fetch_subject_list(course_institute, course_institute_id):
     resource_df = _fetch_resources(course_institute=course_institute,
@@ -22,20 +92,20 @@ def _fetch_subject_list(course_institute, course_institute_id):
     return list(subject_hist[subject_hist >= 2].keys())
 
 
-def _fetch_instructor_list(course_institute, course_institute_id):
+def _fetch_creator_list(course_institute, course_institute_id):
     resource_df = _fetch_resources(course_institute=course_institute,
                                    course_institute_id=course_institute_id, should_enrich=False)
 
     if len(resource_df) == 0:
         return []
 
-    resource_df['instructor'] = resource_df['instructor'].str.split(',')
-    resource_df = resource_df.explode('instructor')
+    resource_df['creator'] = resource_df['creator'].str.split(',')
+    resource_df = resource_df.explode('creator')
 
-    resource_df = resource_df[resource_df['instructor'] != '']
-    instructor_hist = resource_df['instructor'].value_counts()
+    resource_df = resource_df[resource_df['creator'] != '']
+    creator_hist = resource_df['creator'].value_counts()
 
-    return list(instructor_hist[instructor_hist >= 2].keys())
+    return list(creator_hist[creator_hist >= 2].keys())
 
 
 def _fetch_courses(course_institute=None, course_institute_id=None):
@@ -55,33 +125,33 @@ def _fetch_courses(course_institute=None, course_institute_id=None):
 
 def _update_form_according_to_resource(form, resource):
     form.display_name.data = resource.display_name
-    form.grouping.data = resource.grouping
+    form.folder.data = resource.folder
     form.link.data = resource.link
     form.type.data = resource.type
     form.solution.data = resource.solution
-    form.recording.data = resource.recording
-    form.recording2.data = resource.recording2
-    form.recording3.data = resource.recording3
-    form.recording4.data = resource.recording4
-    form.recording5.data = resource.recording5
-    form.recording_comment.data = resource.recording_comment
-    form.recording2_comment.data = resource.recording2_comment
-    form.recording3_comment.data = resource.recording3_comment
-    form.recording4_comment.data = resource.recording4_comment
-    form.recording5_comment.data = resource.recording5_comment
+    form.recording[0].data = resource.recording
+    form.recording[1].data = resource.recording2
+    form.recording[2].data = resource.recording3
+    form.recording[3].data = resource.recording4
+    form.recording[4].data = resource.recording5
+    form.recording_comment[0].data = resource.recording_comment
+    form.recording_comment[1].data = resource.recording2_comment
+    form.recording_comment[2].data = resource.recording3_comment
+    form.recording_comment[3].data = resource.recording4_comment
+    form.recording_comment[4].data = resource.recording5_comment
     form.is_out_of_date.data = resource.is_out_of_date
     form.is_solution_partial.data = resource.is_solution_partial
     form.semester.data = resource.semester
     #form.deadline_week.data = resource.deadline_week
-    form.instructor.data = resource.instructor
+    form.creator.data = resource.creator
     form.subject.data = resource.subject
     return form
 
 
 def _update_resource_according_to_form(resource, form):
 
-    if form.grouping.data == '':
-        form.grouping.data = 'ללא תיקייה'
+    if form.folder.data == '':
+        form.folder.data = 'ללא תיקייה'
 
     if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
         form.display_name.data = 'ללא שם'
@@ -90,31 +160,30 @@ def _update_resource_according_to_form(resource, form):
         resource_id=int(resource.resource_id)).first()
 
     actual_resource.display_name = form.display_name.data
-    actual_resource.grouping = form.grouping.data
+    actual_resource.folder = form.folder.data
     actual_resource.type = form.type.data
     actual_resource.link = _strip_after_file_extension(form.link.data)
     actual_resource.solution = _strip_after_file_extension(form.solution.data)
-    actual_resource.recording = form.recording.data
-    actual_resource.recording2 = form.recording2.data
-    actual_resource.recording3 = form.recording3.data
-    actual_resource.recording4 = form.recording4.data
-    actual_resource.recording5 = form.recording5.data
-    actual_resource.recording_comment = form.recording_comment.data
-    actual_resource.recording2_comment = form.recording2_comment.data
-    actual_resource.recording3_comment = form.recording3_comment.data
-    actual_resource.recording4_comment = form.recording4_comment.data
-    actual_resource.recording5_comment = form.recording5_comment.data
+    actual_resource.recording = form.recording[0].data
+    actual_resource.recording2 = form.recording[1].data
+    actual_resource.recording3 = form.recording[2].data
+    actual_resource.recording4 = form.recording[3].data
+    actual_resource.recording5 = form.recording[4].data
+    actual_resource.recording_comment = form.recording_comment[0].data
+    actual_resource.recording2_comment = form.recording_comment[1].data
+    actual_resource.recording3_comment = form.recording_comment[2].data
+    actual_resource.recording4_comment = form.recording_comment[3].data
+    actual_resource.recording5_comment = form.recording_comment[4].data
     actual_resource.is_out_of_date = form.is_out_of_date.data
     actual_resource.is_solution_partial = form.is_solution_partial.data
-    #actual_resource.deadline_week = form.deadline_week.data
     actual_resource.semester = form.semester.data
     actual_resource.subject = form.subject.data
-    actual_resource.instructor = form.instructor.data
+    actual_resource.creator = form.creator.data
 
     db.session.commit()
     db.session.refresh(actual_resource)
 
-    return [(actual_resource.resource_id, actual_resource.display_name, actual_resource.type, actual_resource.semester, actual_resource.comments)]
+    return [(actual_resource.resource_id, actual_resource.display_name, actual_resource.type, actual_resource.semester)]
 
 
 def _strip_after_file_extension(s):
@@ -130,8 +199,8 @@ def _insert_resource_according_to_form(form, course_institute, course_institute_
 
     num = 1
 
-    if form.grouping.data == '':
-        form.grouping.data = 'ללא תיקייה'
+    if form.folder.data == '':
+        form.folder.data = 'ללא תיקייה'
 
     if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
         form.display_name.data = 'ללא שם'
@@ -145,39 +214,32 @@ def _insert_resource_according_to_form(form, course_institute, course_institute_
         if num > 1:
             name += ' שאלה ' + str((i+1))
         resource = Resource(display_name=name,
-                            grouping=form.grouping.data,
+                            folder=form.folder.data,
                             type=form.type.data,
                             link=_strip_after_file_extension(form.link.data),
                             solution=_strip_after_file_extension(
                                 form.solution.data),
-                            recording=form.recording.data,
-                            recording2=form.recording2.data,
-                            recording3=form.recording3.data,
-                            recording4=form.recording4.data,
-                            recording5=form.recording5.data,
-                            recording_comment=form.recording_comment.data,
-                            recording2_comment=form.recording2_comment.data,
-                            recording3_comment=form.recording3_comment.data,
-                            recording4_comment=form.recording4_comment.data,
-                            recording5_comment=form.recording5_comment.data,
+                            recording=form.recording[0].data,
+                            recording2=form.recording[1].data,
+                            recording3=form.recording[2].data,
+                            recording4=form.recording[3].data,
+                            recording5=form.recording[4].data,
+                            recording_comment=form.recording_comment[0].data,
+                            recording2_comment=form.recording_comment[1].data,
+                            recording3_comment=form.recording_comment[2].data,
+                            recording4_comment=form.recording_comment[3].data,
+                            recording5_comment=form.recording_comment[4].data,
                             is_out_of_date=form.is_out_of_date.data,
                             is_solution_partial=form.is_solution_partial.data,
-                            # deadline_week=form.deadline_week.data,
                             semester=form.semester.data,
                             likes=0,
-                            num_comments=0,
                             subject=form.subject.data,
-                            instructor=form.instructor.data,
+                            creator=form.creator.data,
                             course_institute=course_institute,
                             course_institute_id=course_institute_id)
         db.session.add(resource)
         db.session.commit()
         db.session.refresh(resource)
-
-        updated_resources += [(resource.resource_id, resource.display_name,
-                               resource.type, resource.semester, resource.comments)]
-
-    return updated_resources
 
 
 def _get_subjects(resources_df):
@@ -188,7 +250,7 @@ def _get_subjects(resources_df):
 
 def _get_instuctors(resources_df):
     list_of_lists = [
-        resource[1].instructor for resource in resources_df.iterrows()]
+        resource[1].creator for resource in resources_df.iterrows()]
     return set([x for xs in list_of_lists for x in xs])
 
 
@@ -257,7 +319,7 @@ def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, 
     if not should_enrich:
         return resource_df
 
-    resource_df.sort_values(['semester', 'grouping', 'display_name'],
+    resource_df.sort_values(['semester', 'folder', 'display_name'],
                             key=_alternative_sort,  ascending=[False, True, True], inplace=True)
 
     resources_extended_df = resource_df
@@ -275,14 +337,14 @@ def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, 
         resources_extended_df['subject'] = resources_extended_df['subject'].apply(
             lambda x: x.split(',') if x else "")
 
-    if 'instructor' in resources_extended_df.keys():
-        resources_extended_df['instructor'] = resources_extended_df['instructor'].apply(
+    if 'creator' in resources_extended_df.keys():
+        resources_extended_df['creator'] = resources_extended_df['creator'].apply(
             lambda x: x.split(',') if x else "")
 
     if tab == 'exams':
         if (len(resources_extended_df) > 0):
             resources_extended_df['scans'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course_institute_id + "&search=\"" +
-                                                                         x.semester + "\" " + x.grouping.replace("'", "%27"), axis=1)
+                                                                         x.semester + "\" " + x.folder.replace("'", "%27"), axis=1)
 
     resources_extended_df = resources_extended_df.fillna(0)
 

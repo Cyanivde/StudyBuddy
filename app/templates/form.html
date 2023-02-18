@@ -5,8 +5,28 @@
         {{ form.hidden_tag() }}
         {% for field in form if field.type not in ['SubmitField', 'CSRFTokenField'] %}
             <div class="mb-2">
-                <div class="col-sm-3">{{ field.label(class_="col-form-label") }}</div>
-                <div class="col-sm-3">{{ field(class="form-control") }}</div>
+                {% if field.type == 'BooleanField' %}
+                    <div class="col-sm-3">
+                        {{ field(class="form-checkbox") }}
+                        {{ field.label(class_="col-form-label") }}
+                    </div>
+                {% else %}
+                    {% if field.type == 'FieldList' %}
+                        <div class="col-sm-3">
+                            {{ field.label(class_="col-form-label") }}
+                            {% for f in field %}{{ f(class="form-control") }}{% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="col-sm-3">{{ field.label(class_="col-form-label") }}</div>
+                        <div class="col-sm-3">
+                            {% if field.type == 'SelectField' %}
+                                {{ field(class="form-select") }}
+                            {% else %}
+                                {{ field(class="form-control") }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endif %}
                 <div class="col-sm-3">
                     {% for error in field.errors %}<span class="form-text text-danger">{{ error }}</span>{% endfor %}
                 </div>
@@ -26,4 +46,6 @@
             </div>
         </div>
     </form>
+    {% block addition_to_form %}
+    {% endblock addition_to_form %}
 {% endblock content %}

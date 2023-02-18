@@ -1,200 +1,126 @@
-{% extends "base.html" %}
-{% block content %}
-    <h4>
-        {% if is_existing_resource %}
-            עריכת
-        {% else %}
-            הוספת
-        {% endif %}
-        חומר לימוד
-    </h4>
-    <br/>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            <span style="color:red">*</span>
-            {{ form.semester.label }}
-            <br/>
-            {{ form.semester() }}
-        </p>
-        <p>
-            <span style="color:red">*</span>
-            {{ form.type.label }}
-            <br/>
-            {{ form.type() }}
-        </p>
-        <p id="folder-p">
-            תיקייה
-            <br/>
-            {{ form.grouping() }}
-        </p>
-        <p id="qcount">
-            <span style="color:red">*</span>
-            {{ form.questions_count.label }}
-            <br/>
-            {{ form.questions_count() }}
-            <br/>
-            {% for error in form.questions_count.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p id="dname">
-            {{ form.display_name.label }}
-            <br/>
-            {{ form.display_name(size=32) }}
-            <br/>
-            {% for error in form.display_name.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.link.label }} (נא להעלות קבצים ל<a target="_blank"
-   href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/">כאן</a>)
-            <br/>
-            {{ form.link(size=32) }}
-            <br/>
-            {% for error in form.link.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.solution.label }} (נא להעלות קבצים ל<a target="_blank"
-   href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/">כאן</a>)
-            <br/>
-            {{ form.solution(size=32) }}
-            <br/>
-            {% for error in form.solution.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.recording.label }}
-            <br/>
-            {{ form.recording(size=32) }}
-            {{ form.recording_comment(size=16) }}
-            <br/>
-            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            {{ form.recording2(size=32) }}
-            {{ form.recording2_comment(size=16) }}
-            <br/>
-            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            {{ form.recording3(size=32) }}
-            {{ form.recording3_comment(size=16) }}
-            <br/>
-            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            {{ form.recording4(size=32) }}
-            {{ form.recording4_comment(size=16) }}
-            <br/>
-            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-            {{ form.recording5(size=32) }}
-            {{ form.recording5_comment(size=16) }}
-            <br/>
-            {% for error in form.recording.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.subject.label }}
-            <br/>
-            {{ form.subject(size=32) }}
-            {% for subj in course_subjects %}
-                <button type="button"
-                        onClick="addSubj('{{ subj }}')"
-                        class="btn btn-outline-primary btn-sm">{{ subj }}</button>
-            {% endfor %}
-            <br/>
-            {% for error in form.subject.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>
-            {{ form.instructor.label }}
-            <br/>
-            {{ form.instructor(size=32) }}
-            {% for inst in course_instructors %}
-                <button type="button"
-                        onClick="addInst('{{ inst }}')"
-                        class="btn btn-outline-primary btn-sm">{{ inst }}</button>
-            {% endfor %}
-            <br/>
-            {% for error in form.instructor.errors %}<span class="text-danger">[{{ error }}]</span>{% endfor %}
-        </p>
-        <p>{{ form.is_out_of_date() }} {{ form.is_out_of_date.label }}</p>
-        <p>{{ form.is_solution_partial() }} {{ form.is_solution_partial.label }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+{% extends "form.html" %}
+{% block addition_to_form %}
     <script>
-        function addSubj(subj) {
-            var subjectInput = document.getElementById("subject");
-
-            if (!subjectInput.value.split(',').includes(subj)) {
-                if (subjectInput.value != '') {
-                    subjectInput.value = subjectInput.value + ','
-                }
-            subjectInput.value = subjectInput.value + subj;
-            }
-        }
-        function addInst(subj) {
-            var subjectInput = document.getElementById("instructor");
-
-            if (!subjectInput.value.split(',').includes(subj)) {
-                if (subjectInput.value != '') {
-                    subjectInput.value = subjectInput.value + ','
-                }
-            subjectInput.value = subjectInput.value + subj;
-            }
-        }
+        var infoAlert = document.createElement("div");
+        infoAlert.role="alert";
+        infoAlert.classList.add('alert');
+        infoAlert.classList.add('alert-info');
+        infoAlert.classList.add('mt-4');
+        infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.';
+        document.getElementsByTagName('form')[0].prepend(infoAlert);
 
         {% if is_existing_resource %}
-        $("#type option[value='exam_full']").remove();
-        $("#type option[value='exercise_full']").remove();
+            $("#type option[value='exam_full']").remove();
+            $("#type option[value='exercise_full']").remove();
         {% else %}
-        $("#type option[value='exam']").remove();
-        $("#type option[value='exercise']").remove();
+            $("#type option[value='exam']").remove();
+            $("#type option[value='exercise']").remove();
         {% endif %}
 
         document.getElementById('display_name').placeholder = "הרצאה 1";
-        document.getElementById('grouping').placeholder = "שבוע 1";
-        document.getElementById('qcount').style.display = "none";
+        document.getElementById('folder').placeholder = "שבוע 1";
+
+        $('label[for=questions_count], select#questions_count').hide();
+
         document.getElementById("type").onchange =
             function displayNamePlaceholder() {
                 var typeSelect = document.getElementById("type");
                 var val = typeSelect.options[typeSelect.selectedIndex].value;
                 if (val == "lecture") {
                     document.getElementById('display_name').placeholder = "הרצאה 1";
-                    document.getElementById('grouping').placeholder = "שבוע 1";
-                    document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dname').style.display = "block";
-                    document.getElementById('folder-p').style.display = "block";
+                    document.getElementById('folder').placeholder = "שבוע 1";
+                    $('label[for=questions_count], select#questions_count').hide();
+                    $('label[for=display_name], input#display_name').show();
+                    $('label[for=folder], input#folder').show();
                 } else if (val == "exercise") {
                     document.getElementById('display_name').placeholder = "שאלה 1";
-                    document.getElementById('grouping').placeholder = "תרגיל בית 1";
-                    document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dname').style.display = "block";
-                    document.getElementById('folder-p').style.display = "block";
+                    document.getElementById('folder').placeholder = "תרגיל בית 1";
+                    $('label[for=questions_count], select#questions_count').hide();
+                    $('label[for=display_name], input#display_name').show();
+                    $('label[for=folder], input#folder').show();
                 } else if (val == "exercise_full") {
                     document.getElementById('display_name').placeholder = "";
-                    document.getElementById('grouping').placeholder = "תרגיל בית 1";
-                    document.getElementById('qcount').style.display = "block";
-                    document.getElementById('dname').style.display = "none";
-                    document.getElementById('folder-p').style.display = "block";
+                    document.getElementById('folder').placeholder = "תרגיל בית 1";
+                    $('label[for=questions_count], select#questions_count').show();
+                    $('label[for=display_name], input#display_name').hide();
+                    $('label[for=folder], input#folder').show();
                 } else if (val == "exam") {
                     document.getElementById('display_name').placeholder = "שאלה 1";
-                    document.getElementById('grouping').placeholder = "מועד א'";
-                    document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dname').style.display = "block";
-                    document.getElementById('folder-p').style.display = "block";
+                    document.getElementById('folder').placeholder = "מועד א'";
+                    $('label[for=questions_count], select#questions_count').hide();
+                    $('label[for=display_name], input#display_name').show();
+                    $('label[for=folder], input#folder').show();
                 } else if (val == "exam_full") { 
-                    document.getElementById('grouping').placeholder = "מועד א'";
-                    document.getElementById('qcount').style.display = "block";
-                    document.getElementById('dname').style.display = "none";
-                    document.getElementById('folder-p').style.display = "block";
+                    document.getElementById('folder').placeholder = "מועד א'";
+                    $('label[for=questions_count], select#questions_count').show();
+                    $('label[for=display_name], input#display_name').hide();
+                    $('label[for=folder], input#folder').show();
                 } else {
-                    document.getElementById('grouping').placeholder = "";
+                    document.getElementById('folder').placeholder = "";
                     document.getElementById('display_name').placeholder = "";
-                    document.getElementById('qcount').style.display = "none";
-                    document.getElementById('dname').style.display = "block";
-                    document.getElementById('folder-p').style.display = "none";
+                    $('label[for=questions_count], select#questions_count').hide();
+                    $('label[for=display_name], input#display_name').show();
+                    $('label[for=folder], input#folder').hide();
                 }
             }
 
-    document.getElementById('recording').placeholder = "קישור";
-    document.getElementById('recording2').placeholder = "קישור לחלק 2 (אם יש)";
-    document.getElementById('recording3').placeholder = "קישור לחלק 3 (אם יש)";
-    document.getElementById('recording4').placeholder = "קישור לחלק 4 (אם יש)";
-    document.getElementById('recording5').placeholder = "קישור לחלק 5 (אם יש)";
-    document.getElementById('recording_comment').placeholder = "הערות";
-    document.getElementById('recording2_comment').placeholder = "הערות";
-    document.getElementById('recording3_comment').placeholder = "הערות";
-    document.getElementById('recording4_comment').placeholder = "הערות";
-    document.getElementById('recording5_comment').placeholder = "הערות";
+    document.getElementById('recording-0').placeholder = "קישור";
+    document.getElementById('recording-1').placeholder = "קישור לחלק 2 (אם יש)";
+    document.getElementById('recording-2').placeholder = "קישור לחלק 3 (אם יש)";
+    document.getElementById('recording-3').placeholder = "קישור לחלק 4 (אם יש)";
+    document.getElementById('recording-4').placeholder = "קישור לחלק 5 (אם יש)";
+    document.getElementById('recording_comment-0').placeholder = "הערות";
+    document.getElementById('recording_comment-1').placeholder = "הערות לחלק 2 (אם יש)";
+    document.getElementById('recording_comment-2').placeholder = "הערות לחלק 3 (אם יש)";
+    document.getElementById('recording_comment-3').placeholder = "הערות לחלק 4 (אם יש)";
+    document.getElementById('recording_comment-4').placeholder = "הערות לחלק 5 (אם יש)";
+
+
+    {% for subject in course_subjects %}
+        var subjectButton = document.createElement("button");
+            subjectButton.type="button";
+            subjectButton.classList.add('btn');
+            subjectButton.classList.add('btn-outline-primary');
+            subjectButton.classList.add('btn-sm');
+            subjectButton.innerHTML = "{{subject}}";
+            subjectButton.addEventListener("click", addSubject, false);
+            document.getElementById('subject').parentElement.append(subjectButton);
+    {% endfor %}
+
+    {% for creator in course_creators %}
+        var creatorButton = document.createElement("button");
+            creatorButton.type="button";
+            creatorButton.classList.add('btn');
+            creatorButton.classList.add('btn-outline-primary');
+            creatorButton.classList.add('btn-sm');
+            creatorButton.innerHTML = "{{creator}}";
+            creatorButton.addEventListener("click", addInstructor, false);
+            document.getElementById('creator').parentElement.append(creatorButton);
+    {% endfor %}
+
+    function addSubject(event) {
+        var subject = event.currentTarget.innerHTML;
+        var subjectInput = document.getElementById("subject");
+
+        if (!subjectInput.value.split(',').includes(subject)) {
+            if (subjectInput.value != '') {
+                subjectInput.value = subjectInput.value + ','
+            }
+        subjectInput.value = subjectInput.value + subject;
+        }
+    }
+
+    function addInstructor(event) {
+        var creator = event.currentTarget.innerHTML;
+        var creatorInput = document.getElementById("creator");
+
+        if (!creatorInput.value.split(',').includes(creator)) {
+            if (creatorInput.value != '') {
+                creatorInput.value = creatorInput.value + ','
+            }
+        creatorInput.value = creatorInput.value + creator;
+        }
+    }
+
     </script>
-{% endblock content %}
+{% endblock addition_to_form %}

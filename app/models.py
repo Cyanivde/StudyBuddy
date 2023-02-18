@@ -45,11 +45,6 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-class Subject(db.Model):
-    subject_id = db.Column(db.Integer, primary_key=True)
-    subject_name = db.Column(db.String(500))
-
-
 class Resource(db.Model):
     resource_id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
@@ -64,36 +59,19 @@ class Resource(db.Model):
     recording4_comment = db.Column(db.String(100))
     recording5 = db.Column(db.String(500))
     recording5_comment = db.Column(db.String(100))
-    comments = db.Column(db.String(500))
-    num_comments = db.Column(db.Integer)
-    last_comment = db.Column(db.DateTime)
     subject = db.Column(db.Text)
-    course_id = db.Column(db.Integer)
     course_institute = db.Column(db.String(140))
     course_institute_id = db.Column(db.String(140))
     display_name = db.Column(db.String(140))
     semester = db.Column(db.String(30))
+    folder = db.Column(db.String(50))
     grouping = db.Column(db.String(50))
+    creator = db.Column(db.String(50))
     instructor = db.Column(db.String(50))
-    deadline_week = db.Column(db.String(140))
     is_out_of_date = db.Column(db.Boolean)
     is_solution_partial = db.Column(db.Boolean)
     type = db.Column(db.String(20))
     likes = db.Column(db.Integer)
-
-
-class Course(db.Model):
-    course_id = db.Column(db.Integer, primary_key=True)
-    course_institute = db.Column(db.String(140))
-    course_institute_english = db.Column(db.String(140))
-    course_institute_id = db.Column(db.String(140))
-    course_name = db.Column(db.String(140))
-    maintainer = db.Column(db.String(140))
-    maintainer_email = db.Column(db.String(140))
-    discord_channel_id = db.Column(db.String(50))
-    discord_invite = db.Column(db.String(200))
-    show_scans = db.Column(db.Boolean)
-    updating_status = db.Column(db.String(200))
 
 
 class ResourceToUser(db.Model):
