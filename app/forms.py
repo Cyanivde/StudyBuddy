@@ -94,7 +94,7 @@ class UpdateResourceForm(FlaskForm):
 
     type = SelectField('סוג',
                        choices=[
-                           ('lecture', 'שיעור (הרצאה/תרגול/סדנה)'),
+                           ('lesson', 'שיעור (הרצאה/תרגול/סדנה)'),
                            ('exercise_full', 'תרגיל בית'),
                            ('exercise', 'שאלה מתרגיל בית'),
                            ('exam_full', 'מבחן'),

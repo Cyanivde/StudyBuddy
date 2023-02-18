@@ -78,34 +78,31 @@ SEMESTERS_LIST = ['חורף 2022-2023',
 
 def _fetch_subject_list(course_institute, course_institute_id):
     resource_df = _fetch_resources(course_institute=course_institute,
-                                   course_institute_id=course_institute_id, should_enrich=False)
+                                   course_institute_id=course_institute_id,
+                                   should_enrich=False)
 
-    if len(resource_df) == 0:
-        return []
-
-    resource_df['subject'] = resource_df['subject'].str.split(',')
-    resource_df = resource_df.explode('subject')
-
-    resource_df = resource_df[resource_df['subject'] != '']
-    subject_hist = resource_df['subject'].value_counts()
-
-    return list(subject_hist[subject_hist >= 2].keys())
+    return _get_prominent_values(resource_df, 'subject')
 
 
 def _fetch_creator_list(course_institute, course_institute_id):
     resource_df = _fetch_resources(course_institute=course_institute,
-                                   course_institute_id=course_institute_id, should_enrich=False)
+                                   course_institute_id=course_institute_id,
+                                   should_enrich=False)
 
-    if len(resource_df) == 0:
+    return _get_prominent_values(resource_df, 'creator')
+
+
+def _get_prominent_values(dataframe, column):
+    if len(dataframe) == 0:
         return []
 
-    resource_df['creator'] = resource_df['creator'].str.split(',')
-    resource_df = resource_df.explode('creator')
+    dataframe[column] = dataframe[column].str.split(',')
+    dataframe = dataframe.explode(column)
 
-    resource_df = resource_df[resource_df['creator'] != '']
-    creator_hist = resource_df['creator'].value_counts()
+    dataframe = dataframe[dataframe[column] != '']
+    hist = dataframe[column].value_counts()
 
-    return list(creator_hist[creator_hist >= 2].keys())
+    return list(hist[hist >= 2].keys())
 
 
 def _fetch_courses(course_institute=None, course_institute_id=None):
@@ -142,48 +139,45 @@ def _update_form_according_to_resource(form, resource):
     form.is_out_of_date.data = resource.is_out_of_date
     form.is_solution_partial.data = resource.is_solution_partial
     form.semester.data = resource.semester
-    #form.deadline_week.data = resource.deadline_week
     form.creator.data = resource.creator
     form.subject.data = resource.subject
     return form
 
 
-def _update_resource_according_to_form(resource, form):
-
+def _update_resource_according_to_form(resource_series, form):
     if form.folder.data == '':
         form.folder.data = 'ללא תיקייה'
 
-    if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
+    if (form.type.data not in ("exercise_full", "exam_full")
+            and form.display_name.data == ''):
         form.display_name.data = 'ללא שם'
 
-    actual_resource = db.session.query(Resource).filter_by(
-        resource_id=int(resource.resource_id)).first()
+    resource = db.session.query(Resource).filter_by(
+        resource_id=int(resource_series.resource_id)).first()
 
-    actual_resource.display_name = form.display_name.data
-    actual_resource.folder = form.folder.data
-    actual_resource.type = form.type.data
-    actual_resource.link = _strip_after_file_extension(form.link.data)
-    actual_resource.solution = _strip_after_file_extension(form.solution.data)
-    actual_resource.recording = form.recording[0].data
-    actual_resource.recording2 = form.recording[1].data
-    actual_resource.recording3 = form.recording[2].data
-    actual_resource.recording4 = form.recording[3].data
-    actual_resource.recording5 = form.recording[4].data
-    actual_resource.recording_comment = form.recording_comment[0].data
-    actual_resource.recording2_comment = form.recording_comment[1].data
-    actual_resource.recording3_comment = form.recording_comment[2].data
-    actual_resource.recording4_comment = form.recording_comment[3].data
-    actual_resource.recording5_comment = form.recording_comment[4].data
-    actual_resource.is_out_of_date = form.is_out_of_date.data
-    actual_resource.is_solution_partial = form.is_solution_partial.data
-    actual_resource.semester = form.semester.data
-    actual_resource.subject = form.subject.data
-    actual_resource.creator = form.creator.data
+    resource.display_name = form.display_name.data
+    resource.folder = form.folder.data
+    resource.type = form.type.data
+    resource.link = _strip_after_file_extension(form.link.data)
+    resource.solution = _strip_after_file_extension(form.solution.data)
+    resource.recording = form.recording[0].data
+    resource.recording2 = form.recording[1].data
+    resource.recording3 = form.recording[2].data
+    resource.recording4 = form.recording[3].data
+    resource.recording5 = form.recording[4].data
+    resource.recording_comment = form.recording_comment[0].data
+    resource.recording2_comment = form.recording_comment[1].data
+    resource.recording3_comment = form.recording_comment[2].data
+    resource.recording4_comment = form.recording_comment[3].data
+    resource.recording5_comment = form.recording_comment[4].data
+    resource.is_out_of_date = form.is_out_of_date.data
+    resource.is_solution_partial = form.is_solution_partial.data
+    resource.semester = form.semester.data
+    resource.subject = form.subject.data
+    resource.creator = form.creator.data
 
     db.session.commit()
-    db.session.refresh(actual_resource)
-
-    return [(actual_resource.resource_id, actual_resource.display_name, actual_resource.type, actual_resource.semester)]
+    db.session.refresh(resource)
 
 
 def _strip_after_file_extension(s):
@@ -305,10 +299,7 @@ def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, 
     if course_institute_id:
         query = query.filter_by(course_institute_id=course_institute_id)
     if tab:
-        if tab == 'lessons':
-            query = query.filter_by(type='lecture')
-        else:
-            query = query.filter_by(type=tab[:-1])
+        query = query.filter_by(type=tab[:-1])
     if resource_id:
         query = query.filter_by(resource_id=resource_id)
     resource_df = _query_to_dataframe(query.all())

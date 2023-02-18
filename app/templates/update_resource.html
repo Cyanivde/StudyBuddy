@@ -26,7 +26,7 @@
             function displayNamePlaceholder() {
                 var typeSelect = document.getElementById("type");
                 var val = typeSelect.options[typeSelect.selectedIndex].value;
-                if (val == "lecture") {
+                if (val == "lesson") {
                     document.getElementById('display_name').placeholder = "הרצאה 1";
                     document.getElementById('folder').placeholder = "שבוע 1";
                     $('label[for=questions_count], select#questions_count').hide();
