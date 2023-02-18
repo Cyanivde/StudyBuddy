@@ -51,13 +51,13 @@ def create_resource(course_institute, course_institute_id):
                             is_existing_resource=False)
 
 
-@app.route('/<course_institute>/<course_institute_id>/edit_resource/<id>',
+@app.route('/<course_institute>/<course_institute_id>/edit_resource/<resource_id>',
            methods=['GET', 'POST'])
-def edit_resource(course_institute, course_institute_id, id=None):
+def edit_resource(course_institute, course_institute_id, resource_id=None):
     return _update_resource(course_institute,
                             course_institute_id,
                             is_existing_resource=True,
-                            resource_id=id)
+                            resource_id=resource_id)
 
 
 @ app.route('/updateresourcetouser', methods=['POST'])
