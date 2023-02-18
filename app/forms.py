@@ -14,42 +14,76 @@ ERR_INVALID_EMAIL = "כתובת המייל אינה תקינה"
 ERR_INVALID_PASSWORD = "הסיסמה חייבת להכיל 8 תווים לפחות, עם אות אחת וספרה אחת"
 ERR_USERNAME_TAKEN = "שם המשתמש כבר נמצא בשימוש"
 ERR_EMAIL_TAKEN = "כתובת המייל כבר נמצאת בשימוש"
+ERR_PASSWORD_MATCH = "הסיסמאות אינן תואמות"
 USERNAME_REGEX = r"^\w{5,20}$"
 PASSWORD_REGEX = "^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$"
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('username',
+    username = StringField('שם משתמש',
                            filters=[strip_whitespace],
                            validators=[DataRequired(message=ERR_EMPTY),
                                        Regexp(USERNAME_REGEX,
                                               message=ERR_INVALID_USERNAME)])
 
-    email = StringField('email',
+    email = StringField('כתובת מייל',
                         filters=[strip_whitespace],
                         validators=[DataRequired(message=ERR_EMPTY),
                                     Email(message=ERR_INVALID_EMAIL)])
 
-    password = PasswordField('password',
+    password = PasswordField('סיסמה',
                              validators=[DataRequired(message=ERR_EMPTY),
                                          Regexp(PASSWORD_REGEX,
                                                 message=ERR_INVALID_PASSWORD)])
 
-    password2 = PasswordField('confirm password',
+    password2 = PasswordField('אימות סיסמה',
                               validators=[DataRequired(ERR_EMPTY),
-                                          EqualTo('password')])
+                                          EqualTo('password',
+                                                  message=ERR_PASSWORD_MATCH)])
 
     submit = SubmitField('הרשמה')
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data.lower()).first()
         if user is not None:
-            raise ValidationError()
+            raise ValidationError(ERR_USERNAME_TAKEN)
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data.lower()).first()
         if user is not None:
-            raise ValidationError()
+            raise ValidationError(ERR_EMAIL_TAKEN)
+
+
+class LoginForm(FlaskForm):
+    usernameemail = StringField('שם משתמש או כתובת מייל',
+                                filters=[strip_whitespace],
+                                validators=[DataRequired(message=ERR_EMPTY)])
+
+    password = PasswordField('סיסמה',
+                             validators=[DataRequired(message=ERR_EMPTY)])
+
+    submit = SubmitField('התחברות')
+
+
+class ForgotPasswordForm(FlaskForm):
+    usernameemail = StringField('שם משתמש או כתובת מייל',
+                                filters=[strip_whitespace],
+                                validators=[DataRequired(message=ERR_EMPTY)])
+
+    submit = SubmitField('שליחה')
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('סיסמה חדשה',
+                             validators=[DataRequired(message=ERR_EMPTY),
+                                         Regexp(PASSWORD_REGEX,
+                                                message=ERR_INVALID_PASSWORD)])
+
+    password2 = PasswordField('אימות סיסמה חדשה',
+                              validators=[DataRequired(ERR_EMPTY),
+                                          EqualTo('password')])
+
+    submit = SubmitField('שמירה')
 
 
 class UpdateResourceForm(FlaskForm):
@@ -156,27 +190,4 @@ class UpdateResourceForm(FlaskForm):
     instructor = StringField('יוצרים (מופרדים בפסיק)')
     is_out_of_date = BooleanField('כבר לא בחומר')
     is_solution_partial = BooleanField('הפתרון חלקי')
-    submit = SubmitField('שמירה')
-
-
-class forgot_passwordForm(FlaskForm):
-    usernameemail = StringField('שם משתמש או כתובת מייל', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_EMPTY)])
-    submit = SubmitField('שליחה')
-
-
-class LoginForm(FlaskForm):
-    usernameemail = StringField('שם משתמש או כתובת מייל', filters=[strip_whitespace], validators=[
-        DataRequired(message=ERR_EMPTY)])
-    password = PasswordField('סיסמה', validators=[
-        DataRequired(message=ERR_EMPTY)])
-    remember_me = BooleanField('זכור אותי')
-    submit = SubmitField('התחברות')
-
-
-class reset_passwordForm(FlaskForm):
-    password = PasswordField('password', validators=[
-        DataRequired(message=ERR_EMPTY), Regexp('^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$', message="הסיסמה חייבת להכיל 8 תווים לפחות, מהם לפחות אות אחת וספרה אחת.")])
-    password2 = PasswordField(
-        'confirm password', validators=[DataRequired(ERR_EMPTY), EqualTo('password')])
     submit = SubmitField('שמירה')

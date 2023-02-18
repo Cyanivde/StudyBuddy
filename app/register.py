@@ -14,7 +14,7 @@ def _register():
 
     # Form was not yet submitted, or form was submitted with invalid input
     if not form.validate_on_submit():
-        return render_template('register.html', form=form)
+        return render_template('form.html', title="הרשמה", form=form)
 
     # Form was submitted with valid input
     else:

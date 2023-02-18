@@ -1,11 +1,11 @@
 from flask import redirect, url_for
+from flask_login import logout_user
 
 from app import app
 from app.course import _course
 from app.forgot_password import _forgot_password
 from app.index import _index
 from app.login import _login
-from app.logout import _logout
 from app.register import _register
 from app.reset_password import _reset_password
 from app.update_resource import _update_resource
@@ -27,6 +27,12 @@ def login():
     return _login()
 
 
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     return _forgot_password()
@@ -37,19 +43,21 @@ def reset_password(token):
     return _reset_password(token)
 
 
-@app.route('/logout')
-def logout():
-    return _logout()
-
-
-@app.route('/<course_institute>/<course_institute_id>/create_resource', methods=['GET', 'POST'])
+@app.route('/<course_institute>/<course_institute_id>/create_resource',
+           methods=['GET', 'POST'])
 def create_resource(course_institute, course_institute_id):
-    return _update_resource(course_institute, course_institute_id, is_existing_resource=False)
+    return _update_resource(course_institute,
+                            course_institute_id,
+                            is_existing_resource=False)
 
 
-@app.route('/<course_institute>/<course_institute_id>/edit_resource/<resource_id>', methods=['GET', 'POST'])
-def edit_resource(course_institute, course_institute_id, resource_id=None):
-    return _update_resource(course_institute, course_institute_id, is_existing_resource=True, resource_id=resource_id)
+@app.route('/<course_institute>/<course_institute_id>/edit_resource/<id>',
+           methods=['GET', 'POST'])
+def edit_resource(course_institute, course_institute_id, id=None):
+    return _update_resource(course_institute,
+                            course_institute_id,
+                            is_existing_resource=True,
+                            resource_id=id)
 
 
 @ app.route('/updateresourcetouser', methods=['POST'])

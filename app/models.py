@@ -33,9 +33,16 @@ class User(UserMixin, db.Model):
         try:
             id = jwt.decode(token, os.environ.get('SECRET_KEY'),
                             algorithms=['HS256'])['reset_password']
-        except (jwt.InvalidTokenError, jwt.ExpiredSignature, jwt.DecodeError):
+        except (jwt.InvalidTokenError,
+                jwt.ExpiredSignatureError,
+                jwt.DecodeError):
             return
         return User.query.get(id)
+
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 class Subject(db.Model):
@@ -95,8 +102,3 @@ class ResourceToUser(db.Model):
     resource_id = db.Column(db.Integer)
     done = db.Column(db.Integer)
     like = db.Column(db.Boolean)
-
-
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))

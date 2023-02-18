@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+    <h4>{{ title }}</h4>
+    <form novalidate method="post">
+        {{ form.hidden_tag() }}
+        {% for field in form if field.type not in ['SubmitField', 'CSRFTokenField'] %}
+            <div class="mb-2">
+                <div class="col-sm-3">{{ field.label(class_="col-form-label") }}</div>
+                <div class="col-sm-3">{{ field(class="form-control") }}</div>
+                <div class="col-sm-3">
+                    {% for error in field.errors %}<span class="form-text text-danger">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <span class="form-text {% if category == 'error' %}text-danger{% endif %}">{{ message }}</span>
+            {% endfor %}
+        {% endwith %}
+        <div class="mt-3">
+            <div class="col-12">
+                {{ form.submit(class="btn btn-primary") }}
+                {% if additional_link %}
+                    <span class="ms-3"><a href="{{ additional_link }}">{{ additional_link_label }}</a></span>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+{% endblock content %}

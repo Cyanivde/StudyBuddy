@@ -1,23 +1,23 @@
-from flask import redirect, render_template, url_for
-from flask_login import current_user, login_user
+from flask import flash, redirect, render_template, url_for
+from flask_login import login_user
 
 from app import db
-from app.forms import reset_passwordForm
+from app.forms import ResetPasswordForm
 from app.models import User
 
 
 def _reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
     user = User.verify_reset_password_token(token)
     if not user:
-        return redirect(url_for('index'))
+        flash("הקישור אינו תקין. ייתכן שעבר יותר מדי זמן, נסו שנית",
+              category="error")
+        return redirect(url_for('forgot_password'))
 
-    form = reset_passwordForm()
+    form = ResetPasswordForm()
 
     # Form was not yet submitted, or form was submitted with invalid input
     if not form.validate_on_submit():
-        return render_template('reset_password.html', form=form)
+        return render_template('form.html', title="איפוס סיסמה", form=form)
 
     # Form was submitted with valid input
     else:

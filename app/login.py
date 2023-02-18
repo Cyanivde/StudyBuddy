@@ -13,13 +13,22 @@ def _login():
 
     # Form was not yet submitted, or form was submitted with invalid input
     if not form.validate_on_submit():
-        return render_template('login.html', form=form)
+        return render_template('form.html',
+                               title="התחברות",
+                               form=form,
+                               additional_link=url_for('forgot_password'),
+                               additional_link_label="שכחתי סיסמה")
 
     # Form was submitted with valid input
     else:
-        user = User.query.filter((User.username == form.usernameemail.data.lower()) | (User.email == form.usernameemail.data.lower())).first()
+        user = User.query.filter(
+            (User.username == form.usernameemail.data.lower()) |
+            (User.email == form.usernameemail.data.lower())
+        ).first()
+
         if user is None or not user.check_password(form.password.data):
-            flash('שם המשתמש או הסיסמה שגויים')
+            flash('פרטי ההתחברות שגויים', category='error')
             return redirect(url_for('login'))
+
         login_user(user, remember=True)
         return redirect(url_for('index'))
