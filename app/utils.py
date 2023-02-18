@@ -181,31 +181,32 @@ def _update_resource_according_to_form(resource_series, form):
 
 
 def _strip_after_file_extension(s):
-    for extension in ['.pdf', '.docx', '.pptx']:
+    for extension in ['.pdf', '.doc', '.docx', '.pptx', '.ppt']:
         if extension in s:
             return s.split(extension)[0] + extension
     else:
         return s
 
 
-def _insert_resource_according_to_form(form, course_institute, course_institute_id):
-    updated_resources = []
-
-    num = 1
+def _insert_resource_according_to_form(form,
+                                       course_institute,
+                                       course_institute_id):
+    num_resources = 1
 
     if form.folder.data == '':
         form.folder.data = 'ללא תיקייה'
 
-    if form.type.data not in ("exercise_full", "exam_full") and form.display_name.data == '':
+    if (form.type.data not in ("exercise_full", "exam_full")
+            and form.display_name.data == ''):
         form.display_name.data = 'ללא שם'
 
     if form.type.data in ('exam_full', 'exercise_full'):
         form.type.data = form.type.data[:-5]
-        num = int(form.questions_count.data)
+        num_resources = int(form.questions_count.data)
 
-    for i in range(num):
+    for i in range(num_resources):
         name = form.display_name.data
-        if num > 1:
+        if num_resources > 1:
             name += ' שאלה ' + str((i+1))
         resource = Resource(display_name=name,
                             folder=form.folder.data,
@@ -291,7 +292,11 @@ def _alternative_sort(series):
     return series
 
 
-def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, resource_id=None, should_enrich=True):
+def _fetch_resources(course_institute=None,
+                     course_institute_id=None,
+                     tab=None,
+                     resource_id=None,
+                     should_enrich=True):
     # query resources from database
     query = Resource.query
     if course_institute:
@@ -304,42 +309,48 @@ def _fetch_resources(course_institute=None, course_institute_id=None, tab=None, 
         query = query.filter_by(resource_id=resource_id)
     resource_df = _query_to_dataframe(query.all())
 
-    if resource_df.empty:
-        return resource_df
-
-    if not should_enrich:
+    if resource_df.empty or not should_enrich:
         return resource_df
 
     resource_df.sort_values(['semester', 'folder', 'display_name'],
-                            key=_alternative_sort,  ascending=[False, True, True], inplace=True)
+                            key=_alternative_sort,
+                            ascending=[False, True, True],
+                            inplace=True)
 
-    resources_extended_df = resource_df
     if current_user.is_authenticated:
-        resource_to_user = pd.DataFrame([vars(s) for s in pd.Series(ResourceToUser.query.filter_by(
-            user_id=current_user.user_id).all(), dtype=object)])
+        query = ResourceToUser.query.filter_by(
+            user_id=current_user.user_id).all()
+        resource_to_user = _query_to_dataframe(query)
 
         if len(resource_to_user) > 0:
             resource_to_user.drop('id', axis=1, inplace=True)
             resource_to_user.drop('user_id', axis=1, inplace=True)
-            resources_extended_df = pd.merge(how='left',
-                                             left=resource_df, right=resource_to_user, on="resource_id")
+            resource_df = pd.merge(how='left',
+                                   left=resource_df,
+                                   right=resource_to_user,
+                                   on="resource_id")
 
-    if 'subject' in resources_extended_df.keys():
-        resources_extended_df['subject'] = resources_extended_df['subject'].apply(
+    if 'subject' in resource_df.keys():
+        resource_df['subject'] = resource_df['subject'].apply(
             lambda x: x.split(',') if x else "")
 
-    if 'creator' in resources_extended_df.keys():
-        resources_extended_df['creator'] = resources_extended_df['creator'].apply(
+    if 'creator' in resource_df.keys():
+        resource_df['creator'] = resource_df['creator'].apply(
             lambda x: x.split(',') if x else "")
 
     if tab == 'exams':
-        if (len(resources_extended_df) > 0):
-            resources_extended_df['scans'] = resources_extended_df.apply(lambda x: "https://tscans.cf/?course=" + course_institute_id + "&search=\"" +
-                                                                         x.semester + "\" " + x.folder.replace("'", "%27"), axis=1)
+        resource_df['scans'] = resource_df.apply(
+            lambda x: "https://tscans.cf/?course="
+            + course_institute_id
+            + "&search=\""
+            + x.semester
+            + "\" "
+            + x.folder.replace("'", "%27"),
+            axis=1)
 
-    resources_extended_df = resources_extended_df.fillna(0)
+    resource_df = resource_df.fillna(0)
 
-    return resources_extended_df
+    return resource_df
 
 
 def strip_whitespace(s):

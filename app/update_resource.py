@@ -13,9 +13,9 @@ def _update_resource(course_institute,
                      resource_id=None):
     title = ""
     if is_existing_resource:
-        title += "יצירת "
-    else:
         title += "עריכת "
+    else:
+        title += "יצירת "
     title += "חומר לימוד"
 
     form = UpdateResourceForm()
