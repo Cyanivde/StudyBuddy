@@ -24,7 +24,6 @@ def _update_resource(course_institute,
     if not form.validate_on_submit():
         if is_existing_resource:
             resource = _fetch_resources(resource_id=resource_id,
-                                        should_enrich=False
                                         ).iloc[0]
 
             form = _update_form_according_to_resource(form, resource)
@@ -44,7 +43,6 @@ def _update_resource(course_institute,
     if form.validate_on_submit():
         if is_existing_resource:
             resource_series = _fetch_resources(resource_id=resource_id,
-                                               should_enrich=False
                                                ).iloc[0]
             _update_resource_according_to_form(resource_series, form)
 

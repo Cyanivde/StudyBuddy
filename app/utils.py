@@ -76,18 +76,18 @@ SEMESTERS_LIST = ['חורף 2022-2023',
                   'אביב 2000']
 
 
-def _fetch_subject_list(course_institute, course_institute_id):
-    resource_df = _fetch_resources(course_institute=course_institute,
-                                   course_institute_id=course_institute_id,
-                                   should_enrich=False)
+def _fetch_subject_list(course_institute, course_institute_id, resource_df=None):
+    if resource_df is None:
+        resource_df = _fetch_resources(course_institute=course_institute,
+                                       course_institute_id=course_institute_id)
 
     return _get_prominent_values(resource_df, 'subject')
 
 
-def _fetch_creator_list(course_institute, course_institute_id):
-    resource_df = _fetch_resources(course_institute=course_institute,
-                                   course_institute_id=course_institute_id,
-                                   should_enrich=False)
+def _fetch_creator_list(course_institute, course_institute_id, resource_df=None):
+    if resource_df is None:
+        resource_df = _fetch_resources(course_institute=course_institute,
+                                       course_institute_id=course_institute_id,)
 
     return _get_prominent_values(resource_df, 'creator')
 
@@ -305,27 +305,21 @@ def _alternative_sort(series):
 
 def _fetch_resources(course_institute=None,
                      course_institute_id=None,
-                     tab=None,
-                     resource_id=None,
-                     should_enrich=True):
+                     resource_id=None):
     # query resources from database
     query = Resource.query
     if course_institute:
         query = query.filter_by(course_institute=course_institute)
     if course_institute_id:
         query = query.filter_by(course_institute_id=course_institute_id)
-    if tab:
-        if tab == "recycle_bin":
-            query = query.filter_by(is_in_recycle_bin=True)
-        else:
-            query = query.filter_by(type=tab[:-1], is_in_recycle_bin=False)
     if resource_id:
         query = query.filter_by(resource_id=resource_id)
     resource_df = _query_to_dataframe(query.all())
 
-    if resource_df.empty:
-        return resource_df
+    return resource_df
 
+
+def _enrich_resources(resource_df, course_institute_id, tab):
     # sort resources:
     if tab == "others":
         resource_df.sort_values('likes',
@@ -336,10 +330,6 @@ def _fetch_resources(course_institute=None,
                                 key=_alternative_sort,
                                 ascending=[False, True, True],
                                 inplace=True)
-
-    if not should_enrich:
-        return resource_df
-
     # enrich resources: user's progress
     if current_user.is_authenticated:
         query = ResourceToUser.query.filter_by(
