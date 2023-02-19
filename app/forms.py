@@ -132,4 +132,6 @@ class UpdateResourceForm(FlaskForm):
 
     is_solution_partial = BooleanField('הפתרון חלקי')
 
+    is_in_recycle_bin = BooleanField('לשים בסל המיחזור')
+
     submit = SubmitField('שמירה')

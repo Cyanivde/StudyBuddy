@@ -36,6 +36,21 @@
             </a>
           </span>
         </li>
+        <li class="list-group-item list-group-item-link">
+          <span {% if tab == "recycle_bin" %}class="fw-bold"{% endif %}>
+            <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='recycle_bin') }}">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   width="16"
+                   height="16"
+                   fill="currentColor"
+                   class="bi bi-trash"
+                   viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg>
+            </a>
+          </span>
+        </li>
       </ul>
     </div>
     <hr/>
@@ -45,29 +60,31 @@
       <button class="badge btn-outline-secondary" onclick="closeAll()">סגור הכל</button>
     </div>
     {% if course_subjects %}
-    <div class="col-md-12 mb-1">
-      סינון נושאים:
-      {% for subject in course_subjects %}
-        <button class="badge btn-outline-secondary"
-                onclick="filterTable(&quot;{{ subject }}&quot;)">{{ subject }}</button>
-      {% endfor %}
-    </div>
+      <div class="col-md-12 mb-1">
+        סינון נושאים:
+        {% for subject in course_subjects %}
+          <button class="badge btn-outline-secondary"
+                  onclick="filterTable(&quot;{{ subject }}&quot;)">{{ subject }}</button>
+        {% endfor %}
+      </div>
     {% endif %}
     {% if course_creators %}
-    <div class="col-md-12 mb-1">
-      סינון יוצרים:
-      {% for creator in course_creators %}
-        <button class="badge btn-outline-secondary"
-                onclick="filterTable(&quot;{{ creator }}&quot;)">{{ creator }}</button>
-      {% endfor %}
-    </div>
+      <div class="col-md-12 mb-1">
+        סינון יוצרים:
+        {% for creator in course_creators %}
+          <button class="badge btn-outline-secondary"
+                  onclick="filterTable(&quot;{{ creator }}&quot;)">{{ creator }}</button>
+        {% endfor %}
+      </div>
     {% endif %}
     <hr/>
     <div class="col-md-12 table-responsive">
       <table id="myTable" class="responsive table hover">
         <thead>
           <tr class="align-middle course-tr">
-            {% if tab != "others" %}<th class="text-start">תיקייה</th>{% endif %}
+            {% if tab not in ("others", "recycle_bin") %}
+              <th class="text-start">תיקייה</th>
+            {% endif %}
             <th class="all text-start">שם</th>
             {% if tab in ("exams", "exercises") %}
               <th class="all text-start">פתרון</th>
@@ -78,7 +95,9 @@
             <th class="text-center min-tablet">יוצרים</th>
             <th class="text-center min-tablet">הערות</th>
             <th class="text-center min-tablet">מעקב</th>
-            {% if tab == "others" %}<th class="text-center min-tablet">אהבתי</th>{% endif %}
+            {% if tab in ("others", "recycle_bin") %}
+              <th class="text-center min-tablet">אהבתי</th>
+            {% endif %}
             <th class="text-center min-tablet">עריכה</th>
             <th class="max-tablet"></th>
           </tr>
@@ -86,7 +105,7 @@
         <tbody>
           {% for index, resource in resources.iterrows() %}
             <tr class="align-middle course-tr">
-              {% if tab != 'others' %}
+              {% if tab not in ("others", "recycle_bin") %}
                 <td>
                   {% if tab != "lessons" %}{{ resource.semester }}{% endif %}
                   {{ resource.folder }}
@@ -160,7 +179,7 @@
                      class="btn-group"
                      role="group"
                      aria-label="Basic radio toggle button group">
-                  <input onchange="updateRadio({{ resource.resource_id }}, 0);"
+                  <input onchange="updateResourceProgress({{ resource.resource_id }}, 0);"
                          type="radio"
                          class="btn-check"
                          value="0"
@@ -181,7 +200,7 @@
                       <path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
                     </svg>
                   </label>
-                  <input onchange="updateRadio({{ resource.resource_id }}, 1);"
+                  <input onchange="updateResourceProgress({{ resource.resource_id }}, 1);"
                          type="radio"
                          class="btn-check"
                          value="1"
@@ -203,7 +222,7 @@
                       <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
                     </svg>
                   </label>
-                  <input onchange="updateRadio({{ resource.resource_id }}, 2);"
+                  <input onchange="updateResourceProgress({{ resource.resource_id }}, 2);"
                          type="radio"
                          class="btn-check"
                          value="2"
@@ -226,7 +245,7 @@
                   </label>
                 </div>
               </td class="text-center">
-              {% if tab == "others" %}
+              {% if tab in ("others", "recycle_bin") %}
                 <td class="text-center">
                   <div {% if not current_user.is_authenticated %}tabindex="0" data-bs-toggle="tooltip" title="לסימון, הירשמו למערכת"{% endif %}
                        class="btn-group"
@@ -310,7 +329,7 @@
       }
     }
 
-      function updateRadio(resource_id, val) {
+      function updateResourceProgress(resource_id, val) {
           var xhr = new XMLHttpRequest();
           xhr.open("POST", "{{ url_for('update_resource_to_user')}}", true);
           xhr.setRequestHeader('Content-Type', 'application/json');
@@ -358,7 +377,7 @@
                 orderable: false,
                 targets:   -1
             } ],
-            {%if tab != "others" %}
+            {%if tab not in ("others", "recycle_bin") %}
           rowGroup: {
               dataSrc: [0],
               startRender: function (rows, group, level) {
@@ -382,7 +401,7 @@
           {
             {% if tab == 'exams' %}targets: [6],{%endif%}
             {% if tab == 'exercises' %}targets: [5],{%endif%}
-            {% if tab in ('lessons', 'others') %}targets: [4],{%endif%}
+            {% if tab in ('lessons', 'others', 'recycle_bin') %}targets: [4],{%endif%}
             render: function ( data, type, row ) {
                var s = data.split('</button>').slice(0,4).join('</button>')
                if ((s != '') && (!s.endsWith('</button>'))) {
@@ -518,7 +537,7 @@
 
           initComplete: function () {
             // Start with closed groups
-            {%if tab != "others" %}
+            {%if tab not in ("others", "recycle_bin") %}
               $('#myTable tbody tr.dtrg-start').each(function () {
                 var name = $(this).data('name');
                 collapsedGroups[name] = !collapsedGroups[name];
@@ -548,7 +567,7 @@
   $(document).ready(function() {
     $('#myTable').show();
 } );
-{% if tab != "others" %}
+{% if tab not in ("others", "recycle_bin") %}
     // Collapse Groups
     $('#myTable tbody').on('click', 'tr.dtrg-start', function () {
       var name = $(this).data('name');

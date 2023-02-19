@@ -145,6 +145,7 @@ def _update_form_according_to_resource(form, resource):
     form.recording_comment[4].data = resource.recording5_comment
     form.is_out_of_date.data = resource.is_out_of_date
     form.is_solution_partial.data = resource.is_solution_partial
+    form.is_in_recycle_bin.data = resource.is_in_recycle_bin
     form.semester.data = resource.semester
     form.creator.data = resource.creator
     form.subject.data = resource.subject
@@ -179,6 +180,7 @@ def _update_resource_according_to_form(resource_series, form):
     resource.recording5_comment = form.recording_comment[4].data
     resource.is_out_of_date = form.is_out_of_date.data
     resource.is_solution_partial = form.is_solution_partial.data
+    resource.is_in_recycle_bin = form.is_in_recycle_bin.data
     resource.semester = form.semester.data
     resource.subject = form.subject.data
     resource.creator = form.creator.data
@@ -233,6 +235,7 @@ def _insert_resource_according_to_form(form,
                             recording5_comment=form.recording_comment[4].data,
                             is_out_of_date=form.is_out_of_date.data,
                             is_solution_partial=form.is_solution_partial.data,
+                            is_in_recycle_bin=form.is_in_recycle_bin.data,
                             semester=form.semester.data,
                             likes=0,
                             subject=form.subject.data,
@@ -312,7 +315,10 @@ def _fetch_resources(course_institute=None,
     if course_institute_id:
         query = query.filter_by(course_institute_id=course_institute_id)
     if tab:
-        query = query.filter_by(type=tab[:-1])
+        if tab == "recycle_bin":
+            query = query.filter_by(is_in_recycle_bin=True)
+        else:
+            query = query.filter_by(type=tab[:-1], is_in_recycle_bin=False)
     if resource_id:
         query = query.filter_by(resource_id=resource_id)
     resource_df = _query_to_dataframe(query.all())

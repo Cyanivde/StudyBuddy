@@ -68,6 +68,7 @@ class Resource(db.Model):
     creator = db.Column(db.String(50))
     is_out_of_date = db.Column(db.Boolean)
     is_solution_partial = db.Column(db.Boolean)
+    is_in_recycle_bin = db.Column(db.Boolean)
     type = db.Column(db.String(20))
     likes = db.Column(db.Integer)
 
@@ -76,5 +77,5 @@ class ResourceToUser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     resource_id = db.Column(db.Integer)
-    done = db.Column(db.Integer)
+    done = db.Column(db.Integer)  # 0 - no progress, 1 - in progress, 2 - done
     like = db.Column(db.Boolean)
