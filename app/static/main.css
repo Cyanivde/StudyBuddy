@@ -60,6 +60,44 @@ table.dataTable tr.dtrg-group {
   font-weight: bold;
 }
 
+@font-face {
+  font-family: 'Levin';
+  src:  url('GveretLevinAlefAlefAlef-Regular.woff2') format('woff2'),
+        url('GveretLevinAlefAlefAlef-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Heart';
+  src:  url('Heart\ Warming\ Font\ by\ Situjuh\ \(7NTypes\).otf');
+}
+
+.cover {
+  background-image: url('pexels-photo-5088017.png');
+  height: 550px;
+  width: 100%;
+  background-size: cover;
+  background-position: bottom;
+  box-shadow: 0px 1px 3px #888;
+}
+
+.cover-container {
+  max-width: 430px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.cover-title {
+  padding-top: 100px;
+  padding-bottom: 20px;
+  font-family: 'Levin', 'Heart';
+}
+
+.bootstrap-select {
+  width: 100% !important;
+}
+
+
 #myTable {
   display: none;
 }
