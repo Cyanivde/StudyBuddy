@@ -36,6 +36,10 @@ li {
   text-align: right !important;
 }
 
+.badge {
+  border: 0;
+}
+
 .btn-outline-danger {
   padding: 0rem 0.5rem 0.2rem 0.5rem;
 }
@@ -54,6 +58,10 @@ table.dataTable tr.dtrg-group {
   background-color: #e7e7e7 !important;
   font-size: 0.7rem;
   font-weight: bold;
+}
+
+#myTable {
+  display: none;
 }
 
 #myTable_filter {

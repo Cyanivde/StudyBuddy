@@ -60,17 +60,22 @@ def edit_resource(course_institute, course_institute_id, resource_id=None):
                             resource_id=resource_id)
 
 
-@ app.route('/updateresourcetouser', methods=['POST'])
-def update_resource_to_user():
-    return _update_resource_to_user()
-
-
-@app.route('/<course_institute>/<course_institute_id>/<tab>', methods=['GET', 'POST'])
+@app.route('/<course_institute>/<course_institute_id>/<tab>',
+           methods=['GET', 'POST'])
 def course(course_institute, course_institute_id, tab):
     return _course(course_institute, course_institute_id, tab)
 
 
 # TODO: remove this in ~30 days
-@app.route('/<course_institute>/<course_institute_id>', methods=['GET', 'POST'])
+@app.route('/<course_institute>/<course_institute_id>',
+           methods=['GET', 'POST'])
 def course_backwards_compatibility(course_institute, course_institute_id):
-    return redirect(url_for("course", course_institute=course_institute, course_institute_id=course_institute_id, tab="lessons"))
+    return redirect(url_for("course",
+                            course_institute=course_institute,
+                            course_institute_id=course_institute_id,
+                            tab="lessons"))
+
+
+@ app.route('/updateresourcetouser', methods=['POST'])
+def update_resource_to_user():
+    return _update_resource_to_user()

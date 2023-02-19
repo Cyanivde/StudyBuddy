@@ -96,11 +96,18 @@ def _get_prominent_values(dataframe, column):
     if len(dataframe) == 0:
         return []
 
+    # precedence
+    df_1 = dataframe[dataframe['type'] == 'lesson']
+    df_2 = dataframe[dataframe['type'] == 'exam']
+    df_3 = dataframe[dataframe['type'] == 'exercise']
+    df_4 = dataframe[dataframe['type'] == 'other']
+    dataframe = pd.concat([df_1, df_2, df_3, df_4])
+
     dataframe[column] = dataframe[column].str.split(',')
     dataframe = dataframe.explode(column)
-
     dataframe = dataframe[dataframe[column] != '']
-    hist = dataframe[column].value_counts()
+
+    hist = dataframe[column].value_counts(sort=False)
 
     return list(hist[hist >= 2].keys())
 
@@ -237,19 +244,14 @@ def _insert_resource_according_to_form(form,
         db.session.refresh(resource)
 
 
-def _get_subjects(resources_df):
-    list_of_lists = [
-        resource[1].subject for resource in resources_df.iterrows()]
-    return set([x for xs in list_of_lists for x in xs])
-
-
-def _get_instuctors(resources_df):
-    list_of_lists = [
-        resource[1].creator for resource in resources_df.iterrows()]
-    return set([x for xs in list_of_lists for x in xs])
-
-
 def _alternative_sort(series):
+    """
+    This function is designed as an alternative to alphabetical sorting,
+    in which, for example, "חורף 2018" is before "אביב 2019".
+
+    This function does not sort. it just changes the original data,
+    so that it would fit the desired order after sorting.
+    """
     series = series.fillna('')
 
     if series.dtype == object:
@@ -258,33 +260,39 @@ def _alternative_sort(series):
         series[series.str.startswith(
             'קיץ 20')] = series[series.str.startswith('קיץ 20')] + 'ב'
 
-        series[series.str.startswith('אביב 20')] = series[series.str.startswith(
-            'אביב 20')].str.replace('אביב', '')
-        series[series.str.startswith('קיץ 20')] = series[series.str.startswith(
-            'קיץ 20')].str.replace('קיץ', '')
-        series[series.str.startswith('חורף 20')] = series[series.str.startswith(
-            'חורף 20')].str.replace('חורף', '').str.replace('-', 'ג')
+        series[series.str.startswith('אביב 20')] = series[
+            series.str.startswith('אביב 20')].str.replace('אביב', '')
+        series[series.str.startswith('קיץ 20')] = series[
+            series.str.startswith('קיץ 20')].str.replace('קיץ', '')
+        series[series.str.startswith('חורף 20')] = series[
+            series.str.startswith('חורף 20')].str.replace(
+                'חורף', '').str.replace('-', 'ג')
 
-        series[series.str.startswith(
-            'לקראת המבחן')] = 'תתת' + series[series.str.startswith('לקראת המבחן')]
-
-        series[series.str.startswith(
-            'מבוא להרצאה')] = 'אאאא' + series[series.str.startswith('מבוא להרצאה')]
+        series[series.str.startswith('לקראת המבחן')] = 'תתת' +  \
+            series[series.str.startswith('לקראת המבחן')]
+        series[series.str.startswith('מבוא להרצאה')] = 'אאאא' + \
+            series[series.str.startswith('מבוא להרצאה')]
         series[series.str.startswith('הרצאה')] = 'אאא' + \
             series[series.str.startswith('הרצאה')]
-        series[series.str.startswith(
-            'מבוא לתרגול')] = 'אא' + series[series.str.startswith('מבוא לתרגול')]
+        series[series.str.startswith('מבוא לתרגול')] = 'אא' + \
+            series[series.str.startswith('מבוא לתרגול')]
         series[series.str.startswith('תרגול')] = 'א' + \
             series[series.str.startswith('תרגול')]
+
         for digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            series[series.str.endswith(
-                ' '+digit)] = series[series.str.endswith(' '+digit)].apply(lambda x: x[:-1] + '0'+digit)
+            series[series.str.endswith(' '+digit)] = \
+                series[series.str.endswith(' '+digit)].apply(
+                    lambda x: x[:-1] + '0'+digit)
+
             for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
-                series[series.str.endswith(' '+digit+addend)] = series[series.str.endswith(
-                    ' '+digit+addend)].apply(lambda x: x[:-2] + '0'+digit+addend)
-            for t in ['הרצאה', 'תרגול', 'תרגיל בית', 'גיליון', 'שאלה', 'שבוע', 'חלק']:
+                series[series.str.endswith(' '+digit+addend)] = \
+                    series[series.str.endswith(' '+digit+addend)].apply(
+                        lambda x: x[:-2] + '0'+digit+addend)
+
+            for t in ['הרצאה', 'תרגול', 'תרגיל בית', 'שאלה', 'שבוע', 'חלק']:
                 series = series.str.replace(
                     t + ' ' + digit + ' ', t+' 0' + digit+' ')
+
                 for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
                     series = series.str.replace(
                         t + ' ' + digit + addend, t+' 0' + digit+addend)
@@ -309,14 +317,24 @@ def _fetch_resources(course_institute=None,
         query = query.filter_by(resource_id=resource_id)
     resource_df = _query_to_dataframe(query.all())
 
-    if resource_df.empty or not should_enrich:
+    if resource_df.empty:
         return resource_df
 
-    resource_df.sort_values(['semester', 'folder', 'display_name'],
-                            key=_alternative_sort,
-                            ascending=[False, True, True],
-                            inplace=True)
+    # sort resources:
+    if tab == "others":
+        resource_df.sort_values('likes',
+                                ascending=False,
+                                inplace=True)
+    else:
+        resource_df.sort_values(['semester', 'folder', 'display_name'],
+                                key=_alternative_sort,
+                                ascending=[False, True, True],
+                                inplace=True)
 
+    if not should_enrich:
+        return resource_df
+
+    # enrich resources: user's progress
     if current_user.is_authenticated:
         query = ResourceToUser.query.filter_by(
             user_id=current_user.user_id).all()
@@ -330,24 +348,26 @@ def _fetch_resources(course_institute=None,
                                    right=resource_to_user,
                                    on="resource_id")
 
+    # enrich resources: split subjects and creators into lists
     if 'subject' in resource_df.keys():
         resource_df['subject'] = resource_df['subject'].apply(
             lambda x: x.split(',') if x else "")
-
     if 'creator' in resource_df.keys():
         resource_df['creator'] = resource_df['creator'].apply(
             lambda x: x.split(',') if x else "")
 
+    # enrich resources: links to tscans
     if tab == 'exams':
         resource_df['scans'] = resource_df.apply(
-            lambda x: "https://tscans.cf/?course="
+            lambda resource: "https://tscans.cf/?course="
             + course_institute_id
             + "&search=\""
-            + x.semester
+            + resource.semester
             + "\" "
-            + x.folder.replace("'", "%27"),
+            + resource.folder.replace("'", "%27"),
             axis=1)
 
+    # enrich resources: fill empty fields
     resource_df = resource_df.fillna(0)
 
     return resource_df

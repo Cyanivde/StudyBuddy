@@ -9,22 +9,62 @@
       </ul>
       <ul class="list-group list-group-horizontal">
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "lessons" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='lessons') }}">שיעורים</a></span>
+          <span {% if tab == "lessons" %}class="fw-bold"{% endif %}>
+            <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='lessons') }}">
+              שיעורים
+            </a>
+          </span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exercises" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exercises') }}">תרגילי בית</a></span>
+          <span {% if tab == "exercises" %}class="fw-bold"{% endif %}>
+            <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exercises') }}">
+              תרגילי בית
+            </a>
+          </span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exams" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exams') }}">מבחנים</a></span>
+          <span {% if tab == "exams" %}class="fw-bold"{% endif %}>
+            <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exams') }}">
+              מבחנים
+            </a>
+          </span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "others" %}class="fw-bold"{% endif %}><a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='others') }}">חומרי עזר</a></span>
+          <span {% if tab == "others" %}class="fw-bold"{% endif %}>
+            <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='others') }}">
+              חומרי עזר
+            </a>
+          </span>
         </li>
       </ul>
     </div>
     <hr/>
+    <div class="col-md-12 mb-1">
+      שינוי תצוגה:
+      <button class="badge btn-outline-secondary" onclick="openAll()">פתח הכל</button>
+      <button class="badge btn-outline-secondary" onclick="closeAll()">סגור הכל</button>
+    </div>
+    {% if course_subjects %}
+    <div class="col-md-12 mb-1">
+      סינון נושאים:
+      {% for subject in course_subjects %}
+        <button class="badge btn-outline-secondary"
+                onclick="filterTable(&quot;{{ subject }}&quot;)">{{ subject }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if course_creators %}
+    <div class="col-md-12 mb-1">
+      סינון יוצרים:
+      {% for creator in course_creators %}
+        <button class="badge btn-outline-secondary"
+                onclick="filterTable(&quot;{{ creator }}&quot;)">{{ creator }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <hr/>
     <div class="col-md-12 table-responsive">
-      <table id="myTable" class="responsive table hover" style="display:none">
+      <table id="myTable" class="responsive table hover">
         <thead>
           <tr class="align-middle course-tr">
             {% if tab != "others" %}<th class="text-start">תיקייה</th>{% endif %}
@@ -33,7 +73,7 @@
               <th class="all text-start">פתרון</th>
             {% endif %}
             {% if tab == "exams" %}<th class="min-tablet text-start">סריקות</th>{% endif %}
-            <th class="{% if tab in ("others","exercises") %}min-tablet {% else %}all {% endif %} text-start">הקלטה</th>
+            <th class="min-tablet text-start">הקלטה</th>
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">יוצרים</th>
             <th class="text-center min-tablet">הערות</th>
@@ -53,76 +93,61 @@
                 </td>
               {% endif %}
               <td>
-                {% if resource.link %}<a class="text-decoration-none"
-   target="_blank"
-   href="{{ resource.link }}">{% endif %}
+                {% if resource.link %}<a target="_blank" href="{{ resource.link }}">{% endif %}
                 {{ resource.display_name }}
                 {% if resource.link %}</a>{% endif %}
               </td>
               {% if tab in ("exams", "exercises") %}
                 <td class="text-start">
-                  {% if resource.solution %}
-                    <a target="_blank"
-                       class="text-decoration-none"
-                       href="{{ resource.solution }}">פתרון</a>
-                  {% endif %}
+                  {% if resource.solution %}<a target="_blank" href="{{ resource.solution }}">פתרון</a>{% endif %}
                 </td>
               {% endif %}
               {% if tab == "exams" %}
                 <td class="text-start">
-                  <a target="_blank"
-                     class="text-decoration-none"
-                     href="{{ resource.scans }}">סריקות</a>
+                  <a target="_blank" href="{{ resource.scans }}">סריקות</a>
                 </td>
               {% endif %}
               <td class="text-start">
                 {% if resource.recording %}
-                  <a target="_blank"
-                     class="text-decoration-none"href="{{ resource.recording }}">הקלטה
+                  <a target="_blank" href="{{ resource.recording }}">הקלטה
                     {% if resource.recording2 %}חלק 1{% endif %}
                   </a>
                 {% endif %}
                 {% if resource.recording_comment %}({{ resource.recording_comment }}){% endif %}
                 {% if resource.recording2 %}
                   <br/>
-                  <a target="_blank"
-                     class="text-decoration-none"href="{{ resource.recording2 }}">הקלטה חלק 2</a>
+                  <a target="_blank" href="{{ resource.recording2 }}">הקלטה חלק 2</a>
                 {% endif %}
                 {% if resource.recording2_comment %}({{ resource.recording2_comment }}){% endif %}
                 {% if resource.recording3 %}
                   <br/>
-                  <a target="_blank"
-                     class="text-decoration-none"href="{{ resource.recording3 }}">הקלטה חלק 3</a>
+                  <a target="_blank" href="{{ resource.recording3 }}">הקלטה חלק 3</a>
                 {% endif %}
                 {% if resource.recording3_comment %}({{ resource.recording3_comment }}){% endif %}
                 {% if resource.recording4 %}
                   <br/>
-                  <a target="_blank"
-                     class="text-decoration-none"href="{{ resource.recording4 }}">הקלטה חלק 4</a>
+                  <a target="_blank" href="{{ resource.recording4 }}">הקלטה חלק 4</a>
                 {% endif %}
                 {% if resource.recording4_comment %}({{ resource.recording4_comment }}){% endif %}
                 {% if resource.recording5 %}
                   <br/>
-                  <a target="_blank"
-                     class="text-decoration-none"href="{{ resource.recording5 }}">הקלטה חלק 5</a>
+                  <a target="_blank" href="{{ resource.recording5 }}">הקלטה חלק 5</a>
                 {% endif %}
                 {% if resource.recording5_comment %}({{ resource.recording5_comment }}){% endif %}
               </td>
               <td class="text-center">
-                {% for subj in resource.subject %}
+                {% for subject in resource.subject %}
                   <button class="badge btn-outline-secondary"
-                          onclick="querySubj(&quot;{{ subj }}&quot;)"
-                          style="border: 0">
-                    {{ subj }}
+                          onclick="filterTable(&quot;{{ subject }}&quot;)">
+                    {{ subject }}
                   </button>
                 {% endfor %}
               </td>
               <td class="text-center">
-                {% for instr in resource.creator %}
+                {% for creator in resource.creator %}
                   <button class="badge btn-outline-secondary"
-                          onclick="querySubj(&quot;{{ instr }}&quot;)"
-                          style="border: 0">
-                    {{ instr }}
+                          onclick="filterTable(&quot;{{ creator }}&quot;)">
+                    {{ creator }}
                   </button>
                 {% endfor %}
               </td>
@@ -233,8 +258,7 @@
                 </td class="text-center">
               {% endif %}
               <td class="text-center">
-                <a class="text-decoration-none"
-                   href="{{ url_for('edit_resource', course_institute=course.course_institute, course_institute_id=course.course_institute_id, resource_id=resource.resource_id) }}">עריכה</a>
+                <a href="{{ url_for('edit_resource', course_institute=course.course_institute, course_institute_id=course.course_institute_id, resource_id=resource.resource_id) }}">עריכה</a>
               </td>
               <td>
                 <a href="#" onclick="return false;">
@@ -255,7 +279,23 @@
     </div>
   </div>
   <script type="text/javascript">
-    function querySubj(subj) {
+    function openAll() {
+      $('#myTable tbody tr.dtrg-start').each(function () {
+        var name = $(this).data('name');
+        collapsedGroups[name] = true;
+        myTable.draw(false);
+      });
+    }
+
+    function closeAll() {
+      $('#myTable tbody tr.dtrg-start').each(function () {
+        var name = $(this).data('name');
+        collapsedGroups[name] = false;
+        myTable.draw(false);
+      });
+    }
+
+    function filterTable(subj) {
       var oTable = $('#myTable').dataTable();
       if (document.getElementById("myTable_filter").firstChild.children[0].value != "") {
         if (document.getElementById("myTable_filter").firstChild.children[0].value != subj) {
