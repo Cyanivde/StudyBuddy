@@ -18,7 +18,7 @@ ERR_PASSWORD_MATCH = "הסיסמאות אינן תואמות"
 ERR_NOT_ALLOWED_SITE = "הקישור אינו עומד בדרישות"
 USERNAME_REGEX = r"^\w{5,20}$"
 PASSWORD_REGEX = "^(?=.*?[A-Za-z#?!@$%^&*-])(?=.*?[0-9]).{8,}$"
-ALLOWED_SITES_REGEX = r"^.*(sharepoint|github)\.com.*|\w{0}$"
+ALLOWED_SITES_REGEX = r"^(?!.*grades\.cs|.*moodle2223\.technion.|.*moodle2222\.technion.).*$"
 
 
 class RegistrationForm(FlaskForm):

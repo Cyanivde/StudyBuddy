@@ -320,6 +320,9 @@ def _fetch_resources(course_institute=None,
 
 
 def _enrich_resources(resource_df, course_institute_id, tab):
+    if resource_df.empty:
+        return resource_df
+
     # sort resources:
     if tab == "others":
         resource_df.sort_values('likes',

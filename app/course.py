@@ -24,7 +24,7 @@ def _course(course_institute, course_institute_id, tab):
         enriched_resources_df = resources_df[
             (resources_df['is_in_recycle_bin'] == False) &
             (resources_df['type'] == tab[:-1])]
-    print(enriched_resources_df)
+
     enriched_resources_df = _enrich_resources(
         enriched_resources_df, course_institute_id, tab)
 
