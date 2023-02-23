@@ -16,6 +16,18 @@ def _course(course_institute, course_institute_id, tab):
     course = course.iloc[0]
 
     resources_df = _fetch_resources(course_institute, course_institute_id)
+
+    if resources_df.empty:
+        return render_template('course.html',
+                               course=course,
+                               resources=resources_df,
+                               tab=tab,
+                               course_subjects=_fetch_subject_list(course_institute,
+                                                                   course_institute_id,
+                                                                   resources_df),
+                               course_creators=_fetch_creator_list(course_institute,
+                                                                   course_institute_id,
+                                                                   resources_df))
     enriched_resources_df = None
     if tab == "recycle_bin":
         enriched_resources_df = resources_df[
