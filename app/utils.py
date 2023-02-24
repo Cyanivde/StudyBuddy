@@ -152,9 +152,21 @@ def _update_form_according_to_resource(form, resource):
     return form
 
 
+def _default_folder(form):
+    if "exam" in form.type.data:
+        form.folder.data = 'מועד א\''
+    elif "exercise" in form.type.data:
+        form.folder.data = 'תרגיל בית 1'
+    elif form.type.data == "lesson":
+        form.folder.data = 'הרצאה 1'
+    else:
+        form.folder.data = 'ללא תיקייה'
+    return form
+
+
 def _update_resource_according_to_form(resource_series, form):
     if form.folder.data == '':
-        form.folder.data = 'ללא תיקייה'
+        form = _default_folder(form)
 
     if (form.type.data not in ("exercise_full", "exam_full")
             and form.display_name.data == ''):
@@ -203,7 +215,7 @@ def _insert_resource_according_to_form(form,
     num_resources = 1
 
     if form.folder.data == '':
-        form.folder.data = 'ללא תיקייה'
+        form = _default_folder(form)
 
     if (form.type.data not in ("exercise_full", "exam_full")
             and form.display_name.data == ''):
@@ -216,7 +228,7 @@ def _insert_resource_according_to_form(form,
     for i in range(num_resources):
         name = form.display_name.data
         if num_resources > 1:
-            name += ' שאלה ' + str((i+1))
+            name += 'שאלה ' + str((i+1))
         resource = Resource(display_name=name,
                             folder=form.folder.data,
                             type=form.type.data,
