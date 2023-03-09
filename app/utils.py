@@ -168,7 +168,7 @@ def _update_resource_according_to_form(resource_series, form):
     if form.folder.data == '':
         form = _default_folder(form)
 
-    form.folder.data = form.folder.data.str.replace("׳", "'")
+    form.folder.data = form.folder.data.replace("׳", "'")
 
     if (form.type.data not in ("exercise_full", "exam_full")
             and form.display_name.data == ''):
@@ -219,7 +219,7 @@ def _insert_resource_according_to_form(form,
     if form.folder.data == '':
         form = _default_folder(form)
 
-    form.folder.data = form.folder.data.str.replace("׳", "'")
+    form.folder.data = form.folder.data.replace("׳", "'")
 
     if (form.type.data not in ("exercise_full", "exam_full")
             and form.display_name.data == ''):
@@ -298,6 +298,8 @@ def _alternative_sort(series):
         series[series.str.startswith('תרגול')] = 'א' + \
             series[series.str.startswith('תרגול')]
 
+        series = series.str.replace('-', ' - ')
+
         for digit in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
             series[series.str.endswith(' '+digit)] = \
                 series[series.str.endswith(' '+digit)].apply(
@@ -315,8 +317,6 @@ def _alternative_sort(series):
                 for addend in ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח']:
                     series = series.str.replace(
                         t + ' ' + digit + addend, t+' 0' + digit+addend)
-
-        series.str.replace('-', ' - ')
 
     return series
 
