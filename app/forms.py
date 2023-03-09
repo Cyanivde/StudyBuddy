@@ -116,6 +116,10 @@ class UpdateResourceForm(FlaskForm):
                            validators=[Regexp(ALLOWED_SITES_REGEX,
                                               message=ERR_NOT_ALLOWED_SITE)])
 
+    references = StringField('קישור לתיקיית רפרנסים',
+                             validators=[Regexp(ALLOWED_SITES_REGEX,
+                                                message=ERR_NOT_ALLOWED_SITE)])
+
     recording = FieldList(StringField(),
                           'קישורים להקלטות',
                           min_entries=5)

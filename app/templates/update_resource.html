@@ -6,7 +6,7 @@
         infoAlert.classList.add('alert');
         infoAlert.classList.add('alert-info');
         infoAlert.classList.add('mt-4');
-        infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.';
+        infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.\nנא לשמור על מבנה תיקיות בדומה ל<a target="_blank" class="alert-link" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/234123">דוגמה</a>.';
         document.getElementsByTagName('form')[0].prepend(infoAlert);
 
         {% if is_existing_resource %}
@@ -20,10 +20,7 @@
         document.getElementById('display_name').placeholder = "הרצאה 1";
         document.getElementById('folder').placeholder = "שבוע 1";
 
-        $('label[for=questions_count], select#questions_count').hide();
-
-        document.getElementById("type").onchange =
-            function displayNamePlaceholder() {
+        function displayNamePlaceholder() {
                 var typeSelect = document.getElementById("type");
                 var val = typeSelect.options[typeSelect.selectedIndex].value;
                 if (val == "lesson") {
@@ -31,39 +28,49 @@
                     document.getElementById('folder').placeholder = "שבוע 1";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
+                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').show();
                 } else if (val == "exercise") {
                     document.getElementById('display_name').placeholder = "שאלה 1";
                     document.getElementById('folder').placeholder = "תרגיל בית 1";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
+                    $('label[for=references], input#references').show();
                     $('label[for=folder], input#folder').show();
                 } else if (val == "exercise_full") {
                     document.getElementById('display_name').placeholder = "";
                     document.getElementById('folder').placeholder = "תרגיל בית 1";
                     $('label[for=questions_count], select#questions_count').show();
                     $('label[for=display_name], input#display_name').hide();
+                    $('label[for=references], input#references').show();
                     $('label[for=folder], input#folder').show();
                 } else if (val == "exam") {
                     document.getElementById('display_name').placeholder = "שאלה 1";
                     document.getElementById('folder').placeholder = "מועד א'";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
+                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').show();
                 } else if (val == "exam_full") { 
                     document.getElementById('folder').placeholder = "מועד א'";
                     $('label[for=questions_count], select#questions_count').show();
                     $('label[for=display_name], input#display_name').hide();
+                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').show();
                 } else {
                     document.getElementById('folder').placeholder = "";
                     document.getElementById('display_name').placeholder = "";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
+                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').hide();
                 }
-            }
+            };
 
+        document.getElementById("type").onchange =displayNamePlaceholder;
+            
+    displayNamePlaceholder();
+    
     document.getElementById('recording-0').placeholder = "קישור";
     document.getElementById('recording-1').placeholder = "קישור לחלק 2 (אם יש)";
     document.getElementById('recording-2').placeholder = "קישור לחלק 3 (אם יש)";

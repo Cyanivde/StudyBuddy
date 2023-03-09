@@ -86,6 +86,7 @@
               <th class="all text-start">פתרון</th>
             {% endif %}
             {% if tab == "exams" %}<th class="min-tablet text-start">סריקות</th>{% endif %}
+            {% if tab == "exercises" %}<th class="min-tablet text-start">רפרנסים</th>{% endif %}
             <th class="min-tablet text-start">הקלטה</th>
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">יוצרים</th>
@@ -115,6 +116,11 @@
               {% if tab in ("exams", "exercises") %}
                 <td class="text-start">
                   {% if resource.solution %}<a target="_blank" href="{{ resource.solution }}">פתרון</a>{% endif %}
+                </td>
+              {% endif %}
+              {% if tab == "exercises" %}
+                <td class="text-start">
+                  {% if resource.references %}<a target="_blank" href="{{ resource.references }}">רפרנסים</a>{% endif %}
                 </td>
               {% endif %}
               {% if tab == "exams" %}

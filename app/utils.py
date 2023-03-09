@@ -133,6 +133,7 @@ def _update_form_according_to_resource(form, resource):
     form.link.data = resource.link
     form.type.data = resource.type
     form.solution.data = resource.solution
+    form.references.data = resource.references
     form.recording[0].data = resource.recording
     form.recording[1].data = resource.recording2
     form.recording[2].data = resource.recording3
@@ -182,6 +183,7 @@ def _update_resource_according_to_form(resource_series, form):
     resource.type = form.type.data
     resource.link = _strip_after_file_extension(form.link.data)
     resource.solution = _strip_after_file_extension(form.solution.data)
+    resource.references = _strip_after_file_extension(form.references.data)
     resource.recording = form.recording[0].data
     resource.recording2 = form.recording[1].data
     resource.recording3 = form.recording[2].data
@@ -239,6 +241,8 @@ def _insert_resource_according_to_form(form,
                             link=_strip_after_file_extension(form.link.data),
                             solution=_strip_after_file_extension(
                                 form.solution.data),
+                            references=_strip_after_file_extension(
+                                form.references.data),
                             recording=form.recording[0].data,
                             recording2=form.recording[1].data,
                             recording3=form.recording[2].data,

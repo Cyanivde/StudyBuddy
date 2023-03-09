@@ -49,6 +49,7 @@ class Resource(db.Model):
     resource_id = db.Column(db.Integer, primary_key=True)
     link = db.Column(db.String(500))
     solution = db.Column(db.String(500))
+    references = db.Column(db.String(500))
     recording = db.Column(db.String(500))
     recording_comment = db.Column(db.String(100))
     recording2 = db.Column(db.String(500))
