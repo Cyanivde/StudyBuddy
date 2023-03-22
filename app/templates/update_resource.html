@@ -6,15 +6,13 @@
         infoAlert.classList.add('alert');
         infoAlert.classList.add('alert-info');
         infoAlert.classList.add('mt-4');
-        infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.\nנא לשמור על מבנה תיקיות בדומה ל<a target="_blank" class="alert-link" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/104031">דוגמה</a>.';
+        infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" style="text-decoration:underline" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.';
         document.getElementsByTagName('form')[0].prepend(infoAlert);
 
         {% if is_existing_resource %}
             $("#type option[value='exam_full']").remove();
-            $("#type option[value='exercise_full']").remove();
         {% else %}
             $("#type option[value='exam']").remove();
-            $("#type option[value='exercise']").remove();
         {% endif %}
 
         document.getElementById('display_name').placeholder = "הרצאה 1";
@@ -28,41 +26,23 @@
                     document.getElementById('folder').placeholder = "שבוע 1";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
-                    $('label[for=references], input#references').hide();
-                    $('label[for=folder], input#folder').show();
-                } else if (val == "exercise") {
-                    document.getElementById('display_name').placeholder = "שאלה 1";
-                    document.getElementById('folder').placeholder = "תרגיל בית 1";
-                    $('label[for=questions_count], select#questions_count').hide();
-                    $('label[for=display_name], input#display_name').show();
-                    $('label[for=references], input#references').show();
-                    $('label[for=folder], input#folder').show();
-                } else if (val == "exercise_full") {
-                    document.getElementById('display_name').placeholder = "";
-                    document.getElementById('folder').placeholder = "תרגיל בית 1";
-                    $('label[for=questions_count], select#questions_count').show();
-                    $('label[for=display_name], input#display_name').hide();
-                    $('label[for=references], input#references').show();
                     $('label[for=folder], input#folder').show();
                 } else if (val == "exam") {
                     document.getElementById('display_name').placeholder = "שאלה 1";
                     document.getElementById('folder').placeholder = "מועד א'";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
-                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').show();
                 } else if (val == "exam_full") { 
                     document.getElementById('folder').placeholder = "מועד א'";
                     $('label[for=questions_count], select#questions_count').show();
                     $('label[for=display_name], input#display_name').hide();
-                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').show();
                 } else {
                     document.getElementById('folder').placeholder = "";
                     document.getElementById('display_name').placeholder = "";
                     $('label[for=questions_count], select#questions_count').hide();
                     $('label[for=display_name], input#display_name').show();
-                    $('label[for=references], input#references').hide();
                     $('label[for=folder], input#folder').hide();
                 }
             };

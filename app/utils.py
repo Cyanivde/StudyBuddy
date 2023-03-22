@@ -99,9 +99,8 @@ def _get_prominent_values(dataframe, column):
     # precedence
     df_1 = dataframe[dataframe['type'] == 'lesson']
     df_2 = dataframe[dataframe['type'] == 'exam']
-    df_3 = dataframe[dataframe['type'] == 'exercise']
-    df_4 = dataframe[dataframe['type'] == 'other']
-    dataframe = pd.concat([df_1, df_2, df_3, df_4])
+    df_3 = dataframe[dataframe['type'] == 'other']
+    dataframe = pd.concat([df_1, df_2, df_3])
 
     dataframe[column] = dataframe[column].str.split(',')
     dataframe = dataframe.explode(column)
@@ -133,7 +132,6 @@ def _update_form_according_to_resource(form, resource):
     form.link.data = resource.link
     form.type.data = resource.type
     form.solution.data = resource.solution
-    form.references.data = resource.references
     form.recording[0].data = resource.recording
     form.recording[1].data = resource.recording2
     form.recording[2].data = resource.recording3
@@ -156,8 +154,6 @@ def _update_form_according_to_resource(form, resource):
 def _default_folder(form):
     if "exam" in form.type.data:
         form.folder.data = 'מועד א\''
-    elif "exercise" in form.type.data:
-        form.folder.data = 'תרגיל בית 1'
     elif form.type.data == "lesson":
         form.folder.data = 'הרצאה 1'
     else:
@@ -171,7 +167,7 @@ def _update_resource_according_to_form(resource_series, form):
 
     form.folder.data = form.folder.data.replace("׳", "'")
 
-    if (form.type.data not in ("exercise_full", "exam_full")
+    if (form.type.data != "exam_full"
             and form.display_name.data == ''):
         form.display_name.data = 'ללא שם'
 
@@ -183,7 +179,6 @@ def _update_resource_according_to_form(resource_series, form):
     resource.type = form.type.data
     resource.link = _strip_after_file_extension(form.link.data)
     resource.solution = _strip_after_file_extension(form.solution.data)
-    resource.references = _strip_after_file_extension(form.references.data)
     resource.recording = form.recording[0].data
     resource.recording2 = form.recording[1].data
     resource.recording3 = form.recording[2].data
@@ -223,11 +218,11 @@ def _insert_resource_according_to_form(form,
 
     form.folder.data = form.folder.data.replace("׳", "'")
 
-    if (form.type.data not in ("exercise_full", "exam_full")
+    if (form.type.data != "exam_full"
             and form.display_name.data == ''):
         form.display_name.data = 'ללא שם'
 
-    if form.type.data in ('exam_full', 'exercise_full'):
+    if form.type.data == 'exam_full':
         form.type.data = form.type.data[:-5]
         num_resources = int(form.questions_count.data)
 
@@ -241,8 +236,6 @@ def _insert_resource_according_to_form(form,
                             link=_strip_after_file_extension(form.link.data),
                             solution=_strip_after_file_extension(
                                 form.solution.data),
-                            references=_strip_after_file_extension(
-                                form.references.data),
                             recording=form.recording[0].data,
                             recording2=form.recording[1].data,
                             recording3=form.recording[2].data,

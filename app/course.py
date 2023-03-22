@@ -5,7 +5,7 @@ from app.utils import (_enrich_resources, _fetch_courses, _fetch_creator_list,
 
 
 def _course(course_institute, course_institute_id, tab):
-    if tab not in ["lessons", "exercises", "exams", "others", "recycle_bin"]:
+    if tab not in ["lessons", "exams", "others", "recycle_bin"]:
         abort(404)
 
     course = _fetch_courses(course_institute, course_institute_id)

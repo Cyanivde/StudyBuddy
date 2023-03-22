@@ -17,8 +17,9 @@
           </span>
         </li>
         <li class="list-group-item list-group-item-link">
-          <span {% if tab == "exercises" %}class="fw-bold"{% endif %}>
-            <a href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exercises') }}">
+          <span></span>
+            <a target="_blank"
+               href="https://technionmail.sharepoint.com/:b:/r/sites/StudyBuddy/Shared%20Documents/{{ course.course_institute_id }}/Exercises">
               תרגילי בית
             </a>
           </span>
@@ -87,11 +88,10 @@
               <th class="text-start">תיקייה</th>
             {% endif %}
             <th class="all text-start">שם</th>
-            {% if tab in ("exams", "exercises") %}
+            {% if tab == 'exams' %}
               <th class="all text-start">פתרון</th>
             {% endif %}
             {% if tab == "exams" %}<th class="min-tablet text-start">סריקות</th>{% endif %}
-            {% if tab == "exercises" %}<th class="min-tablet text-start">רפרנסים</th>{% endif %}
             <th class="min-tablet text-start">הקלטה</th>
             <th class="text-center min-tablet">נושאים</th>
             <th class="text-center min-tablet">יוצרים</th>
@@ -118,14 +118,9 @@
                 {{ resource.display_name }}
                 {% if resource.link %}</a>{% endif %}
               </td>
-              {% if tab in ("exams", "exercises") %}
+              {% if tab == 'exams' %}
                 <td class="text-start">
                   {% if resource.solution %}<a target="_blank" href="{{ resource.solution }}">פתרון</a>{% endif %}
-                </td>
-              {% endif %}
-              {% if tab == "exercises" %}
-                <td class="text-start">
-                  {% if resource.references %}<a target="_blank" href="{{ resource.references }}">רפרנסים</a>{% endif %}
                 </td>
               {% endif %}
               {% if tab == "exams" %}
@@ -407,7 +402,6 @@
           
           {
             {% if tab == 'exams' %}targets: [6],{%endif%}
-            {% if tab == 'exercises' %}targets: [5],{%endif%}
             {% if tab in ('lessons', 'others', 'recycle_bin') %}targets: [4],{%endif%}
             render: function ( data, type, row ) {
                var s = data.split('</button>').slice(0,4).join('</button>')

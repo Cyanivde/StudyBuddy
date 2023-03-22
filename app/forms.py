@@ -95,8 +95,6 @@ class UpdateResourceForm(FlaskForm):
     type = SelectField('סוג',
                        choices=[
                            ('lesson', 'שיעור (הרצאה/תרגול/סדנה)'),
-                           ('exercise_full', 'תרגיל בית'),
-                           ('exercise', 'שאלה מתרגיל בית'),
                            ('exam_full', 'מבחן'),
                            ('exam', 'שאלה ממבחן'),
                            ('other', 'אחר (למשל סיכום אישי)')
@@ -115,10 +113,6 @@ class UpdateResourceForm(FlaskForm):
     solution = StringField('קישור לפתרון',
                            validators=[Regexp(ALLOWED_SITES_REGEX,
                                               message=ERR_NOT_ALLOWED_SITE)])
-
-    references = StringField('קישור לתיקיית רפרנסים',
-                             validators=[Regexp(ALLOWED_SITES_REGEX,
-                                                message=ERR_NOT_ALLOWED_SITE)])
 
     recording = FieldList(StringField(),
                           'קישורים להקלטות',
