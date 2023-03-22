@@ -5,7 +5,8 @@ from flask_login import current_user
 from app import db
 from app.models import Resource, ResourceToUser
 
-SEMESTERS_LIST = ['חורף 2022-2023',
+SEMESTERS_LIST = ['אביב 2023',
+                  'חורף 2022-2023',
                   'קיץ 2022',
                   'אביב 2022',
                   'חורף 2021-2022',
