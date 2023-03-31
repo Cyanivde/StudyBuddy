@@ -308,7 +308,7 @@ def _alternative_sort(series):
                     series[series.str.endswith(' '+digit+addend)].apply(
                         lambda x: x[:-2] + '0'+digit+addend)
 
-            for t in ['הרצאה', 'תרגול', 'תרגיל בית', 'שאלה', 'שבוע', 'חלק']:
+            for t in ['הרצאה', 'תרגול', 'שבוע', 'חלק']:
                 series = series.str.replace(
                     t + ' ' + digit + ' ', t+' 0' + digit+' ')
 
@@ -340,15 +340,10 @@ def _enrich_resources(resource_df, course_institute_id, tab):
         return resource_df
 
     # sort resources:
-    if tab == "others":
-        resource_df.sort_values('likes',
-                                ascending=False,
-                                inplace=True)
-    else:
-        resource_df.sort_values(['semester', 'folder', 'display_name'],
-                                key=_alternative_sort,
-                                ascending=[False, True, True],
-                                inplace=True)
+    resource_df.sort_values(['semester', 'folder', 'display_name'],
+                            key=_alternative_sort,
+                            ascending=[False, True, True],
+                            inplace=True)
     # enrich resources: user's progress
     if current_user.is_authenticated:
         query = ResourceToUser.query.filter_by(
