@@ -108,7 +108,6 @@ def _get_prominent_values(dataframe, column):
     dataframe = dataframe[dataframe[column] != '']
 
     hist = dataframe[column].value_counts(sort=False)
-
     return list(hist[hist >= 2].keys())
 
 
@@ -334,6 +333,17 @@ def _fetch_resources(course_institute=None,
 
     return resource_df
 
+def _sort_resources(resource_df):
+    if resource_df.empty:
+        return resource_df
+
+    # sort resources:
+    resource_df.sort_values(['semester', 'folder', 'display_name'],
+                            key=_alternative_sort,
+                            ascending=[False, True, True],
+                            inplace=True)
+
+    return resource_df
 
 def _enrich_resources(resource_df, course_institute_id, tab):
     if resource_df.empty:

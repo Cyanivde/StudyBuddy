@@ -1,7 +1,7 @@
 from flask import abort, render_template
 
 from app.utils import (_enrich_resources, _fetch_courses, _fetch_creator_list,
-                       _fetch_resources, _fetch_subject_list)
+                       _fetch_resources, _fetch_subject_list, _sort_resources)
 
 
 def _course(course_institute, course_institute_id, tab):
@@ -37,6 +37,8 @@ def _course(course_institute, course_institute_id, tab):
             (resources_df['is_in_recycle_bin'] == False) &
             (resources_df['type'] == tab[:-1])]
 
+    sorted_resources_df = _sort_resources(resources_df)
+
     enriched_resources_df = _enrich_resources(
         enriched_resources_df, course_institute_id, tab)
 
@@ -46,7 +48,7 @@ def _course(course_institute, course_institute_id, tab):
                            tab=tab,
                            course_subjects=_fetch_subject_list(course_institute,
                                                                course_institute_id,
-                                                               resources_df),
+                                                               sorted_resources_df),
                            course_creators=_fetch_creator_list(course_institute,
                                                                course_institute_id,
-                                                               resources_df))
+                                                               sorted_resources_df))

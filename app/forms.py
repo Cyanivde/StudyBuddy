@@ -126,7 +126,7 @@ class UpdateResourceForm(FlaskForm):
 
     creator = StringField('יוצרים (מופרדים בפסיק)')
 
-    is_out_of_date = BooleanField('כבר לא בחומר')
+    is_out_of_date = BooleanField('לא למבחן')
 
     is_solution_partial = BooleanField('הפתרון חלקי')
 
