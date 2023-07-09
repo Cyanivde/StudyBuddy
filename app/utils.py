@@ -201,7 +201,7 @@ def _update_resource_according_to_form(resource_series, form):
 
 
 def _strip_after_file_extension(s):
-    for extension in ['.pdf', '.doc', '.docx', '.pptx', '.ppt']:
+    for extension in ['.pdf', '.docx', '.doc', '.pptx', '.ppt']:
         if extension in s:
             return s.split(extension)[0] + extension
     else:

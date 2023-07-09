@@ -124,7 +124,7 @@ class UpdateResourceForm(FlaskForm):
 
     subject = StringField('נושאים (מופרדים בפסיק)')
 
-    creator = StringField('יוצרים (מופרדים בפסיק)')
+    creator = StringField('מרצים (מופרדים בפסיק)')
 
     is_out_of_date = BooleanField('לא למבחן')
 

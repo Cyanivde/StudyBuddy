@@ -50,7 +50,7 @@
   {% endif %}
   {% if course_creators and tab == 'exams' %}
   <div class="col-md-12 mb-1">
-    סינון יוצרים:
+    סינון מרצים:
     {% for creator in course_creators %}
     <button class="badge btn-outline-secondary" onclick="filterTable(&quot;{{ creator }}&quot;)">{{ creator }}</button>
     {% endfor %}
@@ -291,7 +291,7 @@
 
     {
             {% if tab == 'exams' %}targets: [6], {% endif %}
-  {% if tab in ('lessons', 'recycle_bin') %} targets: [4], {% endif %}
+  {% if tab in ('lessons', 'recycle_bin') %} targets: [3], {% endif %}
   render: function (data, type, row) {
     var s = data.split('</button>').slice(0, 4).join('</button>')
     if ((s != '') && (!s.endsWith('</button>'))) {
