@@ -53,19 +53,7 @@
                         <span style="font-size:1.5rem">!</span>
                         <br />
                   </div>
-                  <div>
-                        <select class="selectpicker" data-size="5" data-live-search="true"
-                              data-live-search-style="contains"
-                              onchange="if (this.value) window.location.href=this.value" title="בחרו קורס..."">
-                                    {% for index, course in courses.iterrows() %}
-                                          <option value=" {{ url_for('course',
-                              course_institute=course.course_institute, course_institute_id=course.course_institute_id,
-                              tab='lessons' ) }}">
-                              [{{ course.course_institute_id }}] {{ course.course_name }}
-                              </option>
-                              {% endfor %}
-                        </select>
-                  </div>
+
             </div>
       </div>
 </body>

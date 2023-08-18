@@ -1,40 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="alert alert-info" role="info">
-  מעוניינים להצטרף לצוות StudyBuddy ולהשתתף בבניית האתר? <a style="text-decoration: underline" class="alert-link"
-    href="https://forms.gle/4Shbt5ufh8YU1ext8">לחצו כאן</a>!
-</div>
 <div class="overflow-auto">
-  <div class="header-paragraph">
-    <h4>{{ course.course_name }}</h4>
-    <ul class="list-group list-group-horizontal">
-      <li class="list-group-item list-group-item-link">
-        <span {% if tab=="lessons" %}class="fw-bold" {% endif %}>
-          <a
-            href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='lessons') }}">
-            שיעורים
-          </a>
-        </span>
-      </li>
-      <li class="list-group-item list-group-item-link">
-        <span {% if tab=="exams" %}class="fw-bold" {% endif %}>
-          <a
-            href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='exams') }}">
-            מבחנים
-          </a>
-        </span>
-      </li>
-      <li class="list-group-item list-group-item-link">
-        <span {% if tab=="recycle_bin" %}class="fw-bold" {% endif %}>
-          <a
-            href="{{ url_for('course', course_institute=course.course_institute, course_institute_id=course.course_institute_id, tab='recycle_bin') }}">
-            סל המיחזור
-          </a>
-        </span>
-      </li>
-    </ul>
-  </div>
-  <hr />
   <div class="col-md-12 mb-1">
     שינוי תצוגה:
     <button class="badge btn-outline-secondary" onclick="openAll()">פתח הכל</button>
@@ -71,7 +37,7 @@
           <th class="text-center min-tablet">הערות</th>
           <th class="text-center min-tablet">מעקב</th>
           <th class="text-center min-tablet">עריכה</th>
-          <th class="max-tablet"></th>
+          <th class="max-tablet" style="width: 30px"></th>
         </tr>
       </thead>
       <tbody>

@@ -4,7 +4,7 @@ from app.utils import (_enrich_resources, _fetch_courses, _fetch_creator_list,
                        _fetch_resources, _fetch_subject_list, _sort_resources)
 
 
-def _course(course_institute, course_institute_id, tab):
+def _course(course_institute, course_institute_id, tab, courses):
     if tab not in ["lessons", "exams", "recycle_bin"]:
         abort(404)
 
@@ -20,6 +20,7 @@ def _course(course_institute, course_institute_id, tab):
     if resources_df.empty:
         return render_template('course.html',
                                course=course,
+                               courses=courses,
                                resources=resources_df,
                                tab=tab,
                                course_subjects=_fetch_subject_list(course_institute,
@@ -44,6 +45,7 @@ def _course(course_institute, course_institute_id, tab):
 
     return render_template('course.html',
                            course=course,
+                           courses=courses,
                            resources=enriched_resources_df,
                            tab=tab,
                            course_subjects=_fetch_subject_list(course_institute,

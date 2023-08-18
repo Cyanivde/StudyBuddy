@@ -84,6 +84,18 @@ table.dataTable tr.dtrg-group {
   box-shadow: 0px 1px 3px #888;
 }
 
+.bootstrap-select>.dropdown-toggle {
+  width: 320px !important;
+}
+
+.bootstrap-select>.dropdown-toggle.bs-placeholder,
+.bootstrap-select>.dropdown-toggle.bs-placeholder:active,
+.bootstrap-select>.dropdown-toggle.bs-placeholder:focus,
+.bootstrap-select>.dropdown-toggle.bs-placeholder:hover {
+  color: #111 !important;
+
+}
+
 .cover-container {
   max-width: 430px;
   margin: 0 auto;
