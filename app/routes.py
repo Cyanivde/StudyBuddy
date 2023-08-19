@@ -67,7 +67,11 @@ def course(course_institute, course_institute_id):
          return _course(course_institute, course_institute_id, "exams", courses=_fetch_courses())
             
 
-
+@app.route('/<course_institute>/<course_institute_id>/<tab>',
+           methods=['GET', 'POST'])
+def course_exams(course_institute, course_institute_id, tab):
+         return redirect(url_for('course', course_institute='technion', course_institute_id=course_institute_id))
+            
 
 
 @ app.route('/updateresourcetouser', methods=['POST'])
