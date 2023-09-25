@@ -5,7 +5,9 @@ from flask_login import current_user
 from app import db
 from app.models import Resource, ResourceToUser
 
-SEMESTERS_LIST = ['אביב 2023',
+SEMESTERS_LIST = ['חורף 2023-2024',
+                  'קיץ 2023',
+                  'אביב 2023',
                   'חורף 2022-2023',
                   'קיץ 2022',
                   'אביב 2022',
@@ -133,15 +135,7 @@ def _update_form_according_to_resource(form, resource):
     form.type.data = resource.type
     form.solution.data = resource.solution
     form.recording[0].data = resource.recording
-    form.recording[1].data = resource.recording2
-    form.recording[2].data = resource.recording3
-    form.recording[3].data = resource.recording4
-    form.recording[4].data = resource.recording5
     form.recording_comment[0].data = resource.recording_comment
-    form.recording_comment[1].data = resource.recording2_comment
-    form.recording_comment[2].data = resource.recording3_comment
-    form.recording_comment[3].data = resource.recording4_comment
-    form.recording_comment[4].data = resource.recording5_comment
     form.is_out_of_date.data = resource.is_out_of_date
     form.is_solution_partial.data = resource.is_solution_partial
     form.is_in_recycle_bin.data = resource.is_in_recycle_bin
@@ -180,15 +174,7 @@ def _update_resource_according_to_form(resource_series, form):
     resource.link = _strip_after_file_extension(form.link.data)
     resource.solution = _strip_after_file_extension(form.solution.data)
     resource.recording = form.recording[0].data
-    resource.recording2 = form.recording[1].data
-    resource.recording3 = form.recording[2].data
-    resource.recording4 = form.recording[3].data
-    resource.recording5 = form.recording[4].data
     resource.recording_comment = form.recording_comment[0].data
-    resource.recording2_comment = form.recording_comment[1].data
-    resource.recording3_comment = form.recording_comment[2].data
-    resource.recording4_comment = form.recording_comment[3].data
-    resource.recording5_comment = form.recording_comment[4].data
     resource.is_out_of_date = form.is_out_of_date.data
     resource.is_solution_partial = form.is_solution_partial.data
     resource.is_in_recycle_bin = form.is_in_recycle_bin.data
@@ -237,15 +223,7 @@ def _insert_resource_according_to_form(form,
                             solution=_strip_after_file_extension(
                                 form.solution.data),
                             recording=form.recording[0].data,
-                            recording2=form.recording[1].data,
-                            recording3=form.recording[2].data,
-                            recording4=form.recording[3].data,
-                            recording5=form.recording[4].data,
                             recording_comment=form.recording_comment[0].data,
-                            recording2_comment=form.recording_comment[1].data,
-                            recording3_comment=form.recording_comment[2].data,
-                            recording4_comment=form.recording_comment[3].data,
-                            recording5_comment=form.recording_comment[4].data,
                             is_out_of_date=form.is_out_of_date.data,
                             is_solution_partial=form.is_solution_partial.data,
                             is_in_recycle_bin=form.is_in_recycle_bin.data,

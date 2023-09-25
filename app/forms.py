@@ -115,12 +115,12 @@ class UpdateResourceForm(FlaskForm):
                                               message=ERR_NOT_ALLOWED_SITE)])
 
     recording = FieldList(StringField(),
-                          'קישורים להקלטות',
-                          min_entries=5)
+                          'קישור להקלטה',
+                          min_entries=1)
 
     recording_comment = FieldList(StringField(),
-                                  'הערות להקלטות',
-                                  min_entries=5)
+                                  'הערות להקלטה',
+                                  min_entries=1)
 
     subject = StringField('נושאים (מופרדים בפסיק)')
 

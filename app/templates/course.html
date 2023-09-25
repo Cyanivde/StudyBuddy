@@ -65,30 +65,9 @@
           <td class="text-start">
             {% if resource.recording %}
             <a target="_blank" href="{{ resource.recording }}">הקלטה
-              {% if resource.recording2 %}חלק 1{% endif %}
             </a>
             {% endif %}
             {% if resource.recording_comment %}({{ resource.recording_comment }}){% endif %}
-            {% if resource.recording2 %}
-            <br />
-            <a target="_blank" href="{{ resource.recording2 }}">הקלטה חלק 2</a>
-            {% endif %}
-            {% if resource.recording2_comment %}({{ resource.recording2_comment }}){% endif %}
-            {% if resource.recording3 %}
-            <br />
-            <a target="_blank" href="{{ resource.recording3 }}">הקלטה חלק 3</a>
-            {% endif %}
-            {% if resource.recording3_comment %}({{ resource.recording3_comment }}){% endif %}
-            {% if resource.recording4 %}
-            <br />
-            <a target="_blank" href="{{ resource.recording4 }}">הקלטה חלק 4</a>
-            {% endif %}
-            {% if resource.recording4_comment %}({{ resource.recording4_comment }}){% endif %}
-            {% if resource.recording5 %}
-            <br />
-            <a target="_blank" href="{{ resource.recording5 }}">הקלטה חלק 5</a>
-            {% endif %}
-            {% if resource.recording5_comment %}({{ resource.recording5_comment }}){% endif %}
           </td>
           <td class="text-center">
             {% for subject in resource.subject %}

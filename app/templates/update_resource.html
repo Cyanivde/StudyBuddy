@@ -1,88 +1,77 @@
 {% extends "form.html" %}
 {% block addition_to_form %}
-    <script>
-        var infoAlert = document.createElement("div");
-        infoAlert.role="alert";
-        infoAlert.classList.add('alert');
-        infoAlert.classList.add('alert-info');
-        infoAlert.classList.add('mt-4');
-        infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" style="text-decoration:underline" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.';
-        document.getElementsByTagName('form')[0].prepend(infoAlert);
+<script>
+    var infoAlert = document.createElement("div");
+    infoAlert.role = "alert";
+    infoAlert.classList.add('alert');
+    infoAlert.classList.add('alert-info');
+    infoAlert.classList.add('mt-4');
+    infoAlert.innerHTML = 'לפני שמתחילים, יש להעלות את הקבצים ל<a target="_blank" class="alert-link" style="text-decoration:underline" href="https://technionmail.sharepoint.com/sites/StudyBuddy/Shared%20Documents/{{course_institute_id}}">כאן</a>.';
+    document.getElementsByTagName('form')[0].prepend(infoAlert);
 
-        {% if is_existing_resource %}
-            $("#type option[value='exam_full']").remove();
-        {% else %}
-            $("#type option[value='exam']").remove();
-        {% endif %}
+    {% if is_existing_resource %}
+    $("#type option[value='exam_full']").remove();
+    {% else %}
+    $("#type option[value='exam']").remove();
+    {% endif %}
 
-        document.getElementById('display_name').placeholder = "הרצאה 1";
-        document.getElementById('folder').placeholder = "שבוע 1";
+    document.getElementById('display_name').placeholder = "הרצאה 1";
+    document.getElementById('folder').placeholder = "שבוע 1";
 
-        function displayNamePlaceholder() {
-                var typeSelect = document.getElementById("type");
-                var val = typeSelect.options[typeSelect.selectedIndex].value;
-                if (val == "lesson") {
-                    document.getElementById('display_name').placeholder = "הרצאה 1";
-                    document.getElementById('folder').placeholder = "שבוע 1";
-                    $('label[for=questions_count], select#questions_count').hide();
-                    $('label[for=display_name], input#display_name').show();
-                    $('label[for=folder], input#folder').show();
-                } else if (val == "exam") {
-                    document.getElementById('display_name').placeholder = "שאלה 1";
-                    document.getElementById('folder').placeholder = "מועד א'";
-                    $('label[for=questions_count], select#questions_count').hide();
-                    $('label[for=display_name], input#display_name').show();
-                    $('label[for=folder], input#folder').show();
-                } else if (val == "exam_full") { 
-                    document.getElementById('folder').placeholder = "מועד א'";
-                    $('label[for=questions_count], select#questions_count').show();
-                    $('label[for=display_name], input#display_name').hide();
-                    $('label[for=folder], input#folder').show();
-                } else {
-                    document.getElementById('folder').placeholder = "";
-                    document.getElementById('display_name').placeholder = "";
-                    $('label[for=questions_count], select#questions_count').hide();
-                    $('label[for=display_name], input#display_name').show();
-                    $('label[for=folder], input#folder').hide();
-                }
-            };
+    function displayNamePlaceholder() {
+        var typeSelect = document.getElementById("type");
+        var val = typeSelect.options[typeSelect.selectedIndex].value;
+        if (val == "lesson") {
+            document.getElementById('display_name').placeholder = "הרצאה 1";
+            document.getElementById('folder').placeholder = "שבוע 1";
+            $('label[for=questions_count], select#questions_count').hide();
+            $('label[for=display_name], input#display_name').show();
+            $('label[for=folder], input#folder').show();
+        } else if (val == "exam") {
+            document.getElementById('display_name').placeholder = "שאלה 1";
+            document.getElementById('folder').placeholder = "מועד א'";
+            $('label[for=questions_count], select#questions_count').hide();
+            $('label[for=display_name], input#display_name').show();
+            $('label[for=folder], input#folder').show();
+        } else if (val == "exam_full") {
+            document.getElementById('folder').placeholder = "מועד א'";
+            $('label[for=questions_count], select#questions_count').show();
+            $('label[for=display_name], input#display_name').hide();
+            $('label[for=folder], input#folder').show();
+        } else {
+            document.getElementById('folder').placeholder = "";
+            document.getElementById('display_name').placeholder = "";
+            $('label[for=questions_count], select#questions_count').hide();
+            $('label[for=display_name], input#display_name').show();
+            $('label[for=folder], input#folder').hide();
+        }
+    };
 
-        document.getElementById("type").onchange =displayNamePlaceholder;
-            
+    document.getElementById("type").onchange = displayNamePlaceholder;
+
     displayNamePlaceholder();
-    
-    document.getElementById('recording-0').placeholder = "קישור";
-    document.getElementById('recording-1').placeholder = "קישור לחלק 2 (אם יש)";
-    document.getElementById('recording-2').placeholder = "קישור לחלק 3 (אם יש)";
-    document.getElementById('recording-3').placeholder = "קישור לחלק 4 (אם יש)";
-    document.getElementById('recording-4').placeholder = "קישור לחלק 5 (אם יש)";
-    document.getElementById('recording_comment-0').placeholder = "הערות";
-    document.getElementById('recording_comment-1').placeholder = "הערות לחלק 2 (אם יש)";
-    document.getElementById('recording_comment-2').placeholder = "הערות לחלק 3 (אם יש)";
-    document.getElementById('recording_comment-3').placeholder = "הערות לחלק 4 (אם יש)";
-    document.getElementById('recording_comment-4').placeholder = "הערות לחלק 5 (אם יש)";
 
 
     {% for subject in course_subjects %}
-        var subjectButton = document.createElement("button");
-            subjectButton.type="button";
-            subjectButton.classList.add('btn');
-            subjectButton.classList.add('btn-outline-primary');
-            subjectButton.classList.add('btn-sm');
-            subjectButton.innerHTML = "{{subject}}";
-            subjectButton.addEventListener("click", addSubject, false);
-            document.getElementById('subject').parentElement.append(subjectButton);
+    var subjectButton = document.createElement("button");
+    subjectButton.type = "button";
+    subjectButton.classList.add('btn');
+    subjectButton.classList.add('btn-outline-primary');
+    subjectButton.classList.add('btn-sm');
+    subjectButton.innerHTML = "{{subject}}";
+    subjectButton.addEventListener("click", addSubject, false);
+    document.getElementById('subject').parentElement.append(subjectButton);
     {% endfor %}
 
     {% for creator in course_creators %}
-        var creatorButton = document.createElement("button");
-            creatorButton.type="button";
-            creatorButton.classList.add('btn');
-            creatorButton.classList.add('btn-outline-primary');
-            creatorButton.classList.add('btn-sm');
-            creatorButton.innerHTML = "{{creator}}";
-            creatorButton.addEventListener("click", addInstructor, false);
-            document.getElementById('creator').parentElement.append(creatorButton);
+    var creatorButton = document.createElement("button");
+    creatorButton.type = "button";
+    creatorButton.classList.add('btn');
+    creatorButton.classList.add('btn-outline-primary');
+    creatorButton.classList.add('btn-sm');
+    creatorButton.innerHTML = "{{creator}}";
+    creatorButton.addEventListener("click", addInstructor, false);
+    document.getElementById('creator').parentElement.append(creatorButton);
     {% endfor %}
 
     function addSubject(event) {
@@ -93,7 +82,7 @@
             if (subjectInput.value != '') {
                 subjectInput.value = subjectInput.value + ','
             }
-        subjectInput.value = subjectInput.value + subject;
+            subjectInput.value = subjectInput.value + subject;
         }
     }
 
@@ -105,9 +94,9 @@
             if (creatorInput.value != '') {
                 creatorInput.value = creatorInput.value + ','
             }
-        creatorInput.value = creatorInput.value + creator;
+            creatorInput.value = creatorInput.value + creator;
         }
     }
 
-    </script>
+</script>
 {% endblock addition_to_form %}
